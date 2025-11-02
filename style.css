@@ -1,17 +1,4 @@
+/* Définition de la police Inter comme police par défaut */
 body {
-    background-color: #1a1a1a; /* Un fond gris très foncé */
-    color: #ffffff; /* Un texte blanc */
-    font-family: Arial, sans-serif;
-    padding: 40px;
-    line-height: 1.6;
-}
-
-h1 {
-    color: #0099ff; /* Un titre bleu vif */
-    border-bottom: 2px solid #0099ff;
-    padding-bottom: 10px;
-}
-
-p {
-    font-size: 1.1rem;
+    font-family: 'Inter', sans-serif;
 }
