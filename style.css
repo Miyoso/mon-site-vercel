@@ -110,3 +110,16 @@ h1 {
     55% { opacity: 0.7; text-shadow: none; }
     57% { opacity: 1; text-shadow: 0 0 2px #eaeaea; }
 }
+
+/* --- Animations --- */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Le curseur sera vert "hacker" */
+.blinker {
+    animation: blink 1s infinite step-end;
+    color: #00ff00; 
+    margin-left: 5px;
+}
