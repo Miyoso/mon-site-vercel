@@ -211,3 +211,61 @@ h1 {
         transform: translate(0, 0);
     }
 }
+
+/* --- AJOUT: Styles pour le formulaire de login --- */
+
+.login-form {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.login-form label {
+    font-size: 1rem;
+    color: #888;
+}
+
+.login-input {
+    font-family: 'Share Tech Mono', monospace;
+    background-color: #111;
+    border: 1px solid #333;
+    color: #eaeaea;
+    font-size: 1.5rem;
+    padding: 0.75rem;
+}
+.login-input:focus {
+    outline: none;
+    border-color: #00ff00;
+}
+
+.login-button {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.2rem;
+    color: #000;
+    background-color: #00ff00;
+    border: none;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.login-button:hover {
+    background-color: #fff;
+    box-shadow: 0 0 15px #00ff00;
+}
+
+.error-message {
+    /* Le JS gère la couleur */
+    font-size: 1rem;
+    text-align: center;
+    height: 1rem; /* Garde l'espace même si le message est vide */
+}
+
+/* --- AJOUT: Style pour le contenu des rapports --- */
+.report-content {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #050505;
+    border: 1px solid #222;
+    min-height: 200px;
+}
