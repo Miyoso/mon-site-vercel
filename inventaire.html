@@ -6,14 +6,7 @@
     <title>SAS - Inventaire (Niv 3)</title>
 
     <script>
-        // --- SCRIPT DE SÉCURITÉ ---
-        const REQUIRED_LEVEL = 3; 
-        // -------------------------
-        const userLevel = parseInt(localStorage.getItem('sas_level') || 0);
-        if (userLevel < REQUIRED_LEVEL) {
-            alert("//: ACCREDITATION INSUFFISANTE (NIVEAU " + REQUIRED_LEVEL + " REQUIS)");
-            window.location.href = 'login.html';
-        }
+        const REQUIRED_LEVEL = 3;
     </script>
     
     <link rel="stylesheet" href="style.css">

@@ -415,3 +415,201 @@ h1 {
     margin-bottom: 0.25rem;
     text-transform: uppercase;
 }
+
+/* --- AJOUT: Styles pour la page ACCESS DENIED --- */
+
+.access-denied-body {
+    background-color: #000;
+    overflow: hidden; /* Empêche les barres de défilement pour les glitches */
+}
+
+/* Effet glitch énorme pour le titre */
+.glitch-wrapper {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* Pour pouvoir cliquer sur le terminal en dessous */
+    z-index: 100;
+    opacity: 0.1; /* Très transparent pour un effet de fond */
+}
+
+.glitch-text-huge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8rem; /* Très gros */
+    color: #ff0000;
+    text-shadow: 0 0 5px #ff0000;
+    position: relative;
+    animation: text-flicker 0.1s infinite alternate;
+}
+
+.glitch-text-huge::before,
+.glitch-text-huge::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch-text-huge::before {
+    left: 2px;
+    text-shadow: -2px 0 #00ff00;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
+.glitch-text-huge::after {
+    left: -2px;
+    text-shadow: -2px 0 #0000ff;
+    clip: rect(85px, 450px, 110px, 0);
+    animation: glitch-anim2 3s infinite linear alternate-reverse;
+}
+
+/* Animations pour le gros glitch */
+@keyframes text-flicker {
+    0% { opacity: 0.9; }
+    50% { opacity: 1; }
+    100% { opacity: 0.9; }
+}
+@keyframes glitch-anim {
+    0% { clip: rect(100px, 9999px, 0, 0); transform: skew(0.5deg); }
+    5% { clip: rect(25px, 9999px, 0, 0); transform: skew(0.2deg); }
+    10% { clip: rect(70px, 9999px, 0, 0); transform: skew(0.8deg); }
+    15% { clip: rect(120px, 9999px, 0, 0); transform: skew(-0.3deg); }
+    20% { clip: rect(50px, 9999px, 0, 0); transform: skew(0.1deg); }
+    25% { clip: rect(90px, 9999px, 0, 0); transform: skew(-0.6deg); }
+    30% { clip: rect(30px, 9999px, 0, 0); transform: skew(0.4deg); }
+    35% { clip: rect(110px, 9999px, 0, 0); transform: skew(-0.2deg); }
+    40% { clip: rect(60px, 9999px, 0, 0); transform: skew(0.7deg); }
+    45% { clip: rect(80px, 9999px, 0, 0); transform: skew(-0.1deg); }
+    50% { clip: rect(10px, 9999px, 0, 0); transform: skew(0.3deg); }
+    55% { clip: rect(130px, 9999px, 0, 0); transform: skew(-0.4deg); }
+    60% { clip: rect(40px, 9999px, 0, 0); transform: skew(0.6deg); }
+    65% { clip: rect(105px, 9999px, 0, 0); transform: skew(-0.7deg); }
+    70% { clip: rect(75px, 9999px, 0, 0); transform: skew(0.2deg); }
+    75% { clip: rect(15px, 9999px, 0, 0); transform: skew(-0.5deg); }
+    80% { clip: rect(95px, 9999px, 0, 0); transform: skew(0.8deg); }
+    85% { clip: rect(65px, 9999px, 0, 0); transform: skew(-0.3deg); }
+    90% { clip: rect(125px, 9999px, 0, 0); transform: skew(0.1deg); }
+    95% { clip: rect(20px, 9999px, 0, 0); transform: skew(-0.2deg); }
+    100% { clip: rect(0, 9999px, 0, 0); transform: skew(0deg); }
+}
+@keyframes glitch-anim2 {
+    0% { clip: rect(15px, 9999px, 0, 0); transform: skew(0.8deg); }
+    5% { clip: rect(95px, 9999px, 0, 0); transform: skew(-0.3deg); }
+    10% { clip: rect(65px, 9999px, 0, 0); transform: skew(0.1deg); }
+    15% { clip: rect(125px, 9999px, 0, 0); transform: skew(-0.2deg); }
+    20% { clip: rect(20px, 9999px, 0, 0); transform: skew(0.5deg); }
+    25% { clip: rect(100px, 9999px, 0, 0); transform: skew(0.2deg); }
+    30% { clip: rect(25px, 9999px, 0, 0); transform: skew(0.8deg); }
+    35% { clip: rect(70px, 9999px, 0, 0); transform: skew(-0.3deg); }
+    40% { clip: rect(120px, 9999px, 0, 0); transform: skew(0.1deg); }
+    45% { clip: rect(50px, 9999px, 0, 0); transform: skew(-0.6deg); }
+    50% { clip: rect(90px, 9999px, 0, 0); transform: skew(0.4deg); }
+    55% { clip: rect(30px, 9999px, 0, 0); transform: skew(-0.2deg); }
+    60% { clip: rect(110px, 9999px, 0, 0); transform: skew(0.7deg); }
+    65% { clip: rect(60px, 9999px, 0, 0); transform: skew(-0.1deg); }
+    70% { clip: rect(80px, 9999px, 0, 0); transform: skew(0.3deg); }
+    75% { clip: rect(10px, 9999px, 0, 0); transform: skew(-0.4deg); }
+    80% { clip: rect(130px, 9999px, 0, 0); transform: skew(0.6deg); }
+    85% { clip: rect(40px, 9999px, 0, 0); transform: skew(-0.7deg); }
+    90% { clip: rect(105px, 9999px, 0, 0); transform: skew(0.2deg); }
+    95% { clip: rect(75px, 9999px, 0, 0); transform: skew(-0.5deg); }
+    100% { clip: rect(0, 9999px, 0, 0); transform: skew(0deg); }
+}
+
+
+.access-denied-terminal {
+    background-color: rgba(30, 0, 0, 0.8); /* Fond rouge sombre transparent */
+    border-color: #f00;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.5), inset 0 0 15px rgba(255, 0, 0, 0.2);
+    position: relative;
+    z-index: 101; /* Pour être au-dessus de l'effet glitch global */
+}
+
+.access-denied-terminal h1 {
+    color: #ff4141; /* Rouge pour le titre */
+    text-shadow: 0 0 5px #ff4141, 0 0 10px #ff0000;
+    animation: flicker-red 1s linear infinite;
+}
+
+.error-code {
+    color: #ff0000;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 3px #ff0000;
+}
+
+.warning-message {
+    color: #ff9999;
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    text-align: center;
+}
+
+.data-glitch-block {
+    margin-top: 2rem;
+    padding: 1rem;
+    border: 1px dashed #f00;
+    background-color: #1a0000;
+    text-align: left;
+    color: #fff;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+.data-glitch-block p {
+    margin-bottom: 0.5rem;
+}
+
+/* Version rouge du data-glitched */
+.data-glitched-red {
+    display: inline-block;
+    color: #00ff00; /* Texte vert pour le glitch, contraste avec le rouge */
+    min-width: 80px; 
+    text-align: center;
+    position: relative;
+}
+.data-glitched-red::before {
+    content: '8923#@&1'; /* Contenu initial */
+    display: inline-block;
+    animation: glitch-text-red 100ms infinite step-end;
+}
+@keyframes glitch-text-red {
+    0% { content: '404$#@&1'; }
+    10% { content: '9!A45S&?'; }
+    20% { content: 'ACCESS_DENIED'; }
+    30% { content: '12S4>9#%'; }
+    40% { content: '9B*123&1'; }
+    50% { content: 'ERROR_0X00FF'; }
+    60% { content: '5*<1!2A*'; }
+    70% { content: 'C&12S4!@'; }
+    80% { content: '312S4$*?'; }
+    90% { content: 'SYSTEM_LOCK'; }
+    100% { content: '1S>91*!&'; }
+}
+
+
+.access-denied-footer .back-link {
+    color: #ff4141;
+    text-shadow: 0 0 5px #ff4141;
+}
+.access-denied-footer .back-link:hover {
+    background-color: #ff4141;
+    color: #000;
+}
+
+/* Petite animation de "flicker" rouge */
+@keyframes flicker-red {
+    0%, 100% { opacity: 1; text-shadow: 0 0 2px #ff4141; }
+    50% { opacity: 0.8; text-shadow: none; }
+    52% { opacity: 1; text-shadow: 0 0 2px #ff4141; }
+    55% { opacity: 0.7; text-shadow: none; }
+    57% { opacity: 1; text-shadow: 0 0 2px #ff4141; }
+}
