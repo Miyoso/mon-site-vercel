@@ -6,25 +6,20 @@
 }
 
 body {
-    /* Police "Hacker" */
     font-family: 'Share Tech Mono', monospace; 
     background-color: #000000;
-    color: #c5c5c5; /* Gris clair */
+    color: #c5c5c5;
     display: flex;
     justify-content: center;
     align-items: flex-start;
     min-height: 100vh;
     padding: 2rem;
-    
-    /* Effet de "scanlines" sur l'écran */
     background-image: linear-gradient(
         to bottom,
         rgba(18, 18, 18, 0.5) 50%,
         rgba(0, 0, 0, 0.25) 50%
     );
     background-size: 100% 4px;
-
-    /* AJOUT: Animation de la scanline */
     animation: animateScanline 8s linear infinite;
 }
 
@@ -74,17 +69,84 @@ h1 {
     color: #ff4141;
 }
 
-/* --- Liste des Agents --- */
+/* --- AJOUT: Menu du Portail --- */
+.portal-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.portal-link {
+    text-decoration: none;
+    color: #c5c5c5;
+    background-color: #111;
+    border: 1px solid #222;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    transition: all 0.2s ease-in-out;
+}
+.portal-link .link-title {
+    color: #eaeaea;
+}
+.portal-link .link-status {
+    font-size: 0.9rem;
+    color: #00ff00; /* Vert */
+}
+
+.portal-link.disabled {
+    cursor: not-allowed;
+}
+.portal-link.disabled .link-title {
+    color: #555;
+}
+.portal-link.disabled .link-status {
+    color: #ff4141; /* Rouge */
+}
+
+.portal-link:not(.disabled):hover {
+    background-color: #c5c5c5;
+    color: #000;
+    box-shadow: 0 0 15px rgba(197, 197, 197, 0.5);
+}
+.portal-link:not(.disabled):hover .link-title {
+    color: #000;
+    animation: glitchEffect 150ms 2; /* Réutilise l'effet glitch */
+}
+.portal-link:not(.disabled):hover .link-status {
+    color: #000;
+}
+
+/* --- AJOUT: Pied de page du Portail --- */
+.portal-footer {
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid #333;
+    text-align: center;
+}
+.back-link {
+    text-decoration: none;
+    color: #00ff00;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+.back-link:hover {
+    background-color: #00ff00;
+    color: #000;
+    padding: 2px 4px;
+}
+
+/* --- Liste des Agents (de l'ancienne page) --- */
 .agent-list {
     list-style-type: none;
 }
-
 .agent-list li {
     margin-bottom: 0.5rem;
     border: 1px solid #222;
     transition: all 0.2s ease-in-out;
 }
-
 .agent-list a {
     display: block;
     text-decoration: none;
@@ -92,24 +154,17 @@ h1 {
     padding: 0.75rem 1rem;
     background-color: #111;
     transition: all 0.2s ease-in-out;
-    /* AJOUT: Requis pour le positionnement du glitch */
     position: relative; 
 }
-
-/* --- Effet de survol (Glitch) --- */
-/* MODIFIÉ: Remplacement de l'ancien hover */
 .agent-list a:hover,
 .agent-list a:focus {
-    color: #fff; /* Rend le texte plus lumineux */
-    background-color: #151515; /* Assombrit légèrement le fond */
-    
-    /* L'animation "glitch" est rapide et se joue 2 fois */
+    color: #fff;
+    background-color: #151515;
     animation: glitchEffect 150ms 2;
 }
 
-/* --- Animations --- */
 
-/* Animation de "flicker" pour le titre */
+/* --- Animations --- */
 @keyframes flicker {
     0%, 100% { opacity: 1; text-shadow: 0 0 2px #eaeaea; }
     50% { opacity: 0.8; text-shadow: none; }
@@ -118,7 +173,6 @@ h1 {
     57% { opacity: 1; text-shadow: 0 0 2px #eaeaea; }
 }
 
-/* Animation du curseur qui clignote */
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
@@ -130,18 +184,11 @@ h1 {
     margin-left: 5px;
 }
 
-/* AJOUT: Animation de la scanline */
 @keyframes animateScanline {
-    from { 
-        background-position: 0 0; 
-    }
-    to { 
-        /* La valeur 4px correspond à la hauteur de la scanline (background-size) */
-        background-position: 0 4px; 
-    }
+    from { background-position: 0 0; }
+    to { background-position: 0 4px; }
 }
 
-/* AJOUT: Animation du glitch au survol */
 @keyframes glitchEffect {
     0% {
         text-shadow: 1px 0 #ff4141, -1px 0 #00ff00;
