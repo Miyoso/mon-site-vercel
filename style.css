@@ -23,6 +23,9 @@ body {
         rgba(0, 0, 0, 0.25) 50%
     );
     background-size: 100% 4px;
+
+    /* AJOUT: Animation de la scanline */
+    animation: animateScanline 8s linear infinite;
 }
 
 /* --- Terminal --- */
@@ -43,19 +46,17 @@ body {
     height: auto;
     margin: 0 auto 1.5rem auto;
     opacity: 0.8;
-    /* Assure que le logo est monochrome et lumineux */
     filter: grayscale(100%) brightness(1.2);
 }
 
 /* --- Textes --- */
 h1 {
-    color: #eaeaea; /* Blanc cassé */
+    color: #eaeaea; 
     text-align: center;
     font-size: 2rem;
     letter-spacing: 3px;
     text-transform: uppercase;
     margin-bottom: 0.5rem;
-    /* Légère animation de "flicker" */
     animation: flicker 4s linear infinite;
 }
 
@@ -67,10 +68,10 @@ h1 {
 }
 
 .status .secure {
-    color: #00ff00; /* Vert "hacker" */
+    color: #00ff00;
 }
 .status .restricted {
-    color: #ff4141; /* Rouge "danger" */
+    color: #ff4141;
 }
 
 /* --- Liste des Agents --- */
@@ -91,16 +92,22 @@ h1 {
     padding: 0.75rem 1rem;
     background-color: #111;
     transition: all 0.2s ease-in-out;
+    /* AJOUT: Requis pour le positionnement du glitch */
+    position: relative; 
 }
 
-/* --- Effet de survol --- */
+/* --- Effet de survol (Glitch) --- */
+/* MODIFIÉ: Remplacement de l'ancien hover */
 .agent-list a:hover,
 .agent-list a:focus {
-    background-color: #c5c5c5; /* Fond gris */
-    color: #000000; /* Texte noir */
-    padding-left: 1.5rem; /* Décale le texte */
-    box-shadow: 0 0 15px rgba(197, 197, 197, 0.5); /* Lueur grise */
+    color: #fff; /* Rend le texte plus lumineux */
+    background-color: #151515; /* Assombrit légèrement le fond */
+    
+    /* L'animation "glitch" est rapide et se joue 2 fois */
+    animation: glitchEffect 150ms 2;
 }
+
+/* --- Animations --- */
 
 /* Animation de "flicker" pour le titre */
 @keyframes flicker {
@@ -111,15 +118,49 @@ h1 {
     57% { opacity: 1; text-shadow: 0 0 2px #eaeaea; }
 }
 
-/* --- Animations --- */
+/* Animation du curseur qui clignote */
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
 }
 
-/* Le curseur sera vert "hacker" */
 .blinker {
     animation: blink 1s infinite step-end;
     color: #00ff00; 
     margin-left: 5px;
+}
+
+/* AJOUT: Animation de la scanline */
+@keyframes animateScanline {
+    from { 
+        background-position: 0 0; 
+    }
+    to { 
+        /* La valeur 4px correspond à la hauteur de la scanline (background-size) */
+        background-position: 0 4px; 
+    }
+}
+
+/* AJOUT: Animation du glitch au survol */
+@keyframes glitchEffect {
+    0% {
+        text-shadow: 1px 0 #ff4141, -1px 0 #00ff00;
+        transform: translate(0, 0);
+    }
+    25% {
+        text-shadow: -1px 0 #00ff00, 1px 0 #ff4141;
+        transform: translate(2px, -2px);
+    }
+    50% {
+        text-shadow: 1px 0 #ff4141, -1px 0 #00ff00;
+        transform: translate(-2px, 2px);
+    }
+    75% {
+        text-shadow: -1px 0 #00ff00, 1px 0 #ff4141;
+        transform: translate(2px, 0);
+    }
+    100% {
+        text-shadow: 1px 0 #ff4141, -1px 0 #00ff00;
+        transform: translate(0, 0);
+    }
 }
