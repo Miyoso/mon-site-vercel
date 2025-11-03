@@ -34,64 +34,53 @@
     </main>
 
     <script>
-        // --- NOTRE FAUSSE BASE DE DONNÉES D'AGENTS ---
-        const agentDatabase = {
-            "Graves": {
-                password: "alpha3", // Mettez le mdp que vous voulez
-                level: 3
-            },
-            "Miyoso": {
-                password: "Test", // L'ancien mdp
-                level: 2
-            },
-            "Recrue": {
-                password: "12345",
-                level: 1
-            }
-        };
-        // ---------------------------------------------
-
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault(); 
             
-            let usernameInput = document.getElementById('username');
-            let passwordInput = document.getElementById('password');
-            let errorMessage = document.getElementById('errorMessage');
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const button = document.querySelector('.login-button');
 
-            let username = usernameInput.value;
-            let password = passwordInput.value;
+            button.disabled = true; // Désactive le bouton
+            errorMessage.textContent = "//: CONNECTING TO MAINFRAME...";
+            errorMessage.style.color = "#c5c5c5";
 
-            // 1. L'agent existe-t-il ?
-            if (agentDatabase[username]) {
-                
-                let agent = agentDatabase[username];
+            try {
+                // 1. On envoie les données au "Cerveau" (API)
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
 
-                // 2. Le mot de passe est-il correct ?
-                if (agent.password === password) {
-                    
-                    // ON STOCKE LES INFOS DE SESSION
-                    localStorage.setItem('sas_user', username);
-                    localStorage.setItem('sas_level', agent.level);
+                const data = await response.json();
 
-                    errorMessage.textContent = `//: ACCREDITATION_LEVEL_${agent.level}_ACCEPTED... WELCOME, ${username}.`;
+                if (data.success) {
+                    // --- SUCCÈS ---
+                    // Le "Cerveau" a dit OUI.
+                    localStorage.setItem('sas_user', data.user);
+                    localStorage.setItem('sas_level', data.level);
+
+                    errorMessage.textContent = `//: ACCREDITATION_LEVEL_${data.level}_ACCEPTED... WELCOME, ${data.user}.`;
                     errorMessage.style.color = "#00ff00";
                     
-                    setTimeout(function() {
+                    setTimeout(() => {
                         window.location.href = "index.html"; // On envoie au portail
                     }, 1500);
 
                 } else {
-                    // Mdp incorrect
-                    errorMessage.textContent = "//: ERROR :: PASSPHRASE_INCORRECT";
+                    // --- ÉCHEC ---
+                    // Le "Cerveau" a dit NON.
+                    errorMessage.textContent = data.message;
                     errorMessage.style.color = "#ff4141";
-                    passwordInput.value = "";
+                    button.disabled = false; // Réactive le bouton
                 }
-            } else {
-                // Agent inconnu
-                errorMessage.textContent = "//: ERROR :: AGENT_ID_UNKNOWN";
+            } catch (error) {
+                // Erreur de connexion au "Cerveau"
+                errorMessage.textContent = "//: ERROR :: MAINFRAME_CONNECTION_FAILED";
                 errorMessage.style.color = "#ff4141";
-                usernameInput.value = "";
-                passwordInput.value = "";
+                button.disabled = false;
             }
         });
     </script>
