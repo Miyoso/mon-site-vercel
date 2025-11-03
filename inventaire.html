@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAS - Inventaire (Niv 3)</title>
+
+    <script>
+        // --- SCRIPT DE SÉCURITÉ ---
+        const REQUIRED_LEVEL = 3; 
+        // -------------------------
+        const userLevel = parseInt(localStorage.getItem('sas_level') || 0);
+        if (userLevel < REQUIRED_LEVEL) {
+            alert("//: ACCREDITATION INSUFFISANTE (NIVEAU " + REQUIRED_LEVEL + " REQUIS)");
+            window.location.href = 'login.html';
+        }
+    </script>
+    
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
