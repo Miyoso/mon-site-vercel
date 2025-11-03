@@ -14,7 +14,7 @@ export default async function handler(request, response) {
     }
 
     // NE PAS SUPPRIMER L'AGENT "GRAVES" (Niveau 3)
-    // C'est une sécurité pour que vous ne vous bloquiez pas vous-même
+
     if (parseInt(agentId) === 1) { // 1 est l'ID de Graves
          return response.status(403).json({ error: 'OPERATION REFUSEE: Impossible de supprimer un admin (Niv 3).' });
     }

@@ -224,7 +224,7 @@ h4.liabilities { color: #ff4141; margin-top: 1rem; }
     }
 }
 
-/* --- MODIFICATION: Animation "data glitched" --- */
+
 .data-glitched {
     display: inline-block;
     color: #ff4141; /* Rouge pour montrer que c'est buggé */
@@ -256,7 +256,7 @@ h4.liabilities { color: #ff4141; margin-top: 1rem; }
     100% { content: '1S>91*!&'; }
 }
 
-/* --- AJOUT: Styles pour les dossiers corrompus --- */
+
 
 /* Conteneur principal corrompu */
 .file-container.corrupted {
@@ -294,7 +294,7 @@ h4.liabilities { color: #ff4141; margin-top: 1rem; }
 }
 
 
-/* Effet de texte glitch général (plus subtil) */
+/* Effet de texte glitch général */
 .glitch-text {
     animation: text-glitch-small 2s infinite step-end;
 }
@@ -439,11 +439,9 @@ h4.liabilities { color: #ff4141; margin-top: 1rem; }
 
 /* --- AJOUT: Style pour le watermark "DECEASED" --- */
 
-/* --- AJOUT: Style pour le watermark "DECEASED" --- */
-
 .deceased-watermark {
     position: fixed;
-    /* On le met au-dessus (101) du contenu (100) */
+  
     z-index: 101; 
 
     top: 50%;
