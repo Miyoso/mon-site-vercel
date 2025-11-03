@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dossier Agent :: NYX_BLACKWOOD</title>
+
+    <script>
+        const REQUIRED_LEVEL = 1;
+    </script>
+    <script src="../security.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="style-nyx.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+</head>
+<body class="text-green-400 min-h-screen p-4 md:p-8 scanline">
+
+    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50">
+        <header class="font-tech text-lg md:text-xl p-4 bg-green-900/30 border-b-2 border-green-700/50 flex justify-between items-center">
+            <span>[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3 REQUIS]</span>
+            <span class="text-red-500 animate-pulse">● REC</span>
+        </header>
+
+        <div class="p-6 md:p-8 space-y-8">
+            
+            <div>
+                <span class="text-green-300">$</span> <span class="text-white">load --dossier=AGENT_BLACKWOOD_NYX</span>
+                <p class="text-cyan-400">... Chargement du dossier ...</p>
+                <p class="text-green-400">Authentification réussie. Affichage des données publiques.</p>
+                <span class="text-green-300">$</span> <span class="cursor-blink"></span>
+            </div>
+
+            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
+                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 01 : IDENTIFICATION PUBLIQUE]</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-slate-400">NOM DE L'AGENT :</p>
+                        <p class="text-xl text-white">BLACKWOOD, NYX</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400">ALIAS CONNUS :</p>
+                        <p class="text-xl text-white">"ZERO", "NULL", "GHOST"</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400">STATUT ACTUEL :</p>
+                        <p class="text-xl text-yellow-400">ACTIF (NON-SANCTIONNÉ)</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400">NIVEAU DE MENACE :</p>
+                        <p class="text-xl text-red-500">VARIABLE (ÉLEVÉ)</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
+
+            <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
+                <h2 class="font-tech text-2xl text-red-400 mb-4">[SECTION 02 : HISTORIQUE - NIVEAU 5 REQUIS]</h2>
+                <div class="bg-black/30 p-4 rounded">
+                    <p class="text-red-400">[ACCÈS VERROUILLÉ - CHIFFREMENT AES-256]</p>
+                    <p class="encrypted text-sm select-none">
+                        Nyx Blackwood (née le 27 mai 1999) est l'enfant prodige d'une dynastie technologique... 
+                        b8 00 00 00 b8 00 00 00 00 00 00 00 00 00 00 00
+                        ...Suite à certaines "découvertes" troublantes...
+                        48 65 6c 6c 6f 20 57 6f 72 6c 64 21 0a 00 00 00
+                        ...elle décida de s'émanciper et de couper les ponts...
+                        31 32 33 34 35 36 37 38 39 30 00 00 00 00 00 00
+                        ...Cherchant à repartir de zéro... 
+                        f0 9f 92 bb f0 9f 92 bb f0 9f 92 bb 00 00 00 00
+                        ...[DONNÉES CORROMPUES]...
+                    </p>
+                </div>
+            </section>
+
+            <section class="border border-yellow-600/30 p-4 rounded-lg bg-yellow-900/10">
+                <h2 class="font-tech text-2xl text-yellow-400 mb-4">[SECTION 03 : COMPÉTENCES & OPÉRATIONS - NIVEAU 7 REQUIS]</h2>
+                <div class="bg-black/30 p-4 rounded">
+                    <p class="text-yellow-400">[ACCÈS VERROUILLÉ - CLÉ DE DÉCHIFFREMENT MANQUANTE]</p>
+                    <p class="encrypted text-sm select-none">
+                        [FICHIER: operations_datahaven.log]...
+                        2f 2f 20 43 6f 6d 70 65 74 65 6e 63 65 73 20...
+                        [FICHIER: analyse_psy_cortex.dat]...
+                        ...[DONNÉES CORROMPUES]...
+                        ...[DONNÉES CORROMPUES]...
+                        [FICHIER: contacts_actifs.db] (Verrouillé)...
+                        [FICHIER: transactions_crypto.bin] (Verrouillé)...
+                        01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+                    </p>
+                </div>
+            </section>
+
+             <div>
+                <span class="text-green-300">$</span> <span class="text-white">exit</span>
+                <p class="text-red-500">... Déconnexion ...</p>
+                <p class="text-slate-500">SESSION TERMINÉE.</p>
+                
+                <div class="mt-8 text-center border-t border-green-700/50 pt-4">
+                    <a href="../database.html" class="font-tech text-green-400 hover:text-white hover:bg-green-700 p-2 transition-all">
+                        &lt;&lt; RETURN_TO_DATABASE
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
