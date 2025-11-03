@@ -77,6 +77,19 @@
                 <button type="submit" class="form-button">&gt;&gt; CONFIRMER LA MISE À JOUR</button>
                 <p id="update-form-message" class="form-message"></p>
             </form>
+
+            <h3 class="category-title" id="form-title-delete">//: SUPPRIMER UN OBJET (IRRÉVERSIBLE)</h3>
+            <form id="delete-item-form" class="assignment-form">
+                
+                <label for="delete-item-select">//: SÉLECTIONNER L'OBJET À SUPPRIMER</label>
+                <select id="delete-item-select" name="itemId" class="form-select" required>
+                    <option value="">-- En attente de l'API... --</option>
+                </select>
+                
+                <button type="submit" class="form-button delete">&gt;&gt; SUPPRIMER DÉFINITIVEMENT</button>
+                <p id="delete-form-message" class="form-message"></p>
+            </form>
+
         </div>
 
         <footer class="portal-footer">
@@ -88,14 +101,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // On récupère les éléments
             const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
             document.getElementById('agent-name-display').textContent = agentName;
             const inventoryContainer = document.getElementById('inventory-container');
             
-            // On récupère les listes déroulantes (pour les remplir)
             const updateItemSelect = document.getElementById('update-item-select');
             const updateAgentSelect = document.getElementById('update-agent-select');
+            const deleteItemSelect = document.getElementById('delete-item-select'); // NOUVEAU
 
             // --- FONCTION 1 : AFFICHER L'INVENTAIRE ---
             async function fetchAndDisplayInventory() {
@@ -127,13 +139,13 @@
                                 </ul>
                             </li>
                         `;
-                        // Prépare la liste pour le formulaire de MISE A JOUR
                         itemOptionsHTML += `<option value="${item.id}">${item.item_name} (N°: ${item.serial_number})</option>`;
                     });
                     htmlToInsert += `</ul>`;
                     
                     inventoryContainer.innerHTML = htmlToInsert;
-                    updateItemSelect.innerHTML = itemOptionsHTML; // Remplit la liste du formulaire
+                    updateItemSelect.innerHTML = itemOptionsHTML;
+                    deleteItemSelect.innerHTML = itemOptionsHTML; // NOUVEAU: Remplit aussi la liste de suppression
 
                 } catch (error) {
                     console.error('Erreur:', error);
@@ -185,9 +197,9 @@
                     
                     addMessageEl.textContent = 'Objet ajouté ! Mise à jour...';
                     addMessageEl.className = 'form-message success';
-                    addForm.reset(); // Vide le formulaire
+                    addForm.reset();
                     
-                    setTimeout(fetchAndDisplayInventory, 500); // Recharge la liste
+                    setTimeout(fetchAndDisplayInventory, 500);
 
                 } catch (error) {
                     addMessageEl.textContent = `Erreur: ${error.message}`;
@@ -211,7 +223,6 @@
                         status: updateForm.status.value
                     };
                     
-                    // On appelle notre "Cerveau" (api/update-item.js)
                     const response = await fetch('/api/update-item', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -224,7 +235,7 @@
                     updateMessageEl.textContent = 'Objet mis à jour ! Mise à jour...';
                     updateMessageEl.className = 'form-message success';
                     
-                    setTimeout(fetchAndDisplayInventory, 500); // Recharge la liste
+                    setTimeout(fetchAndDisplayInventory, 500);
 
                 } catch (error) {
                     updateMessageEl.textContent = `Erreur: ${error.message}`;
@@ -232,9 +243,48 @@
                 }
             });
 
+            // --- FONCTION 5 : GÉRER LE FORMULAIRE "DELETE ITEM" (NOUVEAU) ---
+            const deleteForm = document.getElementById('delete-item-form');
+            const deleteMessageEl = document.getElementById('delete-form-message');
+            
+            deleteForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const itemId = deleteForm.itemId.value;
+                
+                // On demande une confirmation
+                if (!confirm("Voulez-vous vraiment supprimer cet objet ?\nCette action est IRRÉVERSIBLE.")) {
+                    return;
+                }
+
+                deleteMessageEl.textContent = 'Suppression en cours...';
+                deleteMessageEl.className = 'form-message';
+
+                try {
+                    const response = await fetch('/api/delete-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ itemId }) // On envoie juste l'ID
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+                    
+                    deleteMessageEl.textContent = 'Objet supprimé ! Mise à jour...';
+                    deleteMessageEl.className = 'form-message success';
+                    
+                    setTimeout(fetchAndDisplayInventory, 500); // Recharge toute la liste
+
+                } catch (error) {
+                    deleteMessageEl.textContent = `Erreur: ${error.message}`;
+                    deleteMessageEl.className = 'form-message error';
+                }
+            });
+
+
             // --- DÉMARRAGE ---
-            fetchAndDisplayInventory(); // Affiche la liste et remplit le formulaire 1
-            fetchAgentsForForm(); // Remplit le formulaire 2
+            fetchAndDisplayInventory();
+            fetchAgentsForForm(); 
         });
     </script>
 </body>

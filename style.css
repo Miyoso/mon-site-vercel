@@ -650,3 +650,16 @@ h1 {
 .full-width {
     grid-column: 1 / -1; 
 }
+
+/* --- AJOUT: Style pour le bouton de suppression --- */
+
+.form-button.delete {
+    background-color: #ff4141; /* Rouge */
+    color: #fff;
+    text-shadow: 0 0 5px #000;
+}
+.form-button.delete:hover {
+    background-color: #fff;
+    color: #ff4141;
+    box-shadow: 0 0 15px #ff4141;
+}
