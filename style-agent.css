@@ -255,3 +255,136 @@ h4.liabilities { color: #ff4141; margin-top: 1rem; }
     90% { content: '00X12S&1'; }
     100% { content: '1S>91*!&'; }
 }
+
+/* --- AJOUT: Styles pour les dossiers corrompus --- */
+
+/* Conteneur principal corrompu */
+.file-container.corrupted {
+    background-color: #0d0d0d; /* Fond légèrement plus clair */
+    border-color: #500; /* Bordure rouge sombre */
+    box-shadow: 0 0 25px rgba(255, 0, 0, 0.2), inset 0 0 10px rgba(255, 0, 0, 0.1);
+    animation: container-glitch 5s infinite linear alternate; /* Animation du conteneur */
+}
+
+/* En-tête corrompue */
+.corrupted-header {
+    background-color: #200; /* Fond rouge très sombre */
+    border-bottom-color: #500;
+}
+
+/* Sections corrompues */
+.corrupted-section {
+    border-bottom-color: #500;
+}
+.corrupted-grid .data-block {
+    border-color: #300;
+}
+
+/* Pied de page corrompu */
+.corrupted-footer {
+    border-top-color: #500;
+    background-color: #200;
+}
+.corrupted-footer .back-link {
+    color: #ff4141; /* Lien de retour rouge */
+}
+.corrupted-footer .back-link:hover {
+    background-color: #ff4141;
+    color: #000;
+}
+
+
+/* Effet de texte glitch général (plus subtil) */
+.glitch-text {
+    animation: text-glitch-small 2s infinite step-end;
+}
+.glitch-text-large {
+    animation: text-glitch-large 1s infinite step-end;
+    font-size: 2.5rem !important; /* Pour rendre le titre plus grand */
+}
+.glitch-text-small {
+    animation: text-glitch-small 0.8s infinite step-end;
+}
+.glitch-img {
+    filter: saturate(0) hue-rotate(90deg) contrast(1.5) blur(1px); /* Effet visuel sur l'image */
+    animation: image-glitch 0.5s infinite alternate;
+}
+
+
+/* --- Keyframes pour les effets de corruption --- */
+
+/* Glitch du conteneur entier */
+@keyframes container-glitch {
+    0% { transform: translate(0, 0) scale(1); }
+    10% { transform: translate(1px, -1px) scale(1.005); }
+    20% { transform: translate(-1px, 1px) scale(0.995); }
+    30% { transform: translate(1px, 1px) scale(1); }
+    40% { transform: translate(0, 0) scale(1.002); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+/* Texte glitch rapide */
+@keyframes text-glitch-small {
+    0% {
+        text-shadow: 1px 0 #ff4141, -1px 0 #00ff00;
+        transform: translate(0, 0);
+        opacity: 0.9;
+    }
+    5% {
+        text-shadow: -1px 0 #00ff00, 1px 0 #ff4141;
+        transform: translate(0.5px, -0.5px);
+        opacity: 0.8;
+    }
+    10% {
+        text-shadow: 1px 0 #ff4141, -1px 0 #00ff00;
+        transform: translate(-0.5px, 0.5px);
+        opacity: 0.95;
+    }
+    15% {
+        text-shadow: none;
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        text-shadow: none;
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+/* Texte glitch plus agressif pour les titres */
+@keyframes text-glitch-large {
+    0% {
+        text-shadow: 2px 0 #ff0000, -2px 0 #00ff00;
+        transform: translate(0, 0);
+        opacity: 0.8;
+    }
+    7% {
+        text-shadow: -2px 0 #00ff00, 2px 0 #ff0000;
+        transform: translate(3px, -3px);
+        opacity: 0.7;
+    }
+    14% {
+        text-shadow: 2px 0 #ff0000, -2px 0 #00ff00;
+        transform: translate(-3px, 3px);
+        opacity: 0.9;
+    }
+    21% {
+        text-shadow: none;
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        text-shadow: none;
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+
+/* Glitch de l'image placeholder */
+@keyframes image-glitch {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.01) skewX(2deg); opacity: 0.9; }
+    100% { transform: scale(1) skewX(-2deg); opacity: 1; }
+}
