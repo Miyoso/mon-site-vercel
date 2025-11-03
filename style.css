@@ -613,3 +613,40 @@ h1 {
     55% { opacity: 0.7; text-shadow: none; }
     57% { opacity: 1; text-shadow: 0 0 2px #ff4141; }
 }
+
+/* --- AJOUT: Styles pour le formulaire d'ajout --- */
+.form-grid {
+    display: grid;
+    /* 2 colonnes */
+    grid-template-columns: 1fr 1fr; 
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem; /* Plus petit que les autres labels */
+    color: #888;
+}
+
+.form-input {
+    font-family: 'Share Tech Mono', monospace;
+    background-color: #111;
+    border: 1px solid #333;
+    color: #eaeaea;
+    font-size: 1.1rem;
+    padding: 0.5rem;
+}
+.form-input:focus {
+    outline: none;
+    border-color: #00ff00;
+}
+
+/* Fait en sorte que le bouton prenne toute la largeur */
+.full-width {
+    grid-column: 1 / -1; 
+}

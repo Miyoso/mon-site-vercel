@@ -8,7 +8,9 @@
     <script>
         const REQUIRED_LEVEL = 3;
     </script>
-    <script src="security.js"></script> <link rel="stylesheet" href="style.css"> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="security.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
@@ -19,42 +21,95 @@
         <p class="status">STATUS: <span class="secure">DECRYPTED</span> :: ACCES: <span class="restricted" id="agent-name-display"></span></p>
 
         <div class="report-content" id="inventory-container">
-            <p>[CHARGEMENT DE L'INVENTAIRE DEPUIS LA BASE DE DONNÉES...]</p>
+            <p>[CHARGEMENT DE L'INVENTAIRE...]</p>
+        </div>
+
+        <div class="report-content" id="forms-container">
+            <h3 class="category-title" id="form-title-add">//: AJOUTER UN NOUVEL OBJET</h3>
+            <form id="add-item-form" class="form-grid">
+                
+                <div class="form-group">
+                    <label for="add-category">Catégorie</label>
+                    <input type="text" id="add-category" name="category" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-item-name">Nom de l'objet</label>
+                    <input type="text" id="add-item-name" name="item_name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-serial">N° de série</label>
+                    <input type="text" id="add-serial" name="serial_number" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="add-status">Statut initial</label>
+                    <select id="add-status" name="status" class="form-select" required>
+                        <option value="Opérationnel">Opérationnel</option>
+                        <option value="Stock">Stock</option>
+                        <option value="En maintenance">En maintenance</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="form-button full-width">&gt;&gt; AJOUTER L'OBJET</button>
+                <p id="add-form-message" class="form-message full-width"></p>
+            </form>
+
+            <h3 class="category-title" id="form-title-update">//: METTRE À JOUR UN OBJET</h3>
+            <form id="update-item-form" class="assignment-form">
+                
+                <label for="update-item-select">//: 1. SÉLECTIONNER L'OBJET</label>
+                <select id="update-item-select" name="itemId" class="form-select" required>
+                    <option value="">-- En attente de l'API... --</option>
+                </select>
+                
+                <label for="update-agent-select">//: 2. ASSIGNER À</label>
+                <select id="update-agent-select" name="agentName" class="form-select" required>
+                    <option value="">-- En attente de l'API... --</option>
+                </select>
+
+                <label for="update-status-select">//: 3. CHANGER STATUT</label>
+                <select id="update-status-select" name="status" class="form-select" required>
+                    <option value="Opérationnel">Opérationnel</option>
+                    <option value="Stock">Stock</option>
+                    <option value="En maintenance">En maintenance</option>
+                    <option value="Perdu">Perdu</option>
+                </select>
+                
+                <button type="submit" class="form-button">&gt;&gt; CONFIRMER LA MISE À JOUR</button>
+                <p id="update-form-message" class="form-message"></p>
+            </form>
         </div>
 
         <footer class="portal-footer">
-            <a href="index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a> </footer>
+            <a href="index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
+        </footer>
     </main>
 
 
     <script>
-        // On attend que la page soit chargée
         document.addEventListener('DOMContentLoaded', () => {
             
-            // On récupère tous les éléments dont on a besoin
+            // On récupère les éléments
             const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
             document.getElementById('agent-name-display').textContent = agentName;
-
-            const container = document.getElementById('inventory-container');
+            const inventoryContainer = document.getElementById('inventory-container');
             
-            // --- FONCTION 1 : AFFICHER L'INVENTAIRE (ET REMPLIR LES FORMULAIRES) ---
+            // On récupère les listes déroulantes (pour les remplir)
+            const updateItemSelect = document.getElementById('update-item-select');
+            const updateAgentSelect = document.getElementById('update-agent-select');
+
+            // --- FONCTION 1 : AFFICHER L'INVENTAIRE ---
             async function fetchAndDisplayInventory() {
-                
                 try {
-                    // On appelle le "Cerveau" de l'inventaire
                     const response = await fetch('/api/get-inventory');
                     const data = await response.json();
-
                     if (!data.items) throw new Error('Données d\'inventaire non reçues');
 
-                    // On vide le conteneur
-                    container.innerHTML = '';
+                    inventoryContainer.innerHTML = '';
                     
                     let htmlToInsert = '';
                     let currentCategory = '';
-                    let itemOptionsHTML = '<option value="">-- Sélectionner un objet --</option>'; // Pour le formulaire
+                    let itemOptionsHTML = '<option value="">-- Sélectionner un objet --</option>';
 
-                    // Boucle sur les objets
                     data.items.forEach(item => {
                         // Affiche la liste principale
                         if (item.category !== currentCategory) {
@@ -72,117 +127,114 @@
                                 </ul>
                             </li>
                         `;
-
-                        // Prépare la liste pour le formulaire
+                        // Prépare la liste pour le formulaire de MISE A JOUR
                         itemOptionsHTML += `<option value="${item.id}">${item.item_name} (N°: ${item.serial_number})</option>`;
                     });
-                    htmlToInsert += `</ul>`; // Ferme la dernière liste
-
-                    // Injecte le formulaire d'assignation
-                    htmlToInsert += `
-                        <h3 class="category-title" id="form-title">//: ASSIGNATION D'ÉQUIPEMENT</h3>
-                        <form id="assignment-form" class="assignment-form">
-                            <label for="item-select">//: 1. SÉLECTIONNER L'OBJET</label>
-                            <select id="item-select" name="itemId" class="form-select" required>
-                                ${itemOptionsHTML} </select>
-                            
-                            <label for="agent-select">//: 2. ASSIGNER À</label>
-                            <select id="agent-select" name="agentName" class="form-select" required>
-                                <option value="">-- Chargement des agents... --</option>
-                            </select>
-                            
-                            <button type="submit" class="form-button">&gt;&gt; CONFIRMER L'ASSIGNATION</button>
-                            <p id="form-message" class="form-message"></p>
-                        </form>
-                    `;
+                    htmlToInsert += `</ul>`;
                     
-                    // On injecte tout le HTML
-                    container.innerHTML = htmlToInsert;
-
-                    // MAINTENANT que le formulaire existe, on remplit les agents et on écoute
-                    fetchAgentsForForm();
-                    setupFormListener();
+                    inventoryContainer.innerHTML = htmlToInsert;
+                    updateItemSelect.innerHTML = itemOptionsHTML; // Remplit la liste du formulaire
 
                 } catch (error) {
                     console.error('Erreur:', error);
-                    container.innerHTML = '<p>[ERREUR DE CONNEXION AU MAINFRAME]</p>';
+                    inventoryContainer.innerHTML = '<p>[ERREUR DE CONNEXION AU MAINFRAME]</p>';
                 }
             }
 
             // --- FONCTION 2 : REMPLIR LA LISTE DES AGENTS ---
             async function fetchAgentsForForm() {
                 try {
-                    const agentSelect = document.getElementById('agent-select');
                     const response = await fetch('/api/get-agents');
                     const data = await response.json();
-
                     if (!data.agents) throw new Error('Agents non reçus');
 
-                    let agentOptionsHTML = '<option value="Réserve SAS">-- Réserve SAS --</option>'; // Option pour désassigner
+                    let agentOptionsHTML = '<option value="Réserve SAS">-- Réserve SAS --</option>';
                     data.agents.forEach(agent => {
-                        // On utilise le VRAI nom de l'agent
                         agentOptionsHTML += `<option value="${agent.name}">${agent.name} (Niv ${agent.level})</option>`;
                     });
                     
-                    agentSelect.innerHTML = agentOptionsHTML;
+                    updateAgentSelect.innerHTML = agentOptionsHTML;
 
                 } catch (error) {
                     console.error('Erreur agents:', error);
-                    document.getElementById('agent-select').innerHTML = '<option value="">Erreur API</option>';
+                    updateAgentSelect.innerHTML = '<option value="">Erreur API</option>';
                 }
             }
 
-            // --- FONCTION 3 : GÉRER L'ENVOI DU FORMULAIRE ---
-            function setupFormListener() {
-                const form = document.getElementById('assignment-form');
-                const messageEl = document.getElementById('form-message');
+            // --- FONCTION 3 : GÉRER LE FORMULAIRE "ADD ITEM" ---
+            const addForm = document.getElementById('add-item-form');
+            const addMessageEl = document.getElementById('add-form-message');
+            
+            addForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                addMessageEl.textContent = 'Ajout en cours...';
+                addMessageEl.className = 'form-message';
+                
+                try {
+                    const formData = new FormData(addForm);
+                    const data = Object.fromEntries(formData.entries());
 
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault(); // Empêche la page de recharger
+                    const response = await fetch('/api/add-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
                     
-                    const itemId = form.itemId.value;
-                    const agentName = form.agentName.value;
+                    addMessageEl.textContent = 'Objet ajouté ! Mise à jour...';
+                    addMessageEl.className = 'form-message success';
+                    addForm.reset(); // Vide le formulaire
+                    
+                    setTimeout(fetchAndDisplayInventory, 500); // Recharge la liste
 
-                    if (!itemId || !agentName) {
-                        messageEl.textContent = 'Sélection requise';
-                        messageEl.className = 'form-message error';
-                        return;
-                    }
+                } catch (error) {
+                    addMessageEl.textContent = `Erreur: ${error.message}`;
+                    addMessageEl.className = 'form-message error';
+                }
+            });
 
-                    messageEl.textContent = 'Assignation en cours...';
-                    messageEl.className = 'form-message';
+            // --- FONCTION 4 : GÉRER LE FORMULAIRE "UPDATE ITEM" ---
+            const updateForm = document.getElementById('update-item-form');
+            const updateMessageEl = document.getElementById('update-form-message');
+            
+            updateForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                updateMessageEl.textContent = 'Mise à jour en cours...';
+                updateMessageEl.className = 'form-message';
 
-                    try {
-                        // On appelle notre NOUVEAU "Cerveau" (api/assign-item.js)
-                        const response = await fetch('/api/assign-item', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ itemId, agentName }) // On envoie l'ordre
-                        });
+                try {
+                    const data = {
+                        itemId: updateForm.itemId.value,
+                        agentName: updateForm.agentName.value,
+                        status: updateForm.status.value
+                    };
+                    
+                    // On appelle notre "Cerveau" (api/update-item.js)
+                    const response = await fetch('/api/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
 
-                        const result = await response.json();
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+                    
+                    updateMessageEl.textContent = 'Objet mis à jour ! Mise à jour...';
+                    updateMessageEl.className = 'form-message success';
+                    
+                    setTimeout(fetchAndDisplayInventory, 500); // Recharge la liste
 
-                        if (!response.ok) throw new Error(result.error);
-                        
-                        // C'est un succès !
-                        messageEl.textContent = 'Assignation confirmée ! Mise à jour...';
-                        messageEl.className = 'form-message success';
-                        
-                        // La "magie" : on recharge tout l'inventaire pour voir le changement
-                        setTimeout(fetchAndDisplayInventory, 1000); 
-
-                    } catch (error) {
-                        console.error('Erreur d\'assignation:', error);
-                        messageEl.textContent = `Erreur: ${error.message}`;
-                        messageEl.className = 'form-message error';
-                    }
-                });
-            }
+                } catch (error) {
+                    updateMessageEl.textContent = `Erreur: ${error.message}`;
+                    updateMessageEl.className = 'form-message error';
+                }
+            });
 
             // --- DÉMARRAGE ---
-            // On lance la première fonction qui s'occupe de tout
-            fetchAndDisplayInventory();
-
+            fetchAndDisplayInventory(); // Affiche la liste et remplit le formulaire 1
+            fetchAgentsForForm(); // Remplit le formulaire 2
         });
     </script>
 </body>
