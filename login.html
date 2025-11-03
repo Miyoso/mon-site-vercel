@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS - Authentication</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <main class="terminal">
+        
+        <img src="logo-sas.png" alt="Logo SAS" class="logo">
+        
+        <h1>SAS MAINFRAME<span class="blinker">_</span></h1>
+        <p class="status">AUTHENTICATION_REQUIRED</p>
+
+        <form class="login-form" id="loginForm">
+            
+            <label for="username">//: AGENT_ID:</label>
+            <input type="text" id="username" class="login-input" autofocus>
+
+            <label for="password">//: PASSPHRASE:</label>
+            <input type="password" id="password" class="login-input">
+            
+            <p id="errorMessage" class="error-message"></p>
+            
+            <button type="submit" class="login-button">&gt;&gt; CONNECT</button>
+        </form>
+
+    </main>
+
+    <script>
+        // --- NOTRE FAUSSE BASE DE DONNÉES D'AGENTS ---
+        const agentDatabase = {
+            "Graves": {
+                password: "alpha3", // Mettez le mdp que vous voulez
+                level: 3
+            },
+            "Miyoso": {
+                password: "Charlie", // L'ancien mdp
+                level: 2
+            },
+            "Recrue": {
+                password: "12345",
+                level: 1
+            }
+        };
+        // ---------------------------------------------
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+            
+            let usernameInput = document.getElementById('username');
+            let passwordInput = document.getElementById('password');
+            let errorMessage = document.getElementById('errorMessage');
+
+            let username = usernameInput.value;
+            let password = passwordInput.value;
+
+            // 1. L'agent existe-t-il ?
+            if (agentDatabase[username]) {
+                
+                let agent = agentDatabase[username];
+
+                // 2. Le mot de passe est-il correct ?
+                if (agent.password === password) {
+                    
+                    // ON STOCKE LES INFOS DE SESSION
+                    localStorage.setItem('sas_user', username);
+                    localStorage.setItem('sas_level', agent.level);
+
+                    errorMessage.textContent = `//: ACCREDITATION_LEVEL_${agent.level}_ACCEPTED... WELCOME, ${username}.`;
+                    errorMessage.style.color = "#00ff00";
+                    
+                    setTimeout(function() {
+                        window.location.href = "index.html"; // On envoie au portail
+                    }, 1500);
+
+                } else {
+                    // Mdp incorrect
+                    errorMessage.textContent = "//: ERROR :: PASSPHRASE_INCORRECT";
+                    errorMessage.style.color = "#ff4141";
+                    passwordInput.value = "";
+                }
+            } else {
+                // Agent inconnu
+                errorMessage.textContent = "//: ERROR :: AGENT_ID_UNKNOWN";
+                errorMessage.style.color = "#ff4141";
+                usernameInput.value = "";
+                passwordInput.value = "";
+            }
+        });
+    </script>
+
+</body>
+</html>

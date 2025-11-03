@@ -69,7 +69,7 @@ h1 {
     color: #ff4141;
 }
 
-/* --- AJOUT: Menu du Portail --- */
+/* --- Menu du Portail --- */
 .portal-menu {
     display: flex;
     flex-direction: column;
@@ -93,9 +93,9 @@ h1 {
 }
 .portal-link .link-status {
     font-size: 0.9rem;
-    color: #00ff00; /* Vert */
 }
 
+/* MODIFIÉ: Styles pour les liens verrouillés/déverrouillés */
 .portal-link.disabled {
     cursor: not-allowed;
 }
@@ -106,20 +106,29 @@ h1 {
     color: #ff4141; /* Rouge */
 }
 
-.portal-link:not(.disabled):hover {
+/* AJOUT: Style pour liens déverrouillés */
+.portal-link.unlocked {
+    cursor: pointer;
+}
+.portal-link.unlocked .link-status {
+    color: #00ff00; /* Vert */
+}
+
+.portal-link.unlocked:hover {
     background-color: #c5c5c5;
     color: #000;
     box-shadow: 0 0 15px rgba(197, 197, 197, 0.5);
 }
-.portal-link:not(.disabled):hover .link-title {
+.portal-link.unlocked:hover .link-title {
     color: #000;
-    animation: glitchEffect 150ms 2; /* Réutilise l'effet glitch */
+    animation: glitchEffect 150ms 2;
 }
-.portal-link:not(.disabled):hover .link-status {
+.portal-link.unlocked:hover .link-status {
     color: #000;
 }
 
-/* --- AJOUT: Pied de page du Portail --- */
+
+/* --- Pied de page du Portail --- */
 .portal-footer {
     padding-top: 1.5rem;
     margin-top: 1.5rem;
@@ -138,7 +147,7 @@ h1 {
     padding: 2px 4px;
 }
 
-/* --- Liste des Agents (de l'ancienne page) --- */
+/* --- Liste des Agents --- */
 .agent-list {
     list-style-type: none;
 }
@@ -163,6 +172,57 @@ h1 {
     animation: glitchEffect 150ms 2;
 }
 
+/* --- Styles pour le formulaire de login --- */
+.login-form {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.login-form label {
+    font-size: 1rem;
+    color: #888;
+}
+.login-input {
+    font-family: 'Share Tech Mono', monospace;
+    background-color: #111;
+    border: 1px solid #333;
+    color: #eaeaea;
+    font-size: 1.5rem;
+    padding: 0.75rem;
+}
+.login-input:focus {
+    outline: none;
+    border-color: #00ff00;
+}
+.login-button {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.2rem;
+    color: #000;
+    background-color: #00ff00;
+    border: none;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.login-button:hover {
+    background-color: #fff;
+    box-shadow: 0 0 15px #00ff00;
+}
+.error-message {
+    font-size: 1rem;
+    text-align: center;
+    height: 1rem;
+}
+
+/* --- Style pour le contenu des rapports --- */
+.report-content {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: #050505;
+    border: 1px solid #222;
+    min-height: 200px;
+}
 
 /* --- Animations --- */
 @keyframes flicker {
@@ -172,23 +232,19 @@ h1 {
     55% { opacity: 0.7; text-shadow: none; }
     57% { opacity: 1; text-shadow: 0 0 2px #eaeaea; }
 }
-
 @keyframes blink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
 }
-
 .blinker {
     animation: blink 1s infinite step-end;
     color: #00ff00; 
     margin-left: 5px;
 }
-
 @keyframes animateScanline {
     from { background-position: 0 0; }
     to { background-position: 0 4px; }
 }
-
 @keyframes glitchEffect {
     0% {
         text-shadow: 1px 0 #ff4141, -1px 0 #00ff00;
@@ -210,62 +266,4 @@ h1 {
         text-shadow: 1px 0 #ff4141, -1px 0 #00ff00;
         transform: translate(0, 0);
     }
-}
-
-/* --- AJOUT: Styles pour le formulaire de login --- */
-
-.login-form {
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.login-form label {
-    font-size: 1rem;
-    color: #888;
-}
-
-.login-input {
-    font-family: 'Share Tech Mono', monospace;
-    background-color: #111;
-    border: 1px solid #333;
-    color: #eaeaea;
-    font-size: 1.5rem;
-    padding: 0.75rem;
-}
-.login-input:focus {
-    outline: none;
-    border-color: #00ff00;
-}
-
-.login-button {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.2rem;
-    color: #000;
-    background-color: #00ff00;
-    border: none;
-    padding: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.login-button:hover {
-    background-color: #fff;
-    box-shadow: 0 0 15px #00ff00;
-}
-
-.error-message {
-    /* Le JS gère la couleur */
-    font-size: 1rem;
-    text-align: center;
-    height: 1rem; /* Garde l'espace même si le message est vide */
-}
-
-/* --- AJOUT: Style pour le contenu des rapports --- */
-.report-content {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background-color: #050505;
-    border: 1px solid #222;
-    min-height: 200px;
 }
