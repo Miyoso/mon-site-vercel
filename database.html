@@ -4,18 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAS - Agent Database</title>
-
-    <script>
-        // --- SCRIPT DE SÉCURITÉ ---
-        const REQUIRED_LEVEL = 1; 
-        // -------------------------
-        const userLevel = parseInt(localStorage.getItem('sas_level') || 0);
-        if (userLevel < REQUIRED_LEVEL) {
-            alert("//: ACCREDITATION INSUFFISANTE (NIVEAU " + REQUIRED_LEVEL + " REQUIS)");
-            window.location.href = 'login.html';
-        }
-    </script>
     
+    <script>
+        const REQUIRED_LEVEL = 1;
+    </script>
+    <script src="security.js"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,27 +23,8 @@
         <h1>AGENT DATABASE<span class="blinker">_</span></h1>
         <p class="status">SYSTEM STATUS: <span class="secure">SECURED</span> :: ACCESS: <span class="restricted">[ENCRYPTED]</span></p>
 
-        <ul class="agent-list">
-            <li><a href="#">[AGENT 01] :: FILE_ENCRYPTED :: 0x4A...F3</a></li>
-            <li><a href="#">[AGENT 02] :: DATA_CORRUPTED :: 0x9B...C1</a></li>
-            <li><a href="#">[AGENT 03] :: FILE_ENCRYPTED :: 0x1F...77</a></li>
-            <li><a href="#">[AGENT 04] :: FILE_ENCRYPTED :: 0x8D...E9</a></li>
-            <li><a href="#">[AGENT 05] :: FILE_ENCRYPTED :: 0x3C...2A</a></li>
-            <li><a href="#">[AGENT 06] :: DATA_CORRUPTED :: 0x7E...B4</a></li>
-            
-            <li><a href="AgentDatabase/agent-7.html" class="decrypted">[AGENT 07] :: FILE_DECRYPTED :: A. SANTO</a></li>
-            
-            <li><a href="#">[AGENT 08] :: FILE_ENCRYPTED :: 0x22...A9</a></li>
-            <li><a href="#">[AGENT 09] :: FILE_ENCRYPTED :: 0x6G...F2</a></li>
-            <li><a href="AgentDatabase/agent-10.html" class="decrypted">[AGENT 10] :: FILE_DECRYPTED :: E. BALDWIN</a></li>
-
-            <li><a href="AgentDatabase/agent-11.html" class="decrypted">[AGENT 11] :: FILE_DECRYPTED :: R. ARSENAULT</a></li>
-            
-            <li><a href="#">[AGENT 12] :: FILE_ENCRYPTED :: 0x5A...D5</a></li>
-            <li><a href="#">[AGENT 13] :: FILE_ENCRYPTED :: 0x8C...E1</a></li>
-            <li><a href="#">[AGENT 14] :: DATA_CORRUPTED :: 0x1E...99</a></li>
-
-            <li><a href="AgentDatabase/agent-15.html" class="corrupted">[AGENT 15] :: DATA_CORRUPTED :: 0x7F...B0</a></li>
+        <ul class="agent-list" id="agent-list-container">
+            <li>[CHARGEMENT DE LA BASE DE DONNÉES...]</li>
         </ul>
 
         <footer class="portal-footer">
@@ -59,5 +33,43 @@
 
     </main>
 
-</body>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const listContainer = document.getElementById('agent-list-container');
+
+            try {
+                // 1. On appelle notre "Cerveau" (l'API)
+                const response = await fetch('/api/get-agents');
+                const data = await response.json();
+
+                // 2. On vérifie si l'API a renvoyé les agents
+                if (data.agents && data.agents.length > 0) {
+                    
+                    let htmlToInsert = ''; // On prépare une chaîne de texte HTML
+
+                    // 3. On boucle sur chaque agent reçu de la BDD
+                    data.agents.forEach(agent => {
+                        // On construit la ligne <li> en utilisant les données de la BDD
+                        htmlToInsert += `
+                            <li>
+                                <a href="${agent.profile_url}" class="${agent.css_class}">
+                                    ${agent.status_text}
+                                </a>
+                            </li>
+                        `;
+                    });
+
+                    // 4. On injecte tout le HTML d'un coup dans la page
+                    listContainer.innerHTML = htmlToInsert;
+
+                } else {
+                    listContainer.innerHTML = '<li>Erreur: Aucun agent trouvé dans la base.</li>';
+                }
+            } catch (error) {
+                console.error('Erreur lors de la récupération des agents:', error);
+                listContainer.innerHTML = '<li>[ERREUR DE CONNEXION AU MAINFRAME]</li>';
+            }
+        });
+    </script>
+    </body>
 </html>
