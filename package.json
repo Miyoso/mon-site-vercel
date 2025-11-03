@@ -1,24 +1,13 @@
 {
+  "type": "module",
   "name": "mon-site-vercel",
   "version": "1.0.0",
-  "description": "",
-  "main": "security.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Miyoso/mon-site-vercel.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Miyoso/mon-site-vercel/issues"
-  },
-  "homepage": "https://github.com/Miyoso/mon-site-vercel#readme",
-  "dependencies": {
-    "@vercel/postgres": "^0.10.0"
-  }
+  "description": ""
 }
