@@ -321,25 +321,39 @@ h1 {
     width: 120px; /* Aligne les valeurs */
 }
 
-/* --- AJOUT: Animation "data glitched" --- */
-.data-glitched {
-    display: inline-block;
-    color: #ff4141; /* Rouge pour montrer que c'est buggé */
-    min-width: 80px; /* Empêche le texte de sauter partout */
-    text-align: center;
-    animation: glitch-text 150ms infinite step-end;
+/* --- AJOUT: Mise en valeur des liens déverrouillés --- */
+
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+        border-color: rgba(0, 255, 0, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); /* Lueur plus forte */
+        border-color: rgba(0, 255, 0, 1);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
+        border-color: rgba(0, 255, 0, 0.5);
+    }
 }
 
-@keyframes glitch-text {
-    0% { content: '8923#@&1'; }
-    10% { content: '9!A45S&?'; }
-    20% { content: 'Z3<912$*'; }
-    30% { content: '12S4>9#%'; }
-    40% { content: '9B*123&1'; }
-    50% { content: '4$23S9!1'; }
-    60% { content: '5*<1!2A*'; }
-    70% { content: 'C&12S4!@'; }
-    80% { content: '312S4$*?'; }
-    90% { content: '00X12S&1'; }
-    100% { content: '1S>91*!&'; }
+.agent-list a.decrypted {
+    color: #00ff00; /* Texte vert */
+    background-color: #051a05; /* Fond vert très sombre */
+    
+    /* Application de l'animation de pulsation */
+    animation: pulse-green 2.5s infinite ease-in-out;
+}
+
+/* On garde l'effet glitch au survol, 
+ mais on change les couleurs pour correspondre 
+*/
+.agent-list a.decrypted:hover,
+.agent-list a.decrypted:focus {
+    color: #000; /* Texte noir au survol */
+    background-color: #00ff00; /* Fond vert vif */
+    
+    /* On relance l'animation glitch (déjà définie) au lieu de la pulsation */
+    animation: glitchEffect 150ms 2;
 }
