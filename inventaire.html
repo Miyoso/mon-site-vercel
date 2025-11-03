@@ -8,63 +8,80 @@
     <script>
         const REQUIRED_LEVEL = 3;
     </script>
-    <script src="security.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="../security.js"></script> <link rel="stylesheet" href="../style.css"> <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
     <main class="terminal">
         <h1>INVENTAIRE (NIV 3)<span class="blinker">_</span></h1>
-        <p class="status">STATUS: <span class="secure">DECRYPTED</span> :: ACCES: <span class="restricted">GRAVES</span></p>
+        
+        <p class="status">STATUS: <span class="secure">DECRYPTED</span> :: ACCES: <span class="restricted" id="agent-name-display"></span></p>
 
-        <div class="report-content">
-            
-            <h3 class="category-title">//: ARMES DE POING</h3>
-            <ul class="inventory-list">
-                <li>
-                    <span class="item-name">Glock 19 (Arme 1)</span>
-                    <ul class="item-details">
-                        <li><span class="detail-label">N° de série:</span> 25x84</li>
-                        <li><span class="detail-label">Attribution:</span> Agent D.</li>
-                        <li><span class="detail-label">Statut:</span> Opérationnel</li>
-                    </ul>
-                </li>
-                <li>
-                    <span class="item-name">SIG P226 (Arme 2)</span>
-                    <ul class="item-details">
-                        <li><span class="detail-label">N° de série:</span> 92y11</li>
-                        <li><span class="detail-label">Attribution:</span> Agent</li>
-                        <li><span class="detail-label">Statut:</span> En maintenance</li>
-                    </ul>
-                </li>
-            </ul>
-
-            <h3 class="category-title">//: ÉQUIPEMENT TACTIQUE</h3>
-            <ul class="inventory-list">
-                <li>
-                    <span class="item-name">Gilet pare-balles Lourd (x5)</span>
-                    <ul class="item-details">
-                        <li><span class="detail-label">N° de lot:</span> L-881C</li>
-                        <li><span class="detail-label">Attribution:</span> Réserve SAS</li>
-                        <li><span class="detail-label">Statut:</span> Stock</li>
-                    </ul>
-                </li>
-                 <li>
-                    <span class="item-name">Kit de crochetage (x2)</span>
-                    <ul class="item-details">
-                        <li><span class="detail-label">N° de lot:</span> K-004A</li>
-                        <li><span class="detail-label">Attribution:</span> [CLASSIFIED]</li>
-                        <li><span class="detail-label">Statut:</span> Opérationnel</li>
-                    </ul>
-                </li>
-            </ul>
-
+        <div class="report-content" id="inventory-container">
+            <p>[CHARGEMENT DE L'INVENTAIRE DEPUIS LA BASE DE DONNÉES...]</p>
         </div>
+
         <footer class="portal-footer">
-            <a href="index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
-        </footer>
+            <a href="../index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a> </footer>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Affiche le nom de l'agent connecté
+            const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
+            document.getElementById('agent-name-display').textContent = agentName;
+
+            const container = document.getElementById('inventory-container');
+
+            try {
+                // 1. On appelle notre "Cerveau" (l'API)
+                const response = await fetch('/api/get-inventory');
+                const data = await response.json();
+
+                if (data.items && data.items.length > 0) {
+                    
+                    let htmlToInsert = '';
+                    let currentCategory = '';
+
+                    // 2. On boucle sur chaque objet reçu de la BDD
+                    data.items.forEach(item => {
+                        // Si c'est une nouvelle catégorie, on ajoute un titre
+                        if (item.category !== currentCategory) {
+                            if (currentCategory !== '') {
+                                htmlToInsert += `</ul>`; // On ferme la liste précédente
+                            }
+                            currentCategory = item.category;
+                            htmlToInsert += `<h3 class="category-title">//: ${currentCategory.toUpperCase()}</h3>`;
+                            htmlToInsert += `<ul class="inventory-list">`;
+                        }
+
+                        // 3. On construit l'objet <li>
+                        htmlToInsert += `
+                            <li>
+                                <span class="item-name">${item.item_name}</span>
+                                <ul class="item-details">
+                                    <li><span class="detail-label">N° de série:</span> ${item.serial_number || 'N/A'}</li>
+                                    <li><span class="detail-label">Attribution:</span> ${item.assigned_to || 'Aucune'}</li>
+                                    <li><span class="detail-label">Statut:</span> ${item.status}</li>
+                                </ul>
+                            </li>
+                        `;
+                    });
+
+                    htmlToInsert += `</ul>`; // On ferme la dernière liste
+
+                    // 4. On injecte tout le HTML
+                    container.innerHTML = htmlToInsert;
+
+                } else {
+                    container.innerHTML = '<p>Erreur: Aucun objet trouvé dans l'inventaire.</p>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                container.innerHTML = '<p>[ERREUR DE CONNEXION AU MAINFRAME]</p>';
+            }
+        });
+    </script>
 </body>
 </html>
