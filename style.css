@@ -69,11 +69,16 @@ h1 {
     color: #ff4141;
 }
 
+
+
+
 /* --- Menu du Portail --- */
+/* --- MODIFICATION: Menu du Portail --- */
 .portal-menu {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    /* Gère l'espace ENTRE les groupes */
+    gap: 1.5rem; 
 }
 
 .portal-link {
@@ -391,4 +396,22 @@ h1 {
     
     /* On relance l'animation glitch */
     animation: glitchEffect 150ms 2;
+}
+
+
+/* --- AJOUT: Nouveaux styles pour les groupes --- */
+.portal-group {
+    display: flex;
+    flex-direction: column;
+    /* Gère l'espace ENTRE les liens d'un même groupe */
+    gap: 0.5rem; 
+}
+
+.portal-group-title {
+    color: #00ff00; /* Vert hacker */
+    font-size: 1rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
 }
