@@ -357,3 +357,38 @@ h1 {
     /* On relance l'animation glitch (déjà définie) au lieu de la pulsation */
     animation: glitchEffect 150ms 2;
 }
+
+/* --- AJOUT: Animation de pulsation ROUGE --- */
+@keyframes pulse-red {
+    0% {
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+        border-color: rgba(255, 0, 0, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(255, 0, 0, 0.7); /* Lueur rouge plus forte */
+        border-color: rgba(255, 65, 65, 1);
+    }
+    100% {
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+        border-color: rgba(255, 0, 0, 0.5);
+    }
+}
+
+/* Style pour les liens corrompus */
+.agent-list a.corrupted {
+    color: #ff4141; /* Texte rouge */
+    background-color: #2a0a0a; /* Fond rouge très sombre */
+    
+    /* Application de l'animation de pulsation rouge */
+    animation: pulse-red 2s infinite ease-in-out;
+}
+
+/* Survol pour les liens corrompus */
+.agent-list a.corrupted:hover,
+.agent-list a.corrupted:focus {
+    color: #000; /* Texte noir au survol */
+    background-color: #ff4141; /* Fond rouge vif */
+    
+    /* On relance l'animation glitch */
+    animation: glitchEffect 150ms 2;
+}
