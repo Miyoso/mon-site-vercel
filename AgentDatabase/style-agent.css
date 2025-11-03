@@ -434,31 +434,32 @@ h4.liabilities { color: #ff4141; margin-top: 1rem; }
 
     /* AJOUT: S'assurer que le contenu est au-dessus du watermark */
     position: relative; 
-    z-index: 101; 
+    z-index: 100; 
 }
 
 /* --- AJOUT: Style pour le watermark "DECEASED" --- */
 
+/* --- AJOUT: Style pour le watermark "DECEASED" --- */
+
 .deceased-watermark {
-    position: fixed; /* Reste en place au défilement */
-    z-index: 100; /* Au-dessus du fond, en dessous du terminal */
+    position: fixed;
+    /* On le met au-dessus (101) du contenu (100) */
+    z-index: 101; 
 
     top: 50%;
     left: 50%;
-
-    /* Centre et pivote le texte */
     transform: translate(-50%, -50%) rotate(-35deg); 
 
     font-family: 'Share Tech Mono', monospace;
-    /* La taille s'adapte à la largeur de l'écran */
     font-size: 15vw; 
     font-weight: 900;
-    color: #ff4141; /* Rouge */
+    color: #ff4141;
 
-    opacity: 0.08; /* Très transparent */
+    /* Opacité légèrement augmentée pour être visible PAR-DESSUS le texte */
+    opacity: 0.15; 
     text-shadow: 0 0 10px #000;
 
-    /* Empêche de sélectionner le texte */
-    pointer-events: none;
+    /* TRÈS IMPORTANT: Laisse passer les clics ! */
+    pointer-events: none; 
     user-select: none;
 }
