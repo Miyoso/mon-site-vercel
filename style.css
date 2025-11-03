@@ -267,3 +267,56 @@ h1 {
         transform: translate(0, 0);
     }
 }
+
+/* --- AJOUT: Styles pour l'inventaire détaillé --- */
+
+.report-content {
+    /* On enlève le padding simple pour gérer les listes */
+    padding: 1rem 0.5rem; 
+}
+
+.category-title {
+    color: #00ff00; /* Vert hacker */
+    font-size: 1.2rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem; /* Espace entre les catégories */
+    padding-left: 1rem;
+}
+.report-content > .category-title:first-child {
+    margin-top: 0; /* Pas de marge pour le premier titre */
+}
+
+.inventory-list {
+    list-style-type: none;
+    padding-left: 1rem;
+}
+
+.inventory-list li {
+    margin-bottom: 1.25rem; /* Espace entre les items */
+}
+
+.item-name {
+    font-size: 1.1rem;
+    color: #eaeaea; /* Blanc cassé */
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.item-details {
+    list-style-type: none;
+    padding-left: 1.5rem;
+    border-left: 1px dashed #444; /* Ligne de "connexion" */
+}
+
+.item-details li {
+    margin-bottom: 0.25rem;
+    color: #c5c5c5; /* Gris clair */
+}
+
+.detail-label {
+    color: #888; /* Gris sombre */
+    display: inline-block;
+    width: 120px; /* Aligne les valeurs */
+}
