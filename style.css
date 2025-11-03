@@ -663,3 +663,13 @@ h1 {
     color: #ff4141;
     box-shadow: 0 0 15px #ff4141;
 }
+
+/* --- Styles pour les messages de formulaire --- */
+/* (Vous les avez peut-être déjà pour l'inventaire) */
+
+.form-message.success {
+    color: #00ff00;
+}
+.form-message.error {
+    color: #ff4141;
+}

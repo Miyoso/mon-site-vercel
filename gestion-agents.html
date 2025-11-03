@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS - Gestion Agents (Niv 3)</title>
+
+    <script>
+        const REQUIRED_LEVEL = 3;
+    </script>
+    <script src="security.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="terminal">
+        <h1>GESTION DES AGENTS<span class="blinker">_</span></h1>
+        
+        <p class="status">STATUS: <span class="secure">ACTIF</span> :: ACCES: <span class="restricted" id="agent-name-display"></span></p>
+
+        <div class="report-content">
+            <h3 class="category-title" id="form-title-delete">//: SUPPRIMER UN AGENT (IRRÉVERSIBLE)</h3>
+            <form id="delete-agent-form" class="assignment-form">
+                
+                <label for="delete-agent-select">//: SÉLECTIONNER L'AGENT À SUPPRIMER</label>
+                <select id="delete-agent-select" name="agentId" class="form-select" required>
+                    <option value="">-- Chargement des agents... --</option>
+                </select>
+                
+                <button type="submit" class="form-button delete">&gt;&gt; SUPPRIMER DÉFINITIVEMENT</button>
+                <p id="delete-form-message" class="form-message"></p>
+            </form>
+        </div>
+
+        <footer class="portal-footer">
+            <a href="index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Affiche le nom de l'admin
+            const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
+            document.getElementById('agent-name-display').textContent = agentName;
+
+            const deleteSelect = document.getElementById('delete-agent-select');
+
+            // --- FONCTION 1 : REMPLIR LA LISTE DES AGENTS ---
+            async function fetchAgentsForForm() {
+                try {
+                    const response = await fetch('/api/get-agents');
+                    const data = await response.json();
+                    if (!data.agents) throw new Error('Agents non reçus');
+
+                    let agentOptionsHTML = '<option value="">-- Sélectionner un agent --</option>';
+                    
+                    data.agents.forEach(agent => {
+                        // On n'ajoute pas l'agent admin (Graves) à la liste de suppression
+                        if (agent.level < 3) {
+                             agentOptionsHTML += `<option value="${agent.id}">${agent.name} (ID: ${agent.id})</option>`;
+                        }
+                    });
+                    
+                    deleteSelect.innerHTML = agentOptionsHTML;
+
+                } catch (error) {
+                    console.error('Erreur agents:', error);
+                    deleteSelect.innerHTML = '<option value="">Erreur API</option>';
+                }
+            }
+
+            // --- FONCTION 2 : GÉRER LE FORMULAIRE "DELETE AGENT" ---
+            const deleteForm = document.getElementById('delete-agent-form');
+            const deleteMessageEl = document.getElementById('delete-form-message');
+            
+            deleteForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const agentId = deleteForm.agentId.value;
+                if (!agentId) return;
+                
+                // On demande une confirmation
+                if (!confirm("Voulez-vous vraiment SUPPRIMER cet agent de la base de données ?\nCette action est IRRÉVERSIBLE.")) {
+                    return;
+                }
+
+                deleteMessageEl.textContent = 'Suppression en cours...';
+                deleteMessageEl.className = 'form-message';
+
+                try {
+                    const response = await fetch('/api/delete-agent', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ agentId }) // On envoie juste l'ID
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+                    
+                    deleteMessageEl.textContent = 'Agent supprimé ! Mise à jour...';
+                    deleteMessageEl.className = 'form-message success';
+                    
+                    // On recharge la liste pour enlever l'agent supprimé
+                    setTimeout(fetchAgentsForForm, 1000);
+
+                } catch (error) {
+                    deleteMessageEl.textContent = `Erreur: ${error.message}`;
+                    deleteMessageEl.className = 'form-message error';
+                }
+            });
+
+            // --- DÉMARRAGE ---
+            fetchAgentsForForm();
+        });
+    </script>
+</body>
+</html>
