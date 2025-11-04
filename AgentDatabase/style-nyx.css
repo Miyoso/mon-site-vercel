@@ -72,3 +72,12 @@ body {
     90% { content: '00X1 2S&1 65 6C'; }
     100% { content: '1S>9 1*!& 21 0A'; }
 }
+
+/* --- AJOUT: Glitch JS Aléatoire --- */
+.data-glitched-random {
+    display: inline-block;
+    color: #00ff00; /* Vert vif */
+    min-width: 150px;
+    text-align: left;
+    
+}
