@@ -18,6 +18,9 @@
     <div class="security-container">
         <h1><span class="blink">&gt;&gt;</span>GESTION DE LA SÉCURITÉ</h1>
 
+        <p class="status" id="agent-status-display">AGENT: [CHARGEMENT...]</p>
+
+
         <div class="alert-box">
             <span class="quote">"Attention, mettez un mot de passe différent de vos mots de passe habituels."</span>
             <span class="signature">-- Je vois vos mots de passe -- Ada :)</span>
@@ -52,7 +55,19 @@
             
             // On récupère le nom de l'agent (important pour l'API)
             const user = localStorage.getItem('sas_user') || 'INCONNU';
+            const level = localStorage.getItem('sas_level') || '0';
             
+            // --- AJOUT : Affichage du statut de l'agent ---
+            const statusMessage = document.getElementById('agent-status-display');
+            if (user === 'INCONNU') {
+                statusMessage.textContent = 'AGENT: [ERREUR_SESSION]';
+                statusMessage.style.color = '#ff4444'; // Rouge
+            } else {
+                // Utilise innerHTML pour que les spans fonctionnent
+                statusMessage.innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
+            }
+            // --- FIN DE L'AJOUT ---
+
             const passwordForm = document.getElementById('change-password-form');
             const newPasswordEl = document.getElementById('new-password');
             const confirmPasswordEl = document.getElementById('confirm-password');
