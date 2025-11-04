@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DECRYPTION_EN_COURS...</title>
+    <style>
+        /* Force un fond noir et supprime les marges */
+        body {
+            background: #000;
+            margin: 0;
+            overflow: hidden;
+        }
+        /* Fait en sorte que la vidéo remplisse tout l'écran */
+        #decryptVideo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translateX(-50%) translateY(-50%);
+        }
+    </style>
+</head>
+<body>
+
+    <video id="decryptVideo" autoplay muted playsinline>
+        <source src="../decrypt.mp4" type="video/mp4">
+        Votre navigateur ne supporte pas la vidéo.
+    </video>
+
+    <script>
+        // On récupère la vidéo
+        const video = document.getElementById('decryptVideo');
+
+        // On écoute l'événement 'ended' (vidéo terminée)
+        video.addEventListener('ended', function() {
+            // Une fois la vidéo finie, on redirige vers le vrai profil
+            // (les deux fichiers sont dans le même dossier)
+            window.location.href = 'agent-Javier.html';
+        });
+
+        // Sécurité au cas où l'autoplay ne se lance pas
+        video.play().catch(error => {
+            console.warn("L'autoplay a été bloqué, l'utilisateur devra peut-être cliquer.");
+            // Dans un cas réel, on ajouterait un bouton "Cliquer pour entrer"
+        });
+    </script>
+
+</body>
+</html>
