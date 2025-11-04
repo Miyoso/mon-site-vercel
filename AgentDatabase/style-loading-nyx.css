@@ -1,36 +1,32 @@
-/* AgentDatabase/style-loading-nyx.css */
+
 body {
     background-color: #121212;
-    color: #eaeaea; /* Texte par défaut (blanc/gris) */
+    color: #eaeaea; 
     font-family: 'Roboto Mono', monospace;
     font-size: 1rem;
     line-height: 1.5;
     padding: 1rem;
-    display: flex; /* Utilise flexbox */
-    flex-direction: column; /* Organise en colonne */
-    min-height: 100vh; /* Prend toute la hauteur de la fenêtre */
-    overflow: hidden; /* Empêche la page entière de défiler */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
     box-sizing: border-box;
-    /* justify-content: flex-end; -- TRÈS IMPORTANT : SUPPRIMÉ -- */
-    /* Sans ça, le contenu commence en haut et le défilement est naturel */
 }
 
 .console-output {
-    flex-grow: 1; /* Permet à la console de prendre l'espace disponible */
-    overflow-y: auto; /* Active le défilement vertical DANS la console */
+    flex-grow: 1; 
+    overflow-y: auto; 
     white-space: pre-wrap;
     word-break: break-all;
     
-    /* AJOUT IMPORTANT : Définir une hauteur maximale pour que overflow-y fonctionne */
-    max-height: 100vh; /* Limite la hauteur à celle de la vue */
 }
 
-/* Style du Prompt KALI */
+
 .prompt {
     color: #eaeaea;
 }
 .prompt .user {
-    color: #ff4141; /* Rouge (root) */
+    color: #ff4141; 
     text-shadow: 0 0 2px #ff4141;
 }
 .prompt .host {
@@ -43,7 +39,7 @@ body {
     color: #eaeaea; /* Blanc */
 }
 
-/* Styles des lignes de sortie */
+
 .line-command {
     color: #eaeaea; /* Commande tapée */
 }
