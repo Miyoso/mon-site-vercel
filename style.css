@@ -816,3 +816,35 @@ h1 {
     margin-bottom: 2rem;
     line-height: 1.6;
 }
+
+/* --- Mise à jour: Message d'avertissement d'Ada (Rouge Clignotant) --- */
+.ada-warning {
+    color: #ff4141; /* Rouge vif pour le texte */
+    font-size: 0.9rem;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+    border: 1px dashed #ff4141; /* Bordure rouge */
+    background-color: #2a0a0a; /* Fond rouge foncé */
+    margin-bottom: 2rem;
+    line-height: 1.6;
+
+    /* Animation de clignotement */
+    animation: ada-blink 1.5s infinite alternate; /* Clignote toutes les 1.5s */
+}
+
+/* Définition de l'animation de clignotement */
+@keyframes ada-blink {
+    0% {
+        opacity: 1;
+        text-shadow: 0 0 5px #ff4141; /* Effet de lueur */
+    }
+    50% {
+        opacity: 0.7; /* Réduit l'opacité à mi-chemin */
+        text-shadow: none;
+    }
+    100% {
+        opacity: 1;
+        text-shadow: 0 0 5px #ff4141;
+    }
+}
