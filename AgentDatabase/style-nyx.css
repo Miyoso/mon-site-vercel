@@ -41,3 +41,34 @@ body {
     user-select: none; /* Empêche la sélection */
     filter: blur(0.5px);
 }
+
+/* --- AJOUT: Animation "data glitched" pour le thème Nyx --- */
+.data-glitched {
+    display: inline-block;
+    /* Vert vif pour correspondre au thème du terminal */
+    color: #00ff00; 
+    min-width: 150px; /* Un peu plus large */
+    text-align: left;
+    position: relative;
+}
+
+.data-glitched::before {
+    content: '48 65 6c 6c 6f'; /* Contenu initial */
+    display: inline-block;
+    /* Animation qui change le 'content' */
+    animation: glitch-text-green 150ms infinite step-end;
+}
+
+@keyframes glitch-text-green {
+    0% { content: '48 65 6c 6c 6f'; }
+    10% { content: '9!A4 5S&? 7C 0A'; }
+    20% { content: 'Z3<9 12$* 31 32'; }
+    30% { content: '12S4 >9#% 00 00'; }
+    40% { content: '9B*1 23&1 9F 92'; }
+    50% { content: '4$23 S9!1 20 57'; }
+    60% { content: '5*<1 !2A* B8 00'; }
+    70% { content: 'C&12 S4!@ 0D 11'; }
+    80% { content: '312S 4$*? F0 9F'; }
+    90% { content: '00X1 2S&1 65 6C'; }
+    100% { content: '1S>9 1*!& 21 0A'; }
+}
