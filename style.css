@@ -848,3 +848,10 @@ h1 {
         text-shadow: 0 0 5px #ff4141;
     }
 }
+
+/* --- AJOUT: Alignement pour les labels du formulaire "code" --- */
+.form-group.label-right {
+    text-align: right;
+    /* Aligne le label verticalement avec le champ input */
+    align-self: center; 
+}

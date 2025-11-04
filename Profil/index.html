@@ -44,15 +44,25 @@
                 <br>-- Je vois vos mots de passe -- Ada :)"
             </p>
 
-            <form id="change-password-form" class="assignment-form">
-                <label for="new-password">//: NOUVEAU MOT DE PASSE:</label>
-                <input type="password" id="new-password" class="form-input" required>
-                <br />
-                <label for="confirm-password">//: CONFIRMER LE MOT DE PASSE:</label>
-                <input type="password" id="confirm-password" class="form-input" required>
-                <br />
-                <button type="submit" class="form-button">&gt;&gt; CHANGER LE MOT DE PASSE</button>
-                <p id="form-message" class="form-message"></p>
+            <form id="change-password-form" class="form-grid">
+                
+                <div class="form-group label-right">
+                    <label for="new-password">//: NOUVEAU MOT DE PASSE:</label>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="new-password" class="form-input" required>
+                </div>
+
+                <div class="form-group label-right">
+                    <label for="confirm-password">//: CONFIRMER LE MOT DE PASSE:</label>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="confirm-password" class="form-input" required>
+                </div>
+                
+                <button type="submit" class="form-button full-width">&gt;&gt; CHANGER LE MOT DE PASSE</button>
+                <p id="form-message" class="form-message full-width"></p>
+
             </form>
         </div>
         <footer class="portal-footer">
@@ -81,18 +91,15 @@
             const confirmPasswordEl = document.getElementById('confirm-password');
             const messageEl = document.getElementById('form-message');
 
-            
             function validatePassword(password) {
-                // Au moins 5 caractères
                 if (password.length < 5) {
                     return "Erreur: Mot de passe trop court (5 min).";
                 }
-               
                 const specialCharRegex = /[^A-Za-z0-9]/;
                 if (!specialCharRegex.test(password)) {
                     return "Erreur: Doit contenir au moins 1 caractère spécial (!, @, #, $, etc.)";
                 }
-                return null; 
+                return null;
             }
 
             passwordForm.addEventListener('submit', async (e) => {
@@ -103,13 +110,11 @@
                 const newPassword = newPasswordEl.value;
                 const confirmPassword = confirmPasswordEl.value;
 
-                // Vérification 1: Correspondance
                 if (newPassword !== confirmPassword) {
                     messageEl.textContent = 'Erreur: Les mots de passe ne correspondent pas.';
                     messageEl.className = 'form-message error';
                     return;
                 }
-                
                 
                 const validationError = validatePassword(newPassword);
                 if (validationError) {
