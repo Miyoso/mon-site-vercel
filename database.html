@@ -87,13 +87,12 @@
                             
                             box.querySelector('.name').textContent = agent.name;
                             box.querySelector('a').href = agent.profile_url;
-                            return; 
+                            return;
                         }
 
-                        // -- Traitement pour tous les autres agents 
+                        // -- Traitement pour tous les autres agents (la grille) --
                         
                         const parts = agent.status_text.split('::').map(part => part.trim());
-                        
                         const statusText = parts[1] || '[STATUS_UNKNOWN]';
                         const dataText = parts[2] || null;
 
@@ -106,27 +105,23 @@
                         
                        
                         let cellHTML = `
-                            <a href="${agent.profile_url}" class="agent-cell ${statusClass} ${agent.css_class || ''}">
+                            <a href="${agent.profile_url}" class="agent-cell ${statusClass} ${agent.css_class || ''}" data-id="${agent.id}">
                                 <span class="agent-rank">[AGENT_STD]</span>
                         `;
 
-                        // Cas spécial pour DECEASED
                         if (statusText === 'DOSSIER SCELLÉ' && dataText === '[DECEASED]') {
                             cellHTML += `
                                 <span class="agent-id">${statusText}</span> <span>::</span>
                                 <span class="agent-data special" style="color: #ff4141;">[DECEASED]</span>
                             `;
                         } 
-                        // Cas avec data 
                         else if (dataText) {
                             cellHTML += `
                                 <span class="agent-id">${statusText}</span> <span>::</span>
                                 <span class="agent-status">${dataText}</span>
                             `;
                         } 
-                        // Cas avec statut seul 
                         else {
-                            
                             cellHTML += `
                                 <span class="agent-id" style="grid-column: 1 / 4;">${statusText}</span>
                             `;
@@ -137,6 +132,35 @@
                     });
 
                     gridContainer.innerHTML = gridHTML;
+
+                    
+                    const agent13Link = document.querySelector('a[data-id="13"]');
+                    
+                    if (agent13Link) {
+                        
+                        agent13Link.addEventListener('click', function(e) {
+                            
+                            e.preventDefault(); 
+                            
+                            
+                            this.className = 'agent-cell status-red corrupted';
+                            
+                            
+                            this.style.animation = 'glitchEffect 150ms 5';
+                            
+                            
+                            this.innerHTML = `
+                                <span class="agent-rank">[AGENT_STD]</span>
+                                <span class="agent-id" style="grid-column: 1 / 4; color: #ff4141;">[DONNÉES DÉTRUITES]</span>
+                                <span class="agent-data special" colspan="3">!! ALERTE SYSTÈME !!</span>
+                            `;
+                            
+                            
+                            this.href = '#';
+
+                        }, { once: true });
+                    }
+                    
 
                 } else {
                     gridContainer.innerHTML = '<p>[ERREUR: AUCUN AGENT TROUVÉ]</p>';
