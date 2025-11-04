@@ -3,138 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dossier Agent :: R. ARSENAULT</title>
-
-    <script>
-        const REQUIRED_LEVEL = 1;
-    </script>
-    <script src="../security.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="style-nyx.css">
+    <title>ACCÈS NYX // PRÉPARATION</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     
+    <style>
+        body {
+            background-color: #121212;
+            color: #00e600; /* Vert vif */
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            line-height: 1.5;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Affiche les lignes en bas */
+            min-height: 100vh;
+            overflow: hidden; /* Empêche le scroll par défaut */
+        }
+        .console-output {
+            max-height: 100%; /* S'assure que la console ne dépasse pas */
+            overflow-y: auto; /* Permet le défilement si trop de lignes */
+            white-space: pre-wrap; /* Préserve les retours à la ligne */
+            word-break: break-all; /* Coupe les mots longs */
+        }
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+            display: inline-block;
+            width: 0.6em; /* Largeur du curseur */
+            height: 1em;
+            background-color: #00e600; /* Couleur du curseur */
+            vertical-align: middle;
+            margin-left: 0.2em;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
 </head>
-<body class="text-green-400 min-h-screen p-4 md:p-8 scanline">
+<body>
 
-    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50">
-        <header class="font-tech text-lg md:text-xl p-4 bg-green-900/30 border-b-2 border-green-700/50 flex justify-between items-center">
-            <span>[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3 REQUIS]</span>
-            <span class="text-red-500 animate-pulse">● REC</span>
-        </header>
-
-        <div class="p-6 md:p-8 space-y-8">
-            
-            <div>
-                <span class="text-green-300">$</span> <span class="text-white">load --dossier=AGENT_ARSENAULT_R</span>
-                <p class="text-cyan-400">... Chargement du dossier ...</p>
-                <p class="text-green-400">Authentification réussie. Affichage des données.</p>
-                <span class="text-green-300">$</span> <span class="cursor-blink"></span>
-            </div>
-
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 01 : IDENTIFICATION]</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-slate-400">NOM DE L'AGENT :</p>
-                        <p class="text-xl text-white">ARSENAULT, RAPHAËLLE</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">ÂGE :</p>
-                        <p class="text-xl text-white">26</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">ORIGINE :</p>
-                        <p class="text-xl text-white">Québec</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">STATUT ACTUEL :</p>
-                        <p class="text-xl text-yellow-400">ACTIVE (Protection du Gouverneur)</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">RÉSIDENCE :</p>
-                        <p class="text-xl text-white">QG SAS (Sud)</p>
-                    </div>
-                </div>
-            </section>
-
-            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
-            
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <h3 class="text-xl text-cyan-400 font-tech mb-2">// PHYSIQUE</h3>
-                        <ul class="list-none space-y-1">
-                            <li><span class="text-slate-400">CHEVEUX:</span> Rouge intense</li>
-                            <li><span class="text-slate-400">YEUX:</span> Vert / Gris</li>
-                            <li><span class="text-slate-400">MARQUES:</span> Taches de rousseur</li>
-                            <li><span class="text-slate-400">POSTURE:</span> Militaire, droite</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="text-xl text-green-400 font-tech mb-2">// QUALITÉS (ASSETS)</h3>
-                        <ul class="list-none space-y-1">
-                            <li>Courageuse</li>
-                            <li>Loyale</li>
-                            <li>Perspicace</li>
-                            <li>Instinct affûté</li>
-                            <li>Disciplinée</li>
-                            <li>Méthodique</li>
-                            <li>Analytique (Froide)</li>
-                            <li>Protectrice</li>
-                            <li>Adaptable</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="text-xl text-yellow-400 font-tech mb-2">// DÉFAUTS (LIABILITIES)</h3>
-                        <ul class="list-none space-y-1">
-                            <li>Méfiante (Paranoïaque)</li>
-                            <li>Manipulatrice</li>
-                            <li>Froide (Émotionnellement)</li>
-                            <li>Impulsive (Sujet: Frère)</li>
-                            <li>Culpabilisée (Passé Mercenaire)</li>
-                            <li>Distante</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
-
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 03 : NOTES DE TERRAIN (OBSERVATION)]</h2>
-                <div class="bg-black/30 p-4 rounded text-slate-300 space-y-2">
-                    <p>&gt; Fixation orale (Chewing-gum [Menthe] / Cure-dent).</p>
-                    <p>&gt; Nomme son arme "Charlie".</p>
-                    <p>&gt; Réaction négative au contact physique non sollicité.</p>
-                    <p>&gt; Obsession pour la pluie (Effet: Apaisant).</p>
-                    <p>&gt; Porte une plaque militaire rayée (Souvenir).</p>
-                    <p>&gt; Sujet: Carnet noir (Contenu: Inconnu).</p>
-                    <p>&gt; Insomnies récurrentes (Cause: Actes passés).</p>
-                    <p>&gt; Préférence: Solitude, observation.</p>
-                    <p>&gt; Rire: Rare (Déclencheur: Sarcasme/Absurde).</p>
-                </div>
-            </section>
-
-             <div>
-                <span class="text-green-300">$</span> <span class="text-white">exit</span>
-                <p class="text-red-500">... Déconnexion ...</p>
-                
-                <div class="mt-8 text-center border-t border-green-700/50 pt-4">
-                    <a href="../database.html" class="font-tech text-green-400 hover:text-white hover:bg-green-700 p-2 transition-all">
-                        &lt;&lt; RETURN_TO_DATABASE
-                    </a>
-                </div>
-            </div>
-
+    <div class="console-output" id="consoleOutput">
         </div>
-    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const consoleOutput = document.getElementById('consoleOutput');
+            const lines = [
+                "INIT: Système d'accès SAS v3.1.2b...",
+                "CHECK: Intégrité des modules [OK]",
+                "LOAD: Protocole de sécurité PHOENIX_GUARD...",
+                "VERIFY: Certificats cryptographiques [VALID]",
+                "ACCESS: Tentative de connexion au Méta-Répertoire des Agents...",
+                "QUERY: Agent [NYX_PROFILE]...",
+                "AWAIT: Réponse serveur de données...",
+                "PING: DataServer [SUCCESS]",
+                "FETCH: Dossier [NYX_007] :: Clé d'accréditation [NIVEAU_7]...",
+                "DECRYPT: Flux de données séquentiel (AES-256 / SHA-512)...",
+                "WARNING: Activité anormale détectée sur le segment 'PROJET_VALKYRIE'.",
+                "ALERT: Tentative d'accès non autorisé au champ 'CLASSIFIED_ALPHA'. Contournement actif.",
+                "CLEAN: Purge des résidus d'informations (PROTOCOLE: GHOST_CLEAN)...",
+                "COMPILE: Données brutes en format lisible...",
+                "COMPLETE: Chargement du dossier [NYX_007]. Redirection imminente.",
+                "..."
+            ];
+            let i = 0;
+            let currentLineElement;
 
+            function addLine() {
+                if (i < lines.length) {
+                    const lineText = lines[i];
+                    currentLineElement = document.createElement('p');
+                    currentLineElement.textContent = '> ' + lineText;
+                    consoleOutput.appendChild(currentLineElement);
+                    consoleOutput.scrollTop = consoleOutput.scrollHeight; // Scroll to bottom
+                    i++;
+                    setTimeout(addLine, Math.random() * 150 + 50); // Délai aléatoire pour un effet plus réaliste
+                } else {
+                    // Toutes les lignes affichées, ajouter le curseur et rediriger
+                    const finalPrompt = document.createElement('p');
+                    finalPrompt.innerHTML = '> ACCÈS AUTORISÉ. <span class="cursor-blink"></span>';
+                    consoleOutput.appendChild(finalPrompt);
+                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                    setTimeout(() => {
+                        window.location.href = 'agent-nyx.html'; // Redirige vers le vrai dossier
+                    }, 2000); // 2 secondes après la dernière ligne
+                }
+            }
+
+            addLine();
+        });
+    </script>
 </body>
 </html>
