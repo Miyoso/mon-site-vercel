@@ -1,4 +1,3 @@
-/* --- Réglages Généraux --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -23,7 +22,6 @@ body {
     animation: animateScanline 8s linear infinite;
 }
 
-/* --- Terminal --- */
 .terminal {
     width: 100%;
     max-width: 900px;
@@ -34,7 +32,6 @@ body {
     border-radius: 4px;
 }
 
-/* --- Logo --- */
 .logo {
     display: block;
     width: 120px;
@@ -44,7 +41,6 @@ body {
     filter: grayscale(100%) brightness(1.2);
 }
 
-/* --- Textes --- */
 h1 {
     color: #eaeaea; 
     text-align: center;
@@ -69,15 +65,9 @@ h1 {
     color: #ff4141;
 }
 
-
-
-
-/* --- Menu du Portail --- */
-/* --- MODIFICATION: Menu du Portail --- */
 .portal-menu {
     display: flex;
     flex-direction: column;
-    /* Gère l'espace ENTRE les groupes */
     gap: 1.5rem; 
 }
 
@@ -100,7 +90,6 @@ h1 {
     font-size: 0.9rem;
 }
 
-/* MODIFIÉ: Styles pour les liens verrouillés/déverrouillés */
 .portal-link.disabled {
     cursor: not-allowed;
 }
@@ -108,15 +97,14 @@ h1 {
     color: #555;
 }
 .portal-link.disabled .link-status {
-    color: #ff4141; /* Rouge */
+    color: #ff4141;
 }
 
-/* AJOUT: Style pour liens déverrouillés */
 .portal-link.unlocked {
     cursor: pointer;
 }
 .portal-link.unlocked .link-status {
-    color: #00ff00; /* Vert */
+    color: #00ff00;
 }
 
 .portal-link.unlocked:hover {
@@ -132,8 +120,6 @@ h1 {
     color: #000;
 }
 
-
-/* --- Pied de page du Portail --- */
 .portal-footer {
     padding-top: 1.5rem;
     margin-top: 1.5rem;
@@ -155,32 +141,6 @@ h1 {
     padding: 2px 4px;
 }
 
-/* --- Liste des Agents --- */
-.agent-list {
-    list-style-type: none;
-}
-.agent-list li {
-    margin-bottom: 0.5rem;
-    border: 1px solid #222;
-    transition: all 0.2s ease-in-out;
-}
-.agent-list a {
-    display: block;
-    text-decoration: none;
-    color: #c5c5c5;
-    padding: 0.75rem 1rem;
-    background-color: #111;
-    transition: all 0.2s ease-in-out;
-    position: relative; 
-}
-.agent-list a:hover,
-.agent-list a:focus {
-    color: #fff;
-    background-color: #151515;
-    animation: glitchEffect 150ms 2;
-}
-
-/* --- Styles pour le formulaire de login --- */
 .login-form {
     margin-top: 2rem;
     display: flex;
@@ -223,16 +183,14 @@ h1 {
     height: 1rem;
 }
 
-/* --- Style pour le contenu des rapports --- */
 .report-content {
     margin-top: 1.5rem;
-    padding: 1rem;
+    padding: 1rem 0.5rem;
     background-color: #050505;
     border: 1px solid #222;
     min-height: 200px;
 }
 
-/* --- Animations --- */
 @keyframes flicker {
     0%, 100% { opacity: 1; text-shadow: 0 0 2px #eaeaea; }
     50% { opacity: 0.8; text-shadow: none; }
@@ -276,24 +234,17 @@ h1 {
     }
 }
 
-/* --- AJOUT: Styles pour l'inventaire détaillé --- */
-
-.report-content {
-    /* On enlève le padding simple pour gérer les listes */
-    padding: 1rem 0.5rem; 
-}
-
 .category-title {
-    color: #00ff00; /* Vert hacker */
+    color: #00ff00;
     font-size: 1.2rem;
     border-bottom: 1px solid #333;
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
-    margin-top: 1rem; /* Espace entre les catégories */
+    margin-top: 1rem;
     padding-left: 1rem;
 }
 .report-content > .category-title:first-child {
-    margin-top: 0; /* Pas de marge pour le premier titre */
+    margin-top: 0;
 }
 
 .inventory-list {
@@ -302,12 +253,12 @@ h1 {
 }
 
 .inventory-list li {
-    margin-bottom: 1.25rem; /* Espace entre les items */
+    margin-bottom: 1.25rem;
 }
 
 .item-name {
     font-size: 1.1rem;
-    color: #eaeaea; /* Blanc cassé */
+    color: #eaeaea;
     display: block;
     margin-bottom: 0.5rem;
 }
@@ -315,21 +266,19 @@ h1 {
 .item-details {
     list-style-type: none;
     padding-left: 1.5rem;
-    border-left: 1px dashed #444; /* Ligne de "connexion" */
+    border-left: 1px dashed #444;
 }
 
 .item-details li {
     margin-bottom: 0.25rem;
-    color: #c5c5c5; /* Gris clair */
+    color: #c5c5c5;
 }
 
 .detail-label {
-    color: #888; /* Gris sombre */
+    color: #888;
     display: inline-block;
-    width: 120px; /* Aligne les valeurs */
+    width: 120px;
 }
-
-/* --- AJOUT: Mise en valeur des liens déverrouillés --- */
 
 @keyframes pulse-green {
     0% {
@@ -337,7 +286,7 @@ h1 {
         border-color: rgba(0, 255, 0, 0.5);
     }
     50% {
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); /* Lueur plus forte */
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
         border-color: rgba(0, 255, 0, 1);
     }
     100% {
@@ -346,34 +295,13 @@ h1 {
     }
 }
 
-.agent-list a.decrypted {
-    color: #00ff00; /* Texte vert */
-    background-color: #051a05; /* Fond vert très sombre */
-    
-    /* Application de l'animation de pulsation */
-    animation: pulse-green 2.5s infinite ease-in-out;
-}
-
-/* On garde l'effet glitch au survol, 
- mais on change les couleurs pour correspondre 
-*/
-.agent-list a.decrypted:hover,
-.agent-list a.decrypted:focus {
-    color: #000; /* Texte noir au survol */
-    background-color: #00ff00; /* Fond vert vif */
-    
-    /* On relance l'animation glitch (déjà définie) au lieu de la pulsation */
-    animation: glitchEffect 150ms 2;
-}
-
-/* --- AJOUT: Animation de pulsation ROUGE --- */
 @keyframes pulse-red {
     0% {
         box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
         border-color: rgba(255, 0, 0, 0.5);
     }
     50% {
-        box-shadow: 0 0 15px rgba(255, 0, 0, 0.7); /* Lueur rouge plus forte */
+        box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
         border-color: rgba(255, 65, 65, 1);
     }
     100% {
@@ -382,36 +310,14 @@ h1 {
     }
 }
 
-/* Style pour les liens corrompus */
-.agent-list a.corrupted {
-    color: #ff4141; /* Texte rouge */
-    background-color: #2a0a0a; /* Fond rouge très sombre */
-    
-    /* Application de l'animation de pulsation rouge */
-    animation: pulse-red 2s infinite ease-in-out;
-}
-
-/* Survol pour les liens corrompus */
-.agent-list a.corrupted:hover,
-.agent-list a.corrupted:focus {
-    color: #000; /* Texte noir au survol */
-    background-color: #ff4141; /* Fond rouge vif */
-    
-    /* On relance l'animation glitch */
-    animation: glitchEffect 150ms 2;
-}
-
-
-/* --- AJOUT: Nouveaux styles pour les groupes --- */
 .portal-group {
     display: flex;
     flex-direction: column;
-    /* Gère l'espace ENTRE les liens d'un même groupe */
     gap: 0.5rem; 
 }
 
 .portal-group-title {
-    color: #00ff00; /* Vert hacker */
+    color: #00ff00;
     font-size: 1rem;
     border-bottom: 1px solid #333;
     padding-bottom: 0.5rem;
@@ -419,14 +325,11 @@ h1 {
     text-transform: uppercase;
 }
 
-/* --- AJOUT: Styles pour la page ACCESS DENIED --- */
-
 .access-denied-body {
     background-color: #000;
-    overflow: hidden; /* Empêche les barres de défilement pour les glitches */
+    overflow: hidden;
 }
 
-/* Effet glitch énorme pour le titre */
 .glitch-wrapper {
     position: fixed;
     top: 50%;
@@ -437,14 +340,14 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    pointer-events: none; /* Pour pouvoir cliquer sur le terminal en dessous */
+    pointer-events: none;
     z-index: 100;
-    opacity: 0.1; /* Très transparent pour un effet de fond */
+    opacity: 0.1;
 }
 
 .glitch-text-huge {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 8rem; /* Très gros */
+    font-size: 8rem;
     color: #ff0000;
     text-shadow: 0 0 5px #ff0000;
     position: relative;
@@ -475,7 +378,6 @@ h1 {
     animation: glitch-anim2 3s infinite linear alternate-reverse;
 }
 
-/* Animations pour le gros glitch */
 @keyframes text-flicker {
     0% { opacity: 0.9; }
     50% { opacity: 1; }
@@ -528,17 +430,16 @@ h1 {
     100% { clip: rect(0, 9999px, 0, 0); transform: skew(0deg); }
 }
 
-
 .access-denied-terminal {
-    background-color: rgba(30, 0, 0, 0.8); /* Fond rouge sombre transparent */
+    background-color: rgba(30, 0, 0, 0.8);
     border-color: #f00;
     box-shadow: 0 0 30px rgba(255, 0, 0, 0.5), inset 0 0 15px rgba(255, 0, 0, 0.2);
     position: relative;
-    z-index: 101; /* Pour être au-dessus de l'effet glitch global */
+    z-index: 101;
 }
 
 .access-denied-terminal h1 {
-    color: #ff4141; /* Rouge pour le titre */
+    color: #ff4141;
     text-shadow: 0 0 5px #ff4141, 0 0 10px #ff0000;
     animation: flicker-red 1s linear infinite;
 }
@@ -571,16 +472,15 @@ h1 {
     margin-bottom: 0.5rem;
 }
 
-/* Version rouge du data-glitched */
 .data-glitched-red {
     display: inline-block;
-    color: #00ff00; /* Texte vert pour le glitch, contraste avec le rouge */
+    color: #00ff00;
     min-width: 80px; 
     text-align: center;
     position: relative;
 }
 .data-glitched-red::before {
-    content: '8923#@&1'; /* Contenu initial */
+    content: '8923#@&1';
     display: inline-block;
     animation: glitch-text-red 100ms infinite step-end;
 }
@@ -598,7 +498,6 @@ h1 {
     100% { content: '1S>91*!&'; }
 }
 
-
 .access-denied-footer .back-link {
     color: #ff4141;
     text-shadow: 0 0 5px #ff4141;
@@ -608,7 +507,6 @@ h1 {
     color: #000;
 }
 
-/* Petite animation de "flicker" rouge */
 @keyframes flicker-red {
     0%, 100% { opacity: 1; text-shadow: 0 0 2px #ff4141; }
     50% { opacity: 0.8; text-shadow: none; }
@@ -617,10 +515,8 @@ h1 {
     57% { opacity: 1; text-shadow: 0 0 2px #ff4141; }
 }
 
-/* --- AJOUT: Styles pour le formulaire d'ajout --- */
 .form-grid {
     display: grid;
-    /* 2 colonnes */
     grid-template-columns: 1fr 1fr; 
     gap: 1rem;
 }
@@ -632,7 +528,7 @@ h1 {
 }
 
 .form-group label {
-    font-size: 0.9rem; /* Plus petit que les autres labels */
+    font-size: 0.9rem;
     color: #888;
 }
 
@@ -649,15 +545,12 @@ h1 {
     border-color: #00ff00;
 }
 
-/* Fait en sorte que le bouton prenne toute la largeur */
 .full-width {
     grid-column: 1 / -1; 
 }
 
-/* --- AJOUT: Style pour le bouton de suppression --- */
-
 .form-button.delete {
-    background-color: #ff4141; /* Rouge */
+    background-color: #ff4141;
     color: #fff;
     text-shadow: 0 0 5px #000;
 }
@@ -667,9 +560,6 @@ h1 {
     box-shadow: 0 0 15px #ff4141;
 }
 
-/* --- Styles pour les messages de formulaire --- */
-
-
 .form-message.success {
     color: #00ff00;
 }
@@ -677,170 +567,26 @@ h1 {
     color: #ff4141;
 }
 
-/* --- AJOUT: Styles pour l'Organigramme --- */
-
-.org-chart {
-    padding: 1rem;
-}
-
-.org-level {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap; /* Permet aux agents de passer à la ligne */
-    gap: 20px;
-    margin-bottom: 40px; /* Espace entre les niveaux */
-    position: relative;
-}
-
-/* Titre pour la grille du bas */
-.org-level-title {
-    color: #00ff00;
-    font-size: 1rem;
-    border-bottom: 1px solid #333;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-    margin-top: 2rem;
-    text-transform: uppercase;
-}
-
-/* Lignes de connexion (simplifiées) */
-.org-level#level-1::after {
-    content: '';
-    position: absolute;
-    bottom: -20px; /* Se place entre le niveau 1 et 2 */
-    left: 50%;
-    width: 2px;
-    height: 20px;
-    background-color: #333;
-}
-.org-level#level-2::before {
-    content: '';
-    position: absolute;
-    top: -20px; /* Se place entre le niveau 1 et 2 */
-    left: 25%;
-    width: 50%;
-    height: 2px;
-    background-color: #333;
-}
-
-/* Style des boîtes */
-.agent-box {
-    background-color: #111;
-    border: 1px solid #333;
-    padding: 1rem;
-    width: 280px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    position: relative;
-}
-
-/* Lignes verticales pour le niveau 2 */
-.agent-box.subordinate::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    width: 2px;
-    height: 20px;
-    background-color: #333;
-}
-
-
-/* Style des boîtes "Lead" et "Subordinate" */
-.agent-box .agent-title {
-    font-size: 0.8rem;
-    color: #888;
-}
-.agent-box .agent-name {
-    font-size: 1.5rem;
-    color: #eaeaea;
-    font-weight: bold;
-}
-.agent-box .agent-link {
-    font-size: 0.9rem;
-    color: #00ff00;
-    text-decoration: none;
-    border: 1px solid #00ff00;
-    padding: 2px 6px;
-    transition: all 0.2s;
-}
-.agent-box .agent-link:hover {
-    background-color: #00ff00;
-    color: #000;
-}
-
-/* Style pour la grille du bas (autres agents) */
-.agent-box.team-member {
-    width: 280px;
-    padding: 0; /* Le lien prendra tout l'espace */
-    border: 1px solid #222;
-}
-
-/* Lien qui remplit toute la boîte */
-.agent-link-full {
-    display: block;
-    padding: 0.75rem 1rem;
-    text-decoration: none;
-    color: #c5c5c5;
-    transition: all 0.2s ease-in-out;
-}
-
-/* Réutilisation des styles de pulsation */
-.agent-link-full.decrypted {
-    color: #00ff00;
-    background-color: #051a05;
-    animation: pulse-green 2.5s infinite ease-in-out;
-}
-.agent-link-full.corrupted {
+.ada-warning {
     color: #ff4141;
+    font-size: 0.9rem;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+    border: 1px dashed #ff4141;
     background-color: #2a0a0a;
-    animation: pulse-red 2s infinite ease-in-out;
-}
-.agent-link-full:hover {
-    background-color: #c5c5c5;
-    color: #000;
-    animation: glitchEffect 150ms 2;
-}
-
-/* --- AJOUT: Message d'avertissement d'Ada --- */
-.ada-warning {
-    color: #888; /* Gris sombre */
-    font-size: 0.9rem;
-    font-style: italic;
-    text-align: center;
-    padding: 1rem;
-    border: 1px dashed #333;
-    background-color: #0c0c0c;
     margin-bottom: 2rem;
     line-height: 1.6;
+    animation: ada-blink 1.5s infinite alternate;
 }
 
-/* --- Mise à jour: Message d'avertissement d'Ada (Rouge Clignotant) --- */
-.ada-warning {
-    color: #ff4141; /* Rouge vif pour le texte */
-    font-size: 0.9rem;
-    font-style: italic;
-    text-align: center;
-    padding: 1rem;
-    border: 1px dashed #ff4141; /* Bordure rouge */
-    background-color: #2a0a0a; /* Fond rouge foncé */
-    margin-bottom: 2rem;
-    line-height: 1.6;
-
-    /* Animation de clignotement */
-    animation: ada-blink 1.5s infinite alternate; /* Clignote toutes les 1.5s */
-}
-
-/* Définition de l'animation de clignotement */
 @keyframes ada-blink {
     0% {
         opacity: 1;
-        text-shadow: 0 0 5px #ff4141; /* Effet de lueur */
+        text-shadow: 0 0 5px #ff4141;
     }
     50% {
-        opacity: 0.7; /* Réduit l'opacité à mi-chemin */
+        opacity: 0.7;
         text-shadow: none;
     }
     100% {
@@ -849,9 +595,32 @@ h1 {
     }
 }
 
-/* --- AJOUT: Alignement pour les labels du formulaire "code" --- */
-.form-group.label-right {
-    text-align: right;
-    /* Aligne le label verticalement avec le champ input */
-    align-self: center; 
+.agent-cell.is-corrupting {
+    animation: data-corruption-dissolve 0.5s linear forwards; 
+    border-color: #ff4141 !important; 
+    color: #ff4141 !important;
+}
+
+@keyframes data-corruption-dissolve {
+    0% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate(0, 0);
+    }
+    50% {
+        opacity: 0.5;
+        filter: blur(2px);
+        transform: translate(2px, -2px) skewX(10deg); 
+    }
+    99% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translate(0, 5px);
+    }
+    100% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translate(0, 5px);
+        display: none; 
+    }
 }
