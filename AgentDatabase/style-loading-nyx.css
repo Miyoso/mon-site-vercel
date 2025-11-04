@@ -1,0 +1,69 @@
+/* AgentDatabase/style-loading-nyx.css */
+body {
+    background-color: #121212;
+    color: #eaeaea; /* Texte par défaut (blanc/gris) */
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Affiche les lignes en bas */
+    min-height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+.console-output {
+    max-height: 100%;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* Style du Prompt KALI */
+.prompt {
+    color: #eaeaea; /* Couleur du # et des parenthèses */
+}
+.prompt .user {
+    color: #ff4141; /* Rouge (root) */
+    text-shadow: 0 0 2px #ff4141;
+}
+.prompt .host {
+    color: #eaeaea; /* Blanc */
+}
+.prompt .path {
+    color: #8ab4f8; /* Bleu */
+}
+.prompt .symbol {
+    color: #eaeaea; /* Blanc */
+}
+
+/* Styles des lignes de sortie */
+.line-command {
+    color: #eaeaea; /* Commande tapée */
+}
+.line-info {
+    color: #00cccc; /* Cyan */
+}
+.line-success {
+    color: #00e600; /* Vert */
+}
+.line-warning {
+    color: #ffff00; /* Jaune */
+}
+.line-error {
+    color: #ff4141; /* Rouge */
+}
+
+.cursor-blink {
+    animation: blink 1s step-end infinite;
+    display: inline-block;
+    width: 0.6em;
+    height: 1em;
+    background-color: #eaeaea; /* Curseur blanc */
+    vertical-align: middle;
+    margin-left: 0.2em;
+}
+@keyframes blink {
+    50% { opacity: 0; }
+}

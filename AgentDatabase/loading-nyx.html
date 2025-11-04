@@ -9,76 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     
-    <style>
-        body {
-            background-color: #121212;
-            color: #eaeaea; /* Texte par défaut (blanc/gris) */
-            font-family: 'Roboto Mono', monospace;
-            font-size: 1rem;
-            line-height: 1.5;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end; /* Affiche les lignes en bas */
-            min-height: 100vh;
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-        .console-output {
-            max-height: 100%;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-break: break-all;
-        }
-        
-        /* Style du Prompt KALI */
-        .prompt {
-            color: #eaeaea; /* Couleur du # et des parenthèses */
-        }
-        .prompt .user {
-            color: #ff4141; /* Rouge (root) */
-            text-shadow: 0 0 2px #ff4141;
-        }
-        .prompt .host {
-            color: #eaeaea; /* Blanc */
-        }
-        .prompt .path {
-            color: #8ab4f8; /* Bleu */
-        }
-        .prompt .symbol {
-            color: #eaeaea; /* Blanc */
-        }
-
-        /* Styles des lignes de sortie */
-        .line-command {
-            color: #eaeaea; /* Commande tapée */
-        }
-        .line-info {
-            color: #00cccc; /* Cyan */
-        }
-        .line-success {
-            color: #00e600; /* Vert */
-        }
-        .line-warning {
-            color: #ffff00; /* Jaune */
-        }
-        .line-error {
-            color: #ff4141; /* Rouge */
-        }
-
-        .cursor-blink {
-            animation: blink 1s step-end infinite;
-            display: inline-block;
-            width: 0.6em;
-            height: 1em;
-            background-color: #eaeaea; /* Curseur blanc */
-            vertical-align: middle;
-            margin-left: 0.2em;
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-    </style>
+    <link rel="stylesheet" href="style-loading-nyx.css">
+    
 </head>
 <body>
 
@@ -90,11 +22,9 @@
             const consoleOutput = document.getElementById('consoleOutput');
             const targetFile = 'agent-nyx.html'; // La destination finale
 
-            // Le prompt Kali (sur deux lignes)
             const kaliPrompt = `┌──(<span class="user">root</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/secure/agents</span>]
 └─<span class="symbol">#</span> `;
 
-            // La séquence de commandes à simuler
             const lines = [
                 { type: 'command', text: 'whoami' },
                 { type: 'info', text: 'root (UID: 0, GID: 0)' },
@@ -125,7 +55,7 @@
                 { type: 'info', text: 'Mounting decrypted volume...' },
                 { type: 'success', text: 'VOLUME MOUNTED at /mnt/nyx_data' },
                 { type: 'command', text: 'cat /mnt/nyx_data/loader.log' },
-                { type:Info: 'INIT: Système d\'accès SAS v3.1.2b...' },
+                { type: 'info', text: 'INIT: Système d\'accès SAS v3.1.2b...' },
                 { type: 'info', text: 'LOAD: Protocole PHOENIX_GUARD... [OK]' },
                 { type: 'info', text: 'VERIFY: Certificats [VALID]' },
                 { type: 'info', text: 'QUERY: Agent [NYX_PROFILE]...' },
