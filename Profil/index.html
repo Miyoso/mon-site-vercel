@@ -53,20 +53,20 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // On récupère le nom de l'agent (important pour l'API)
+            
             const user = localStorage.getItem('sas_user') || 'INCONNU';
             const level = localStorage.getItem('sas_level') || '0';
             
-            // --- AJOUT : Affichage du statut de l'agent ---
+            
             const statusMessage = document.getElementById('agent-status-display');
             if (user === 'INCONNU') {
                 statusMessage.textContent = 'AGENT: [ERREUR_SESSION]';
                 statusMessage.style.color = '#ff4444'; // Rouge
             } else {
-                // Utilise innerHTML pour que les spans fonctionnent
+                
                 statusMessage.innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
             }
-            // --- FIN DE L'AJOUT ---
+            // 
 
             const passwordForm = document.getElementById('change-password-form');
             const newPasswordEl = document.getElementById('new-password');

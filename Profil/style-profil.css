@@ -2,18 +2,18 @@
 
 /* Configuration générale */
 body {
-    background-color: #0a0a0a;
-    color: #00ff00; /* Vert vif */
-    font-family: 'VT323', monospace; /* Police rétro */
-    font-size: 20px;
-    text-shadow: 0 0 5px #00ff00, 0 0 10px rgba(0, 255, 0, 0.3);
-    line-height: 1.6;
-    padding: 2rem;
+    background-color: #121212;
+    color: #00e600;
+    font-family: 'Roboto Mono', monospace; 
+    font-size: 16px;
+    text-shadow: 0 0 2px rgba(0, 230, 0, 0.5); 
+    line-height: 1.7;
+    padding: 2.5rem;
     position: relative;
     overflow-x: hidden; /* Empêche le scroll horizontal */
 }
 
-/* Pseudo-élément pour les scanlines */
+/* Scanlines plus subtiles */
 body::before {
     content: "";
     position: absolute;
@@ -26,154 +26,180 @@ body::before {
             to bottom,
             rgba(18, 18, 18, 0),
             rgba(18, 18, 18, 0) 1px,
-            rgba(0, 0, 0, 0.4) 2px,
-            rgba(0, 0, 0, 0.4) 3px
+            rgba(0, 0, 0, 0.2) 2px,
+            rgba(0, 0, 0, 0.2) 3px
         );
     pointer-events: none;
     z-index: 1;
 }
 
-/* Conteneur principal */
 .security-container {
-    max-width: 600px;
-    margin: 4rem auto;
-    border: 1px solid #005500;
-    padding: 2rem;
+    max-width: 650px;
+    margin: 3rem auto;
+    border: 1px solid #004d00;
+    padding: 2.5rem;
     position: relative;
     z-index: 2;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 5px;
 }
 
-/* Titre */
+.prompt-header {
+    color: #00cccc;
+    text-shadow: 0 0 2px #00cccc; 
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+    padding-left: 0.5rem;
+}
+.prompt-header .username {
+    color: #ffff00; /* Jaune pour le nom de l'utilisateur */
+}
+
+.prompt-end {
+    color: #00e600;
+    padding-right: 0.5rem;
+    text-shadow: none; 
+    font-size: 1.1rem;
+}
+
 h1 {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     text-transform: uppercase;
-    border-bottom: 1px dashed #00ff00;
-    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #00e600;
+    padding-bottom: 0.8rem;
     margin-top: 0;
+    margin-bottom: 1.5rem; /* Réduit pour le statut */
+    display: flex;
+    align-items: center;
 }
 
-/* Boîte d'alerte */
+/* --- AJOUT: Ligne de Statut (Agent + Niveau) --- */
+.status {
+    font-size: 1.1rem;
+    text-align: left;
+    color: #888;
+    margin-bottom: 2.5rem;
+}
+.status-secure {
+    color: #00e600;
+    text-shadow: 0 0 3px #00e600;
+}
+.status-level {
+    color: #ffff00;
+    text-shadow: 0 0 3px #ffff00;
+}
+
+
 .alert-box {
-    border: 1px dashed #ff0000;
-    background-color: rgba(255, 0, 0, 0.05);
-    padding: 1.5rem;
-    margin: 2rem 0;
-    color: #ff4444;
-    text-shadow: 0 0 5px #ff0000;
+    border: 1px solid #cc0000;
+    background-color: rgba(204, 0, 0, 0.08);
+    padding: 1.8rem;
+    margin: 2.5rem 0;
+    color: #ff6666;
+    text-shadow: 0 0 3px #ff6666; 
+    border-radius: 3px;
 }
+.alert-box .quote { display: block; font-style: italic; }
+.alert-box .signature { display: block; text-align: right; margin-top: 1.2rem; color: #ff9999; }
 
-.alert-box .quote {
-    display: block;
-    font-style: italic;
-}
-
-.alert-box .signature {
-    display: block;
-    text-align: right;
-    margin-top: 1rem;
-    color: #ff8888;
-}
-
-/* Groupes de formulaire */
 .form-group {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
+    display: flex; 
+    align-items: center;
+    margin-bottom: 0.7rem;
+    font-size: 1.1rem;
 }
 
-/* Champs de saisie */
 .form-input {
     width: 100%;
-    background-color: #050505;
-    border: 1px solid #005500;
-    color: #00ff00;
-    padding: 0.75rem;
-    font-family: 'VT323', monospace;
-    font-size: 1.2rem;
+    background-color: #0e0e0e;
+    border: 1px solid #004d00;
+    color: #00e600;
+    padding: 0.85rem;
+    font-family: 'Roboto Mono', monospace; 
+    font-size: 1rem;
     box-sizing: border-box;
+    border-radius: 3px;
 }
-
 .form-input:focus {
     outline: none;
-    border-color: #00ff00;
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+    border-color: #00e600;
+    box-shadow: 0 0 8px rgba(0, 230, 0, 0.4); 
 }
 
-/* Bouton */
 .btn-submit {
     background: none;
-    border: 2px solid #00ff00;
-    color: #00ff00;
-    padding: 0.75rem 1.5rem;
-    font-family: 'VT323', monospace;
-    font-size: 1.5rem;
+    border: 1.5px solid #00e600;
+    color: #00e600;
+    padding: 0.85rem 1.8rem;
+    font-family: 'Roboto Mono', monospace; 
+    font-size: 1rem;
+    font-weight: bold;
     text-transform: uppercase;
-    text-shadow: 0 0 5px #00ff00;
+    text-shadow: 0 0 3px #00e600; 
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     position: relative;
+    border-radius: 3px;
 }
-
 .btn-submit:hover,
 .btn-submit:focus {
-    background: #00ff00;
-    color: #000;
+    background: #00e600;
+    color: #0a0a0a;
     text-shadow: none;
-    box-shadow: 0 0 20px #00ff00;
+    box-shadow: 0 0 12px rgba(0, 230, 0, 0.7);
 }
-
 .btn-submit:hover::after {
     content: '_';
     animation: blink 1s step-end infinite;
     margin-left: 0.5rem;
 }
 
-/* Classe pour le clignotement */
 .blink {
     animation: blink 1s step-end infinite;
-    padding-right: 0.5rem; 
 }
 
-/* Animation du curseur (réutilisée) */
 @keyframes blink {
     50% {
         opacity: 0;
     }
 }
 
-/* AJOUT: Message d'erreur/succès */
+
 .form-message {
     margin-top: 1.5rem;
-    height: 1.5rem; /* Réserve l'espace */
+    height: 1.5rem;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
 }
 .form-message.success {
-    color: #00ff00; /* Vert */
+    color: #00e600;
+    text-shadow: 0 0 3px #00e600;
 }
 .form-message.error {
-    color: #ff4444; /* Rouge */
+    color: #ff6666;
+    text-shadow: 0 0 3px #ff6666;
 }
 
-/* AJOUT: Lien de retour */
+
 .footer-link {
     text-align: center;
     margin-top: 3rem;
-    padding-top: 1rem;
-    border-top: 1px dashed #005500;
+    padding-top: 1.5rem;
+    border-top: 1px solid #004d00;
 }
 .footer-link a {
-    color: #00ff00;
+    color: #00e600;
     text-decoration: none;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     transition: all 0.2s;
+    font-weight: bold;
 }
 .footer-link a:hover {
-    background-color: #00ff00;
-    color: #000;
+    background-color: #00e600;
+    color: #0a0a0a;
+    padding: 0.25rem 0.5rem;
 }
