@@ -14,99 +14,137 @@
 </head>
 <body>
 
+    <div id="custom-alert-overlay">
+        <div id="custom-alert-box">
+            <p id="custom-alert-message"></p>
+            <button id="custom-alert-ok">OK</button>
+        </div>
+    </div>
     <div class="console-output" id="consoleOutput">
     </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            alert("Tu as crus que ca serait possible ?");
-            alert("Je te vois !");
-            alert("Bien essayer !");
-
-            const consoleOutput = document.getElementById('consoleOutput');
-            const targetFile = 'agent-nyx.html';
-
-            const kaliPrompt = `┌──(<span class="user">root</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/secure/agents</span>]
-└─<span class="symbol">#</span> `;
-
-            const lines = [
-                { type: 'command', text: 'whoami' },
-                { type: 'info', text: 'root (UID: 0, GID: 0)' },
-                { type: 'command', text: 'ls -l /secure/agents/' },
-                { type: 'info', text: 'total 19' },
-                { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-07.html' },
-                { type: 'info', text: '-rwx------ 1 root root 5.0K Nov 3 19:27 agent-10.html' },
-                { type: 'info', text: '-rwx------ 1 root root 5.0K Nov 3 19:27 agent-11.html' },
-                { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 21:54 agent-14.html' },
-                { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-15.html' },
-                { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 21:54 agent-16.html' },
-                { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-Javier.html' },
-                { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-ji.html' },
-                { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-wei.html' },
-                { type: 'warning', text: 'drwx------ 2 root root 4.0K Nov 3 21:54 [ENCRYPTED_NYX]' },
-                { type: 'command', text: `decrypt --target=[ENCRYPTED_NYX] --key=...` },
-                { type: 'info', text: 'INITIATING DECRYPTION PROTOCOL...' },
-                { type: 'info', text: 'Attempting Kernel Module injection...' },
-                { type: 'success', text: 'Kernelspace access [OK]' },
-                { type: 'info', text: 'Running brute-force on AES-256 key...' },
-                { type: 'info', text: '... 0x1A... 0x4F... 0x9C... 0xDD...' },
-                { type: 'info', text: '... 0x3B... 0x7E... 0xAB... 0xFF...' },
-                { type: 'warning', text: 'Key entropy too high. Switching to side-channel attack.' },
-                { type: 'info', text: 'Analyzing power fluctuations... [1/3]' },
-                { type: 'info', text: 'Analyzing memory cache timing... [2/3]' },
-                { type: 'info', text: 'Analyzing electromagnetic emissions... [3/3]' },
-                { type: 'success', text: 'KEY FOUND: [REDACTED]' },
-                { type: 'info', text: 'Mounting decrypted volume...' },
-                { type: 'success', text: 'VOLUME MOUNTED at /mnt/nyx_data' },
-                { type: 'command', text: 'cat /mnt/nyx_data/loader.log' },
-                { type: 'info', text: 'INIT: Système d\'accès SAS v3.1.2b...' },
-                { type: 'info', text: 'LOAD: Protocole PHOENIX_GUARD... [OK]' },
-                { type: 'info', text: 'VERIFY: Certificats [VALID]' },
-                { type: 'info', text: 'QUERY: Agent [NYX_PROFILE]...' },
-                { type: 'error', text: 'WARNING: Activité anormale détectée sur [PROJET_VALKYRIE].' },
-                { type: 'error', text: 'ALERT: Tentative d\'accès non autorisé. Contournement actif.' },
-                { type: 'info', text: 'CLEAN: Purge des résidus (GHOST_CLEAN)...' },
-                { type: 'info', text: 'COMPILE: Données brutes...' },
-                { type: 'success', text: 'COMPLETE: Chargement du dossier [NYX_007].' },
-                { type: 'success', text: 'Redirection imminente.' },
+        
+            const trapMessages = [
+                "Tu as cru que ça serait possible ?", 
+                "Je te vois !",
+                "Bien essayé !" // Corrigé
             ];
-            
-            let i = 0;
+            let currentMessageIndex = 0;
 
-            function addLine() {
-                if (i < lines.length) {
-                    const line = lines[i];
-                    const p = document.createElement('p');
-                    
-                    if (line.type === 'command') {
-                        p.innerHTML = kaliPrompt + `<span class="line-command">${line.text}</span>`;
-                    } else {
-                        p.textContent = line.text;
-                        p.className = line.type;
-                    }
-                    
-                    consoleOutput.appendChild(p);
-                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                    i++;
-                    
-                    let delay = line.type === 'command' ? 1000 : (Math.random() * 150 + 50);
-                    if (line.text.includes('...')) delay = 400;
-                    
-                    setTimeout(addLine, delay);
+         
+            const overlay = document.getElementById('custom-alert-overlay');
+            const messageBox = document.getElementById('custom-alert-message');
+            const okButton = document.getElementById('custom-alert-ok');
+
+            function showNextTrapMessage() {
+                if (currentMessageIndex < trapMessages.length) {
+                    messageBox.textContent = trapMessages[currentMessageIndex];
+                    overlay.style.display = 'flex'; // Afficher la modale
+                    currentMessageIndex++;
                 } else {
-                    const finalPrompt = document.createElement('p');
-                    finalPrompt.innerHTML = kaliPrompt + '<span class="cursor-blink"></span>';
-                    consoleOutput.appendChild(finalPrompt);
-                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                    
-                    setTimeout(() => {
-                        window.location.href = targetFile;
-                    }, 2000);
+                   
+                    overlay.style.display = 'none'; 
+                    startConsoleAnimation(); 
                 }
             }
 
-            addLine();
+    
+            okButton.addEventListener('click', showNextTrapMessage);
+            
+         
+            showNextTrapMessage();
+            
+         
+            function startConsoleAnimation() {
+                const consoleOutput = document.getElementById('consoleOutput');
+                const targetFile = 'agent-nyx.html';
+
+                const kaliPrompt = `┌──(<span class="user">root</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/secure/agents</span>]
+└─<span class="symbol">#</span> `;
+
+              
+                const lines = [
+                    { type: 'command', text: 'whoami' },
+                    { type: 'info', text: 'root (UID: 0, GID: 0)' },
+                    { type: 'command', text: 'ls -l /secure/agents/' },
+                    { type: 'info', text: 'total 19' },
+                    { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-07.html' },
+                    { type: 'info', text: '-rwx------ 1 root root 5.0K Nov 3 19:27 agent-10.html' },
+                    { type: 'info', text: '-rwx------ 1 root root 5.0K Nov 3 19:27 agent-11.html' },
+                    { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 21:54 agent-14.html' },
+                    { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-15.html' },
+                    { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 21:54 agent-16.html' },
+                    { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-Javier.html' },
+                    { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-ji.html' },
+                    { type: 'info', text: '-rwx------ 1 root root 4.0K Nov 3 19:27 agent-wei.html' },
+                    { type: 'warning', text: 'drwx------ 2 root root 4.0K Nov 3 21:54 [ENCRYPTED_NYX]' },
+                    { type: 'command', text: `decrypt --target=[ENCRYPTED_NYX] --key=...` },
+                    { type: 'info', text: 'INITIATING DECRYPTION PROTOCOL...' },
+                    { type: 'info', text: 'Attempting Kernel Module injection...' },
+                    { type: 'success', text: 'Kernelspace access [OK]' },
+                    { type: 'info', text: 'Running brute-force on AES-256 key...' },
+                    { type: 'info', text: '... 0x1A... 0x4F... 0x9C... 0xDD...' },
+                    { type: 'info', text: '... 0x3B... 0x7E... 0xAB... 0xFF...' },
+                    { type: 'warning', text: 'Key entropy too high. Switching to side-channel attack.' },
+                    { type: 'info', text: 'Analyzing power fluctuations... [1/3]' },
+                    { type: 'info', text: 'Analyzing memory cache timing... [2/3]' },
+                    { type: 'info', text: 'Analyzing electromagnetic emissions... [3/3]' },
+                    { type: 'success', text: 'KEY FOUND: [REDACTED]' },
+                    { type: 'info', text: 'Mounting decrypted volume...' },
+                    { type: 'success', text: 'VOLUME MOUNTED at /mnt/nyx_data' },
+                    { type: 'command', text: 'cat /mnt/nyx_data/loader.log' },
+                    { type: 'info', text: 'INIT: Système d\'accès SAS v3.1.2b...' },
+                    { type: 'info', text: 'LOAD: Protocole PHOENIX_GUARD... [OK]' },
+                    { type: 'info', text: 'VERIFY: Certificats [VALID]' },
+                    { type: 'info', text: 'QUERY: Agent [NYX_PROFILE]...' },
+                    { type: 'error', text: 'WARNING: Activité anormale détectée sur [PROJET_VALKYRIE].' },
+                    { type: 'error', text: 'ALERT: Tentative d\'accès non autorisé. Contournement actif.' },
+                    { type: 'info', text: 'CLEAN: Purge des résidus (GHOST_CLEAN)...' },
+                    { type: 'info', text: 'COMPILE: Données brutes...' },
+                    { type: 'success', text: 'COMPLETE: Chargement du dossier [NYX_007].' },
+                    { type: 'success', text: 'Redirection imminente.' },
+                ];
+                
+                let i = 0;
+
+                function addLine() {
+                    if (i < lines.length) {
+                        const line = lines[i];
+                        const p = document.createElement('p');
+                        
+                        if (line.type === 'command') {
+                            p.innerHTML = kaliPrompt + `<span class="line-command">${line.text}</span>`;
+                        } else {
+                            p.textContent = line.text;
+                            p.className = line.type;
+                        }
+                        
+                        consoleOutput.appendChild(p);
+                        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                        i++;
+                        
+                        let delay = line.type === 'command' ? 1000 : (Math.random() * 150 + 50);
+                        if (line.text.includes('...')) delay = 400;
+                        
+                        setTimeout(addLine, delay);
+                    } else {
+                        const finalPrompt = document.createElement('p');
+                        finalPrompt.innerHTML = kaliPrompt + '<span class="cursor-blink"></span>';
+                        consoleOutput.appendChild(finalPrompt);
+                        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                        
+                        setTimeout(() => {
+                            window.location.href = targetFile;
+                        }, 2000);
+                    }
+                }
+
+                
+                addLine();
+            }
             
         });
     </script>
