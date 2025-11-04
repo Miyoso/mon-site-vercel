@@ -1,0 +1,189 @@
+/* --- Styles Spécifiques à la Database --- */
+
+.system-status {
+    text-align: center;
+    font-size: 0.9rem; /* 18px */
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+    color: #888;
+}
+.system-status .secured {
+    color: #00ff00; /* #00E000 */
+}
+.system-status .encrypted {
+    color: #ff4141; /* #FF0000 */
+}
+
+/* Structure de l'organigramme */
+.org-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* Conteneur des subordonnés */
+.chart-sub {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 50px;
+    position: relative;
+}
+
+/* Boîte d'agent (noeud) */
+.chart-node {
+    border: 1px solid #333; /* #444 */
+    background-color: #111;
+    padding: 20px;
+    text-align: center;
+    min-width: 280px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+.chart-node.lead {
+    min-width: 300px;
+}
+.chart-node.subordinate {
+    margin: 0 20px;
+}
+
+/* Lignes de connexion */
+.chart-node.lead::after {
+    content: '';
+    position: absolute;
+    bottom: -26px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 25px;
+    background-color: #333; /* #444 */
+}
+.chart-sub::before {
+    content: '';
+    position: absolute;
+    top: -26px;
+    width: 320px; 
+    left: calc(50% - 160px); 
+    height: 1px;
+    background-color: #333; /* #444 */
+}
+.chart-node.subordinate::before {
+    content: '';
+    position: absolute;
+    top: -26px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 26px; 
+    background-color: #333; /* #444 */
+}
+
+/* Contenu des boîtes */
+.chart-node .role {
+    font-size: 0.9rem; /* 18px */
+    color: #888; /* #aaa */
+}
+.chart-node .name {
+    font-size: 1.8rem; /* 32px */
+    color: #eaeaea; /* #00FF00 */
+    margin: 10px 0;
+    font-weight: normal;
+}
+.chart-node .action-button {
+    display: inline-block;
+    border: 2px solid #00ff00; /* #00E000 */
+    padding: 5px 15px;
+    margin-top: 10px;
+    font-size: 0.9rem; /* 18px */
+    color: #00ff00;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.chart-node .action-button:hover {
+    background-color: #00ff00;
+    color: #000;
+}
+
+/* OPÉRATEURS ACTIFS */
+.operators-section {
+    margin-top: 80px;
+}
+.section-title {
+    font-size: 1.3rem; /* 24px */
+    color: #00ff00;
+    margin-bottom: 20px;
+    font-weight: normal;
+}
+.operators-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+.agent-cell {
+    border: 2px solid; 
+    padding: 15px;
+    background-color: #080808;
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 5px 10px;
+    align-items: baseline;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+/* Modificateurs de couleur */
+.agent-cell.status-green {
+    border-color: #00ff00;
+    color: #00ff00;
+}
+.agent-cell.status-red {
+    border-color: #ff4141;
+    color: #ff4141;
+}
+.agent-cell.status-gray {
+    border-color: #333;
+    color: #888;
+}
+
+/* Style de survol pour les boîtes */
+.agent-cell:hover {
+    background-color: #c5c5c5;
+    color: #000 !important;
+    border-color: #c5c5c5;
+    animation: glitchEffect 150ms 2;
+}
+
+/* CSS RANG DE L'AGENT */
+.agent-cell .agent-rank {
+    grid-column: 1 / 4;
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+.agent-cell:hover .agent-rank {
+    color: #333;
+}
+
+.agent-cell .agent-id {}
+.agent-cell .agent-status {
+    word-break: break-all;
+}
+.agent-cell .agent-data {
+    word-break: break-all;
+}
+
+.agent-cell .agent-data.special {
+    grid-column: 1 / 4;
+    margin-top: 5px;
+}
+
+/* Les classes .decrypted et .corrupted sont déjà dans style.css */
+.agent-cell.decrypted { 
+    animation: pulse-green 2.5s infinite ease-in-out; 
+}
+.agent-cell.corrupted { 
+    animation: pulse-red 2s infinite ease-in-out; 
+}
