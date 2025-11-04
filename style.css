@@ -803,3 +803,16 @@ h1 {
     color: #000;
     animation: glitchEffect 150ms 2;
 }
+
+/* --- AJOUT: Message d'avertissement d'Ada --- */
+.ada-warning {
+    color: #888; /* Gris sombre */
+    font-size: 0.9rem;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+    border: 1px dashed #333;
+    background-color: #0c0c0c;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}

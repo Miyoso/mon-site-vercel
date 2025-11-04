@@ -39,6 +39,11 @@
         <div class="report-content" style="margin-top: 2rem;">
             <h3 class="category-title">//: GESTION DE LA SÉCURITÉ</h3>
             
+            <p class="ada-warning">
+                "Attention, mettez un mot de passe différent de vos mots de passe habituels.
+                <br>-- Je vois vos mots de passe -- Ada :)"
+            </p>
+
             <form id="change-password-form" class="assignment-form">
                 <label for="new-password">//: NOUVEAU MOT DE PASSE:</label>
                 <input type="password" id="new-password" class="form-input" required>
@@ -57,7 +62,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 1. REMPLIR LES DONNÉES DE PROFIL ---
+            
             const user = localStorage.getItem('sas_user') || 'INCONNU';
             const level = localStorage.getItem('sas_level') || '0';
             
@@ -70,12 +75,25 @@
             } else {
                 document.getElementById('profile-level').style.color = '#00ff00';
             }
-
-            // --- 2. GÉRER LE NOUVEAU FORMULAIRE DE MOT DE PASSE ---
+            
             const passwordForm = document.getElementById('change-password-form');
             const newPasswordEl = document.getElementById('new-password');
             const confirmPasswordEl = document.getElementById('confirm-password');
             const messageEl = document.getElementById('form-message');
+
+            
+            function validatePassword(password) {
+                // Au moins 5 caractères
+                if (password.length < 5) {
+                    return "Erreur: Mot de passe trop court (5 min).";
+                }
+               
+                const specialCharRegex = /[^A-Za-z0-9]/;
+                if (!specialCharRegex.test(password)) {
+                    return "Erreur: Doit contenir au moins 1 caractère spécial (!, @, #, $, etc.)";
+                }
+                return null; 
+            }
 
             passwordForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -85,26 +103,27 @@
                 const newPassword = newPasswordEl.value;
                 const confirmPassword = confirmPasswordEl.value;
 
-                // Vérification 1: Les mots de passe correspondent
+                // Vérification 1: Correspondance
                 if (newPassword !== confirmPassword) {
                     messageEl.textContent = 'Erreur: Les mots de passe ne correspondent pas.';
                     messageEl.className = 'form-message error';
                     return;
                 }
-                // Vérification 2: Mot de passe non vide
-                if (newPassword.length < 4) {
-                    messageEl.textContent = 'Erreur: Mot de passe trop court (4 min).';
+                
+                
+                const validationError = validatePassword(newPassword);
+                if (validationError) {
+                    messageEl.textContent = validationError;
                     messageEl.className = 'form-message error';
                     return;
                 }
 
                 try {
-                    // On envoie l'ordre au "Cerveau" (api/change-password.js)
                     const response = await fetch('../api/change-password', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
-                            username: user, // L'agent actuellement connecté
+                            username: user, 
                             newPassword: newPassword 
                         })
                     });
