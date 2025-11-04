@@ -187,3 +187,42 @@
 .agent-cell.corrupted { 
     animation: pulse-red 2s infinite ease-in-out; 
 }
+
+/* --- AJOUT: Animation de corruption/dissolution --- */
+
+.agent-cell.is-corrupting {
+    /* 'forwards' signifie : reste à l'état final de l'animation
+      (c'est-à-dire 100% transparent et flou) 
+    */
+    animation: data-corruption-dissolve 0.5s linear forwards; 
+    
+    /* Force la couleur rouge pendant l'animation */
+    border-color: #ff4141 !important; 
+    color: #ff4141 !important;
+}
+
+@keyframes data-corruption-dissolve {
+    0% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate(0, 0);
+    }
+    50% {
+        opacity: 0.5;
+        filter: blur(2px);
+        /* "Casse" l'élément en le décalant et en l'inclinant */
+        transform: translate(2px, -2px) skewX(10deg); 
+    }
+    99% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translate(0, 5px); /* Il "tombe" en disparaissant */
+    }
+    100% {
+        /* L'élément est 100% invisible et ne prend plus de place */
+        opacity: 0;
+        filter: blur(12px);
+        transform: translate(0, 5px);
+        display: none; 
+    }
+}

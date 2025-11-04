@@ -7,6 +7,7 @@
     
     <script> const REQUIRED_LEVEL = 1; </script>
     <script src="security.js"></script>
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="style-database.css">
     
@@ -47,7 +48,6 @@
         
         <div class="operators-section">
             <h2 class="section-title">//: OPÉRATEURS ACTIFS</h2>
-            
             <div class="operators-grid" id="operators-grid-container">
                 </div>
         </div>
@@ -66,6 +66,19 @@
             const javierBox = document.getElementById('agent-box-javier');
             const jiBox = document.getElementById('agent-box-ji');
 
+            
+            async function destroyAgentData(agentId) {
+                try {
+                    
+                    console.warn(`Simulation: Destruction des données pour Agent ID ${agentId}`);
+                    
+                    
+                } catch (error) {
+                    console.error("Erreur lors de la corruption des données:", error);
+                }
+            }
+
+
             try {
                 const response = await fetch('/api/get-agents');
                 const data = await response.json();
@@ -73,16 +86,15 @@
                 if (data.agents && data.agents.length > 0) {
                     
                     let gridHTML = '';
-                    
                     data.agents.sort((a, b) => a.id - b.id);
 
                     data.agents.forEach(agent => {
                         
-                        // -- Traitement spécial pour les agents-clés --
-                        if (agent.id === 1 || agent.id === 3 || agent.id === 18) {
+                        // -- Traitement agents-clés --
+                        if (agent.id === 1 || agent.id === 8 || agent.id === 18) {
                             let box;
                             if (agent.id === 1) box = gravesBox;
-                            if (agent.id === 3) box = javierBox;
+                            if (agent.id === 8) box = javierBox;
                             if (agent.id === 18) box = jiBox;
                             
                             box.querySelector('.name').textContent = agent.name;
@@ -90,8 +102,7 @@
                             return;
                         }
 
-                        // -- Traitement pour tous les autres agents (la grille) --
-                        
+                        // -- Traitement grille --
                         const parts = agent.status_text.split('::').map(part => part.trim());
                         const statusText = parts[1] || '[STATUS_UNKNOWN]';
                         const dataText = parts[2] || null;
@@ -103,7 +114,6 @@
                             statusClass = 'status-red';
                         }
                         
-                       
                         let cellHTML = `
                             <a href="${agent.profile_url}" class="agent-cell ${statusClass} ${agent.css_class || ''}" data-id="${agent.id}">
                                 <span class="agent-rank">[AGENT_STD]</span>
@@ -133,30 +143,24 @@
 
                     gridContainer.innerHTML = gridHTML;
 
-                    
+                    // --- PIÈGE AGENT 13 
                     const agent13Link = document.querySelector('a[data-id="13"]');
                     
                     if (agent13Link) {
-                        
                         agent13Link.addEventListener('click', function(e) {
-                            
+                         
                             e.preventDefault(); 
                             
+                           
+                            this.classList.add('is-corrupting');
                             
-                            this.className = 'agent-cell status-red corrupted';
-                            
-                            
-                            this.style.animation = 'glitchEffect 150ms 5';
-                            
-                            
-                            this.innerHTML = `
-                                <span class="agent-rank">[AGENT_STD]</span>
-                                <span class="agent-id" style="grid-column: 1 / 4; color: #ff4141;">[DONNÉES DÉTRUITES]</span>
-                                <span class="agent-data special" colspan="3">!! ALERTE SYSTÈME !!</span>
-                            `;
-                            
-                            
+                         
                             this.href = '#';
+
+                            
+                            setTimeout(() => {
+                                
+                            }, 1000); 
 
                         }, { once: true });
                     }
@@ -171,5 +175,5 @@
             }
         });
     </script>
-    </body>
+</body>
 </html>
