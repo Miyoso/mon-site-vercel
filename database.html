@@ -29,18 +29,18 @@
                 <div class="agent-box lead">
                     <span class="agent-title">[Agent_Lead]</span>
                     <span class="agent-name" id="agent-graves">[CHARGEMENT...]</span>
-                    <a href="Profil/index.html" class="agent-link">[ACCÈS PROFIL]</a>
+                    <a href="AgentDatabase/agent-Graves.html" class="agent-link">[ACCÈS PROFIL]</a>
                 </div>
             </div>
             
             <div class="org-level" id="level-2">
                 <div class="agent-box subordinate">
-                    <span class="agent-title">[Agent_08]</span>
+                    <span class="agent-title">[Agent_X]</span>
                     <span class="agent-name" id="agent-javier">[CHARGEMENT...]</span>
-                    <a href="AgentDatabase/agent-08.html" class="agent-link">[FICHIER ENCRYPTÉ]</a>
+                    <a href="AgentDatabase/agent-Javier.html" class="agent-link">[FICHIER ENCRYPTÉ]</a>
                 </div>
                 <div class="agent-box subordinate">
-                    <span class="agent-title">[Agent_18]</span>
+                    <span class="agent-title">[Agent_X]</span>
                     <span class="agent-name" id="agent-ji">[CHARGEMENT...]</span>
                     <a href="AgentDatabase/agent-ji.html" class="agent-link">[VOIR DOSSIER]</a>
                 </div>
@@ -70,7 +70,7 @@
             const jiName = document.getElementById('agent-ji');
 
             try {
-                // 1. On appelle notre "Cerveau" (l'API)
+               
                 const response = await fetch('/api/get-agents');
                 const data = await response.json();
 
@@ -78,16 +78,16 @@
                     
                     let otherAgentsHTML = '';
 
-                    // 2. On trie les agents par ID pour un affichage cohérent
+                  
                     data.agents.sort((a, b) => a.id - b.id);
 
-                    // 3. On boucle sur chaque agent reçu de la BDD
+                    
                     data.agents.forEach(agent => {
-                        // On peuple les agents-clés
-                        if (agent.id === 1) { // Graves
+                       
+                        if (agent.id === 1) { 
                             gravesName.textContent = agent.name;
                         } else if (agent.id === 8) { // Javier
-                            javierName.textContent = 'Javier'; // Nom simple comme sur le croquis
+                            javierName.textContent = 'Javier'; 
                         } else if (agent.id === 18) { // Lin Ji
                             jiName.textContent = 'Lin Ji (Jackal)';
                         } 
@@ -104,7 +104,7 @@
                         }
                     });
 
-                    // 4. On injecte la grille des autres agents
+                    
                     otherAgentsContainer.innerHTML = otherAgentsHTML;
 
                 } else {
