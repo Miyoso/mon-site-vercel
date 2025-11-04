@@ -1,0 +1,179 @@
+/* --- Profil/style-profil.css --- */
+
+/* Configuration générale */
+body {
+    background-color: #0a0a0a;
+    color: #00ff00; /* Vert vif */
+    font-family: 'VT323', monospace; /* Police rétro */
+    font-size: 20px;
+    text-shadow: 0 0 5px #00ff00, 0 0 10px rgba(0, 255, 0, 0.3);
+    line-height: 1.6;
+    padding: 2rem;
+    position: relative;
+    overflow-x: hidden; /* Empêche le scroll horizontal */
+}
+
+/* Pseudo-élément pour les scanlines */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            to bottom,
+            rgba(18, 18, 18, 0),
+            rgba(18, 18, 18, 0) 1px,
+            rgba(0, 0, 0, 0.4) 2px,
+            rgba(0, 0, 0, 0.4) 3px
+        );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Conteneur principal */
+.security-container {
+    max-width: 600px;
+    margin: 4rem auto;
+    border: 1px solid #005500;
+    padding: 2rem;
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Titre */
+h1 {
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    border-bottom: 1px dashed #00ff00;
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+}
+
+/* Boîte d'alerte */
+.alert-box {
+    border: 1px dashed #ff0000;
+    background-color: rgba(255, 0, 0, 0.05);
+    padding: 1.5rem;
+    margin: 2rem 0;
+    color: #ff4444;
+    text-shadow: 0 0 5px #ff0000;
+}
+
+.alert-box .quote {
+    display: block;
+    font-style: italic;
+}
+
+.alert-box .signature {
+    display: block;
+    text-align: right;
+    margin-top: 1rem;
+    color: #ff8888;
+}
+
+/* Groupes de formulaire */
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+/* Champs de saisie */
+.form-input {
+    width: 100%;
+    background-color: #050505;
+    border: 1px solid #005500;
+    color: #00ff00;
+    padding: 0.75rem;
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    box-sizing: border-box;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #00ff00;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+/* Bouton */
+.btn-submit {
+    background: none;
+    border: 2px solid #00ff00;
+    color: #00ff00;
+    padding: 0.75rem 1.5rem;
+    font-family: 'VT323', monospace;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px #00ff00;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+}
+
+.btn-submit:hover,
+.btn-submit:focus {
+    background: #00ff00;
+    color: #000;
+    text-shadow: none;
+    box-shadow: 0 0 20px #00ff00;
+}
+
+.btn-submit:hover::after {
+    content: '_';
+    animation: blink 1s step-end infinite;
+    margin-left: 0.5rem;
+}
+
+/* Classe pour le clignotement */
+.blink {
+    animation: blink 1s step-end infinite;
+    padding-right: 0.5rem; 
+}
+
+/* Animation du curseur (réutilisée) */
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* AJOUT: Message d'erreur/succès */
+.form-message {
+    margin-top: 1.5rem;
+    height: 1.5rem; /* Réserve l'espace */
+    text-align: center;
+    font-size: 1.5rem;
+}
+.form-message.success {
+    color: #00ff00; /* Vert */
+}
+.form-message.error {
+    color: #ff4444; /* Rouge */
+}
+
+/* AJOUT: Lien de retour */
+.footer-link {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #005500;
+}
+.footer-link a {
+    color: #00ff00;
+    text-decoration: none;
+    font-size: 1.5rem;
+    transition: all 0.2s;
+}
+.footer-link a:hover {
+    background-color: #00ff00;
+    color: #000;
+}
