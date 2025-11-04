@@ -15,12 +15,17 @@
 <body>
 
     <div class="console-output" id="consoleOutput">
-        </div>
+    </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
+            alert("Tu as crus que ca serait possible ?");
+            alert("Je te vois !");
+            alert("Bien essayer !");
+
             const consoleOutput = document.getElementById('consoleOutput');
-            const targetFile = 'agent-nyx.html'; // La destination finale
+            const targetFile = 'agent-nyx.html';
 
             const kaliPrompt = `┌──(<span class="user">root</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/secure/agents</span>]
 └─<span class="symbol">#</span> `;
@@ -75,39 +80,34 @@
                     const p = document.createElement('p');
                     
                     if (line.type === 'command') {
-                        // Affiche le prompt + la commande
                         p.innerHTML = kaliPrompt + `<span class="line-command">${line.text}</span>`;
                     } else {
-                        // Affiche juste la sortie de la commande
                         p.textContent = line.text;
-                        p.className = line.type; // Applique la classe de couleur
+                        p.className = line.type;
                     }
                     
                     consoleOutput.appendChild(p);
                     consoleOutput.scrollTop = consoleOutput.scrollHeight;
                     i++;
                     
-                    // Délai aléatoire
                     let delay = line.type === 'command' ? 1000 : (Math.random() * 150 + 50);
-                    if (line.text.includes('...')) delay = 400; // Plus long pour les "..."
+                    if (line.text.includes('...')) delay = 400;
                     
                     setTimeout(addLine, delay);
                 } else {
-                    // Séquence terminée
                     const finalPrompt = document.createElement('p');
                     finalPrompt.innerHTML = kaliPrompt + '<span class="cursor-blink"></span>';
                     consoleOutput.appendChild(finalPrompt);
                     consoleOutput.scrollTop = consoleOutput.scrollHeight;
                     
-                    // Redirection finale
                     setTimeout(() => {
                         window.location.href = targetFile;
-                    }, 1000);
+                    }, 2000);
                 }
             }
 
-            // Démarrage
             addLine();
+            
         });
     </script>
 </body>
