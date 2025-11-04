@@ -6,11 +6,13 @@ body {
     font-size: 1rem;
     line-height: 1.5;
     padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    overflow: hidden;
+    display: flex; 
+    flex-direction: column; 
+    min-height: 100vh; 
+    overflow: hidden; 
     box-sizing: border-box;
+    
+    
 }
 
 .console-output {
@@ -19,6 +21,8 @@ body {
     white-space: pre-wrap;
     word-break: break-all;
     
+   
+    max-height: 100vh; 
 }
 
 
@@ -30,13 +34,13 @@ body {
     text-shadow: 0 0 2px #ff4141;
 }
 .prompt .host {
-    color: #eaeaea; /* Blanc */
+    color: #eaeaea; 
 }
 .prompt .path {
-    color: #8ab4f8; /* Bleu */
+    color: #8ab4f8; 
 }
 .prompt .symbol {
-    color: #eaeaea; /* Blanc */
+    color: #eaeaea; 
 }
 
 
@@ -61,7 +65,7 @@ body {
     display: inline-block;
     width: 0.6em;
     height: 1em;
-    background-color: #eaeaea; /* Curseur blanc */
+    background-color: #eaeaea; 
     vertical-align: middle;
     margin-left: 0.2em;
 }
