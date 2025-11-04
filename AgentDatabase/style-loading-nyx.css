@@ -106,3 +106,83 @@
     background: #fff;
     color: #111;
 }
+
+/* --- STYLE DE LA CONSOLE --- */
+
+body {
+   
+    background-color: #000;
+    color: #eee;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+}
+
+.console-output {
+ 
+    padding: 15px;
+    width: calc(100% - 30px);
+    height: calc(100vh - 30px); 
+    overflow-y: auto;
+    box-sizing: border-box; 
+}
+
+.console-output p {
+   
+    margin: 0;
+    line-height: 1.5;
+    word-break: break-all; 
+}
+
+
+.user { color: #ff5555; } 
+.host { color: #50fa7b; } 
+.path { color: #8be9fd; } 
+.symbol { color: #f8f8f2; }
+
+
+
+.line-command {
+    
+    color: #f1fa8c; 
+    font-weight: 700;
+}
+
+.info {
+    
+    color: #f8f8f2; 
+}
+
+.success {
+   
+    color: #50fa7b; 
+}
+
+.warning {
+   
+    color: #f1fa8c; 
+}
+
+.error {
+
+    color: #ff5555; 
+}
+
+
+
+.cursor-blink {
+    display: inline-block;
+    width: 9px;
+    height: 1.2em;
+    background-color: #f8f8f2;
+    animation: blink 1s step-end infinite;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+@keyframes blink {
+    50% {
+        background-color: transparent;
+    }
+}
