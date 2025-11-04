@@ -79,26 +79,21 @@
                     data.agents.forEach(agent => {
                         
                         // -- Traitement spécial pour les agents-clés --
-                        if (agent.id === 1) { // Graves
-                            gravesBox.querySelector('.name').textContent = agent.name;
-                            gravesBox.querySelector('a').href = agent.profile_url;
-                            return;
-                        }
-                        if (agent.id === 3) { // Javier
-                            javierBox.querySelector('.name').textContent = agent.name;
-                            javierBox.querySelector('a').href = agent.profile_url;
-                            return;
-                        }
-                        if (agent.id === 18) { // Lin Ji
-                            jiBox.querySelector('.name').textContent = agent.name;
-                            jiBox.querySelector('a').href = agent.profile_url;
-                            return;
+                        if (agent.id === 1 || agent.id === 8 || agent.id === 18) {
+                            let box;
+                            if (agent.id === 1) box = gravesBox;
+                            if (agent.id === 3) box = javierBox;
+                            if (agent.id === 18) box = jiBox;
+                            
+                            box.querySelector('.name').textContent = agent.name;
+                            box.querySelector('a').href = agent.profile_url;
+                            return; 
                         }
 
-                        // -- Traitement pour tous les autres agents (la grille) --
+                        // -- Traitement pour tous les autres agents 
                         
                         const parts = agent.status_text.split('::').map(part => part.trim());
-                        const idText = parts[0] || '[AGENT_ID]';
+                        
                         const statusText = parts[1] || '[STATUS_UNKNOWN]';
                         const dataText = parts[2] || null;
 
@@ -109,19 +104,31 @@
                             statusClass = 'status-red';
                         }
                         
+                       
                         let cellHTML = `
                             <a href="${agent.profile_url}" class="agent-cell ${statusClass} ${agent.css_class || ''}">
                                 <span class="agent-rank">[AGENT_STD]</span>
-                                <span class="agent-id">${idText}</span> <span>::</span>
-                                <span class="agent-status">${statusText}</span>
                         `;
 
+                        // Cas spécial pour DECEASED
                         if (statusText === 'DOSSIER SCELLÉ' && dataText === '[DECEASED]') {
-                            cellHTML += `<span class="agent-data special" colspan="3">[DECEASED]</span>`;
-                        } else if (dataText) {
                             cellHTML += `
-                                <span>&nbsp;</span> <span>::</span>
-                                <span class="agent-data">${dataText}</span>
+                                <span class="agent-id">${statusText}</span> <span>::</span>
+                                <span class="agent-data special" style="color: #ff4141;">[DECEASED]</span>
+                            `;
+                        } 
+                        // Cas avec data 
+                        else if (dataText) {
+                            cellHTML += `
+                                <span class="agent-id">${statusText}</span> <span>::</span>
+                                <span class="agent-status">${dataText}</span>
+                            `;
+                        } 
+                        // Cas avec statut seul 
+                        else {
+                            
+                            cellHTML += `
+                                <span class="agent-id" style="grid-column: 1 / 4;">${statusText}</span>
                             `;
                         }
                         
