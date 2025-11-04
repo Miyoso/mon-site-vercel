@@ -44,62 +44,23 @@
     </main>
 
     <script>
-    // SCRIPT DE GESTION D'ACCRÉDITATION
-    document.addEventListener('DOMContentLoaded', function() {
-
-        const user = localStorage.getItem('sas_user');
-        const level = parseInt(localStorage.getItem('sas_level') || 0);
-
-        const statusMessage = document.getElementById('statusMessage');
-        const portalMenu = document.getElementById('portalMenu');
-        const allLinks = portalMenu.querySelectorAll('.portal-link');
-        const footerContainer = document.getElementById('footer-container'); // Nouvel ID
-
-        if (level > 0) {
-            // --- UTILISATEUR CONNECTÉ ---
-            statusMessage.innerHTML = `AGENT: <span class="secure">${user}</span> :: ACCREDITATION_LEVEL: <span class="secure">${level}</span>`;
-
-            // On injecte les liens "Profil" et "Logout"
-            footerContainer.innerHTML = `
-                <a href="Profil/index.html" class="back-link" id="profileLink">>> MON PROFIL</a>
-                <a href="#" class="back-link" id="authLink" style="color: #ff4141;">>> LOGOUT</a>
-            `;
-
-            // On ajoute l'écouteur au nouveau bouton Logout
-            document.getElementById('authLink').addEventListener('click', function(e) {
-                e.preventDefault();
-                localStorage.removeItem('sas_user');
-                localStorage.removeItem('sas_level');
-                window.location.reload();
-            });
-
-            // On déverrouille les liens du menu
-            allLinks.forEach(function(link) {
-                const requiredLevel = parseInt(link.getAttribute('data-level'));
-                if (level >= requiredLevel) {
-                    link.classList.add('unlocked');
-                    link.querySelector('.link-status').textContent = "[ACCESS_GRANTED]";
-                } else {
-                    link.classList.add('disabled');
-                }
-            });
-
-        } else {
-            // --- UTILISATEUR NON CONNECTÉ ---
-            statusMessage.innerHTML = 'AGENT: <span class="restricted">UNKNOWN</span> :: ACCESS_LEVEL: <span class="restricted">0</span>';
-
-            // On injecte juste le lien "Login"
-            footerContainer.innerHTML = `
-                <a href="login.html" class="back-link" id="authLink">>> INITIATE_LOGIN</a>
-            `;
-
-            // On verrouille tous les liens du menu
-            allLinks.forEach(function(link) {
-                link.classList.add('disabled');
-                link.href = "login.html";
-            });
-        }
-    });
-</script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const user = localStorage.getItem('sas_user') || 'INCONNU';
+            const level = localStorage.getItem('sas_level') || '0';
+            
+            
+            document.getElementById('agent-name-status').textContent = `AGENT: ${user}`;
+            document.getElementById('profile-name').textContent = user;
+            document.getElementById('profile-level').textContent = `NIVEAU ${level}`;
+            
+            
+            if (parseInt(level) >= 3) {
+                document.getElementById('profile-level').style.color = '#ff4141'; // Rouge
+            } else {
+                document.getElementById('profile-level').style.color = '#00ff00'; // Vert
+            }
+        });
+    </script>
 </body>
 </html>
