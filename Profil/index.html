@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS - Profil Agent</title>
+
+    <script>
+        const REQUIRED_LEVEL = 1;
+    </script>
+    <script src="../security.js"></script>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="terminal">
+        <h1>PROFIL AGENT<span class="blinker">_</span></h1>
+        
+        <p class="status" id="agent-name-status">AGENT: [CHARGEMENT...]</p>
+
+        <div class="report-content">
+            <h3 class="category-title">//: DONNÉES D'IDENTIFICATION</h3>
+            <ul class="inventory-list">
+                <li>
+                    <span class="item-name">AGENT ID:</span>
+                    <ul class="item-details">
+                        <li><span id="profile-name">[INCONNU]</span></li>
+                    </ul>
+                </li>
+                <li>
+                    <span class="item-name">ACCRÉDITATION:</span>
+                    <ul class="item-details">
+                        <li><span id="profile-level">[NIVEAU 0]</span></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <footer class="portal-footer">
+            <a href="../index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
+        </footer>
+    </main>
+
+    <script>
+    // SCRIPT DE GESTION D'ACCRÉDITATION
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const user = localStorage.getItem('sas_user');
+        const level = parseInt(localStorage.getItem('sas_level') || 0);
+
+        const statusMessage = document.getElementById('statusMessage');
+        const portalMenu = document.getElementById('portalMenu');
+        const allLinks = portalMenu.querySelectorAll('.portal-link');
+        const footerContainer = document.getElementById('footer-container'); // Nouvel ID
+
+        if (level > 0) {
+            // --- UTILISATEUR CONNECTÉ ---
+            statusMessage.innerHTML = `AGENT: <span class="secure">${user}</span> :: ACCREDITATION_LEVEL: <span class="secure">${level}</span>`;
+
+            // On injecte les liens "Profil" et "Logout"
+            footerContainer.innerHTML = `
+                <a href="Profil/index.html" class="back-link" id="profileLink">>> MON PROFIL</a>
+                <a href="#" class="back-link" id="authLink" style="color: #ff4141;">>> LOGOUT</a>
+            `;
+
+            // On ajoute l'écouteur au nouveau bouton Logout
+            document.getElementById('authLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('sas_user');
+                localStorage.removeItem('sas_level');
+                window.location.reload();
+            });
+
+            // On déverrouille les liens du menu
+            allLinks.forEach(function(link) {
+                const requiredLevel = parseInt(link.getAttribute('data-level'));
+                if (level >= requiredLevel) {
+                    link.classList.add('unlocked');
+                    link.querySelector('.link-status').textContent = "[ACCESS_GRANTED]";
+                } else {
+                    link.classList.add('disabled');
+                }
+            });
+
+        } else {
+            // --- UTILISATEUR NON CONNECTÉ ---
+            statusMessage.innerHTML = 'AGENT: <span class="restricted">UNKNOWN</span> :: ACCESS_LEVEL: <span class="restricted">0</span>';
+
+            // On injecte juste le lien "Login"
+            footerContainer.innerHTML = `
+                <a href="login.html" class="back-link" id="authLink">>> INITIATE_LOGIN</a>
+            `;
+
+            // On verrouille tous les liens du menu
+            allLinks.forEach(function(link) {
+                link.classList.add('disabled');
+                link.href = "login.html";
+            });
+        }
+    });
+</script>
+</body>
+</html>
