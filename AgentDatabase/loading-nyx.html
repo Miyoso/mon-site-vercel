@@ -14,27 +14,65 @@
 </head>
 <body>
 
+    <div id="idiot-check-overlay">
+        <div id="idiot-check-box">
+            <p>Es-tu idiot(e) ?</p>
+            <div class="buttons">
+                <button id="idiot-yes">Oui</button>
+                <button id="idiot-no">Non</button>
+            </div>
+        </div>
+    </div>
+
     <div id="custom-alert-overlay">
         <div id="custom-alert-box">
             <p id="custom-alert-message"></p>
             <button id="custom-alert-ok">OK</button>
         </div>
     </div>
+    
     <div class="console-output" id="consoleOutput">
     </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-        
+            const idiotOverlay = document.getElementById('idiot-check-overlay');
+            const idiotBox = document.getElementById('idiot-check-box');
+            const idiotYes = document.getElementById('idiot-yes');
+            const idiotNo = document.getElementById('idiot-no');
+
+            function moveIdiotBox() {
+                const boxWidth = idiotBox.offsetWidth;
+                const boxHeight = idiotBox.offsetHeight;
+                
+                const maxX = window.innerWidth - boxWidth - 20;
+                const maxY = window.innerHeight - boxHeight - 20;
+
+                const newX = Math.max(10, Math.random() * maxX);
+                const newY = Math.max(10, Math.random() * maxY);
+                
+                idiotBox.style.left = newX + 'px';
+                idiotBox.style.top = newY + 'px';
+            }
+
+            idiotNo.addEventListener('click', moveIdiotBox);
+
+            idiotYes.addEventListener('click', () => {
+                idiotOverlay.style.display = 'none';
+                showNextTrapMessage();
+            });
+
+            idiotOverlay.style.display = 'block';
+            moveIdiotBox();
+
             const trapMessages = [
-                "Tu as cru que ça serait possible ?", 
+                "Tu as cru que ça serait possible ?",
                 "Je te vois !",
-                "Bien essayé !" // Corrigé
+                "Bien essayé !"
             ];
             let currentMessageIndex = 0;
 
-         
             const overlay = document.getElementById('custom-alert-overlay');
             const messageBox = document.getElementById('custom-alert-message');
             const okButton = document.getElementById('custom-alert-ok');
@@ -42,22 +80,16 @@
             function showNextTrapMessage() {
                 if (currentMessageIndex < trapMessages.length) {
                     messageBox.textContent = trapMessages[currentMessageIndex];
-                    overlay.style.display = 'flex'; // Afficher la modale
+                    overlay.style.display = 'flex';
                     currentMessageIndex++;
                 } else {
-                   
-                    overlay.style.display = 'none'; 
-                    startConsoleAnimation(); 
+                    overlay.style.display = 'none';
+                    startConsoleAnimation();
                 }
             }
 
-    
             okButton.addEventListener('click', showNextTrapMessage);
             
-         
-            showNextTrapMessage();
-            
-         
             function startConsoleAnimation() {
                 const consoleOutput = document.getElementById('consoleOutput');
                 const targetFile = 'agent-nyx.html';
@@ -65,7 +97,6 @@
                 const kaliPrompt = `┌──(<span class="user">root</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/secure/agents</span>]
 └─<span class="symbol">#</span> `;
 
-              
                 const lines = [
                     { type: 'command', text: 'whoami' },
                     { type: 'info', text: 'root (UID: 0, GID: 0)' },
@@ -142,7 +173,6 @@
                     }
                 }
 
-                
                 addLine();
             }
             

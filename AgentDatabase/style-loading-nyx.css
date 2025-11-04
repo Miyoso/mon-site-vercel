@@ -1,79 +1,62 @@
+#idiot-check-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    display: none; 
+}
 
-body {
-    background-color: #121212;
-    color: #eaeaea; 
+#idiot-check-box {
+    position: absolute;
+    background: #1a1a1a;
+    border: 1px solid #ff0000;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    padding: 25px;
+    border-radius: 5px;
+    text-align: center;
+    color: #eee;
     font-family: 'Roboto Mono', monospace;
-    font-size: 1rem;
-    line-height: 1.5;
-    padding: 1rem;
-    display: flex; 
-    flex-direction: column; 
-    min-height: 100vh; 
-    overflow: hidden; 
-    box-sizing: border-box;
-    
-    
+    width: 300px;
 }
 
-.console-output {
-    flex-grow: 1; 
-    overflow-y: auto; 
-    white-space: pre-wrap;
-    word-break: break-all;
-    
-   
-    max-height: 100vh; 
+#idiot-check-box p {
+    margin: 0;
+    margin-bottom: 20px;
+    font-size: 1.1em;
 }
 
-
-.prompt {
-    color: #eaeaea;
-}
-.prompt .user {
-    color: #ff4141; 
-    text-shadow: 0 0 2px #ff4141;
-}
-.prompt .host {
-    color: #eaeaea; 
-}
-.prompt .path {
-    color: #8ab4f8; 
-}
-.prompt .symbol {
-    color: #eaeaea; 
+#idiot-check-box .buttons {
+    display: flex;
+    justify-content: space-around;
 }
 
-
-.line-command {
-    color: #eaeaea; /* Commande tapée */
-}
-.line-info {
-    color: #00cccc; /* Cyan */
-}
-.line-success {
-    color: #00e600; /* Vert */
-}
-.line-warning {
-    color: #ffff00; /* Jaune */
-}
-.line-error {
-    color: #ff4141; /* Rouge */
+#idiot-yes, #idiot-no {
+    border: none;
+    padding: 10px 20px;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.cursor-blink {
-    animation: blink 1s step-end infinite;
-    display: inline-block;
-    width: 0.6em;
-    height: 1em;
-    background-color: #eaeaea; 
-    vertical-align: middle;
-    margin-left: 0.2em;
+#idiot-yes {
+    background: #00ff00;
+    color: #111;
 }
-@keyframes blink {
-    50% { opacity: 0; }
+#idiot-yes:hover {
+    background: #fff;
 }
 
-
+#idiot-no {
+    background: #ff0000;
+    color: #fff;
+}
+#idiot-no:hover {
+    background: #fff;
+    color: #111;
+}
 
 #custom-alert-overlay {
     position: fixed;
@@ -81,25 +64,23 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85); 
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    
-    
     display: none; 
 }
 
 #custom-alert-box {
-    background: #1a1a1a; 
-    border: 1px solid #00ff00; 
+    background: #1a1a1a;
+    border: 1px solid #00ff00;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
     padding: 25px;
     border-radius: 5px;
     text-align: center;
     color: #eee;
-    font-family: 'Roboto Mono', monospace; 
+    font-family: 'Roboto Mono', monospace;
     max-width: 400px;
 }
 
