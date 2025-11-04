@@ -9,38 +9,51 @@
     <script src="../security.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="style-profil.css">
 </head>
 <body>
 
     <div class="security-container">
-        <h1><span class="blink">&gt;&gt;</span>GESTION DE LA SÉCURITÉ</h1>
+
+        <div class="prompt-header">
+            ┌──(<span id="prompt-user" class="username">[LOADING]</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/profil</span>]
+        </div>
+
+        <h1>
+            <span class="prompt-end">└─<span class="blink">#</span></span>
+            change_passphrase
+        </h1>
 
         <p class="status" id="agent-status-display">AGENT: [CHARGEMENT...]</p>
 
-
         <div class="alert-box">
             <span class="quote">"Attention, mettez un mot de passe différent de vos mots de passe habituels."</span>
-            <span class="signature">-- Je vois vos mots de passe -- Ada :)</span>
+            <span class="signature">-- Je vois vos mots de passe -- <span id="ada-signature">Ada</span> :)</span>
         </div>
 
         <form id="change-password-form">
             <div class="form-group">
-                <label for="new-password"><span class="blink">&gt;&gt;</span>NOUVEAU MOT DE PASSE:</label>
+                <label for="new-password">
+                    <span class="prompt-end" style="color: #888;">&gt;</span>
+                    NOUVEAU MOT DE PASSE:
+                </label>
                 <input type="password" id="new-password" class="form-input" required>
             </div>
 
             <div class="form-group">
-                <label for="confirm-password"><span class="blink">&gt;&gt;</span>CONFIRMER LE MOT DE PASSE:</label>
+                <label for="confirm-password">
+                    <span class="prompt-end" style="color: #888;">&gt;</span>
+                    CONFIRMER LE MOT DE PASSE:
+                </label>
                 <input type="password" id="confirm-password" class="form-input" required>
             </div>
 
             <button type="submit" class="btn-submit">
-                &gt;&gt; Changer le mot de passe
+                &gt;&gt; Exécuter
             </button>
-
+            
             <p id="form-message" class="form-message"></p>
         </form>
 
@@ -53,21 +66,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            
             const user = localStorage.getItem('sas_user') || 'INCONNU';
             const level = localStorage.getItem('sas_level') || '0';
             
+            // --- MISE À JOUR DYNAMIQUE ---
+            document.getElementById('prompt-user').textContent = user.toLowerCase();
+            document.getElementById('agent-status-display').innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
+            document.getElementById('ada-signature').textContent = user;
             
-            const statusMessage = document.getElementById('agent-status-display');
-            if (user === 'INCONNU') {
-                statusMessage.textContent = 'AGENT: [ERREUR_SESSION]';
-                statusMessage.style.color = '#ff4444'; // Rouge
-            } else {
-                
-                statusMessage.innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
-            }
-            // 
-
             const passwordForm = document.getElementById('change-password-form');
             const newPasswordEl = document.getElementById('new-password');
             const confirmPasswordEl = document.getElementById('confirm-password');
