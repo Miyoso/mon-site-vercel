@@ -6,23 +6,26 @@ body {
     font-size: 1rem;
     line-height: 1.5;
     padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end; /* Affiche les lignes en bas */
+    display: flex; /* Utilise flexbox */
+    flex-direction: column; /* Organise en colonne */
     min-height: 100vh;
-    overflow: hidden;
+    overflow: hidden; /* Empêche la page entière de défiler */
     box-sizing: border-box;
+    /* justify-content: flex-end; -- SUPPRIMÉ -- */
 }
+
 .console-output {
-    max-height: 100%;
-    overflow-y: auto;
+    /* flex-grow: 1; -- AJOUTÉ --
+       Cette ligne force la console à prendre toute la hauteur disponible */
+    flex-grow: 1; 
+    overflow-y: auto; /* Active le défilement vertical DANS la console */
     white-space: pre-wrap;
     word-break: break-all;
 }
 
 /* Style du Prompt KALI */
 .prompt {
-    color: #eaeaea; /* Couleur du # et des parenthèses */
+    color: #eaeaea;
 }
 .prompt .user {
     color: #ff4141; /* Rouge (root) */
