@@ -6,7 +6,6 @@
     <title>Dossier Agent :: BLITZ_21</title>
 
     <script>
-        
         const allowedAgents = [
             'Graves',
             'Javier',
@@ -14,12 +13,9 @@
             'Blitz'
         ];
 
-        
         const currentUser = localStorage.getItem('sas_user');
 
-        
         if (!allowedAgents.includes(currentUser)) {
-            
             alert("ERREUR D'ACCRÉDITATION :: ACCÈS REFUSÉ");
             window.location.href = '../access-denied.html';
         }
@@ -104,7 +100,7 @@
                             <li>Violent</li>
                             <li>Sanguinaire</li>
                             <li>Arrogant</li>
-                            <li>Fataliste ("Crois trop en son destin")</li>
+                            <li>Fataliste <li>
                         </ul>
                     </div>
                 </div>
@@ -115,8 +111,8 @@
             <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
                 <h2 class="font-tech text-2xl text-red-400 mb-4">[SECTION 03 : HISTORIQUE - NIVEAU 5 REQUIS]</h2>
                 <div class="bg-black/30 p-4 rounded bio-text">
-                    [cite_start]<p>Originaire d'Amérique Latine, Ruy était un haut gradé de la milice de son pays, dans laquelle il a servi auprès de Javier et Graves. [cite: 26] [cite_start]Il est notamment connu pour ses faits d’armes lors de différentes tentatives d’invasion de son pays. [cite: 27] [cite_start]Il est donc un militaire surentraîné. [cite: 28]</p>
-                    [cite_start]<p>Ruy Diaz (anc. Agent 21) se caractérise par sa loyauté, son dévouement mais surtout sa violence; en effet, il ne laisse pas de survivant après son passage. [cite: 29, 30] [cite_start]Il fait confiance à son instinct et croit que le destin le guide. [cite: 31] [cite_start]Il sait également se mêler aux foules et manipuler ses ennemis pour les frapper de l’intérieur. [cite: 32]</p>
+                    <p>Originaire d'Amérique Latine, Ruy était un haut gradé de la milice de son pays, dans laquelle il a servi auprès de Javier et Graves. Il est notamment connu pour ses faits d’armes lors de différentes tentatives d’invasion de son pays. Il est donc un militaire surentraîné.</p>
+                    <p>Ruy Diaz (anc. Agent 21) se caractérise par sa loyauté, son dévouement mais surtout sa violence; en effet, il ne laisse pas de survivant après son passage. Il fait confiance à son instinct et croit que le destin le guide. Il sait également se mêler aux foules et manipuler ses ennemis pour les frapper de l’intérieur.</p>
                 </div>
             </section>
 
@@ -125,10 +121,10 @@
                 <div class="bg-black/30 p-4 rounded">
                     <p class="text-yellow-400">[ACCÈS VERROUILLÉ – CLÉ DE DÉCHIFFREMENT MANQUANTE]</p>
                     <p class="encrypted text-sm select-none">
-                        [FICHIER: operations_datahaven.log]... 2f 2f 20 43 6f 6d 70 65 74...
+                        [FICHIER: operations_datahaven.log]...
                         [FICHIER: analyse_psy_cortex.dat]... [DONNÉES CORROMPUES]...
                         [FICHIER: contacts_actifs.db] (Verrouillé)...
-                        [FICHIER: transactions_crypto.bin] (Verrouillé)... 01 00 00...
+                        [FICHIER: transactions_crypto.bin] (Verrouillé)...
                     </p>
                 </div>
             </section>
