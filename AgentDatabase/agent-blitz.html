@@ -6,20 +6,20 @@
     <title>Dossier Agent :: BLITZ_21</title>
 
     <script>
-        [cite_start]
+        
         const allowedAgents = [
             'Graves',
             'Javier',
-            'Nyx',
+            'Nyx', 
             'Blitz'
         ];
 
         
         const currentUser = localStorage.getItem('sas_user');
 
-       
+        
         if (!allowedAgents.includes(currentUser)) {
-            // S'il n'y est pas, on le redirige
+            
             alert("ERREUR D'ACCRÉDITATION :: ACCÈS REFUSÉ");
             window.location.href = '../access-denied.html';
         }
