@@ -6,19 +6,17 @@
     <title>SAS FILE :: AGENT 13 :: [CORRUPTED]</title>
 
     <script>
-        // Liste des agents autorisés (par NOM)
+        
         const allowedAgents = [
-            'Graves',          // ID 1
-            'Javier',          // ID 8
-            'Nyx'    // ID 17
+            'Graves',
+            'Javier',
+            'Nyx',
+            'Blitz'
         ];
 
-        // On récupère l'agent connecté
         const currentUser = localStorage.getItem('sas_user');
 
-        // On vérifie s'il est dans la liste
         if (!allowedAgents.includes(currentUser)) {
-            // S'il n'y est pas, on le redirige
             alert("//: ERREUR D'ACCRÉDITATION :: ACCÈS REFUSÉ PAR LE PROTOCOLE 'ECHO'");
             window.location.href = '../access-denied.html';
         }
@@ -33,7 +31,7 @@
     <main class="file-container corrupted">
         <header class="file-header corrupted-header">
             <p class="glitch-text">//: ACCESSING FILE... SAS-DB-AGENT-13</p>
-            <p class="glitch-text success">//: PROTOCOLE 'ECHO' :: ACCÈS ACCORDÉ <span class="blinker">_</span></p>
+            <p class_name="glitch-text success">//: PROTOCOLE 'ECHO' :: ACCÈS ACCORDÉ <span class="blinker">_</span></p>
         </header>
 
         <section class="file-grid corrupted-grid">
