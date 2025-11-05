@@ -21,7 +21,6 @@
         
         <p class="status">ACCES: <span class="restricted" id="agent-name-display"></span> :: NIVEAU 3</p>
 
-        
         <div class="report-content" style="padding: 0; margin-top: 0;">
             <form class="jump-form">
                 <label for="agent-select-jump">//: ACCÈS RAPIDE:</label>
@@ -31,7 +30,6 @@
             </form>
         </div>
 
-        
         <div id="dossiers-container">
             <p style="color: #00ff00; padding: 1rem;">[CHARGEMENT DES DOSSIERS...]</p>
         </div>
@@ -50,6 +48,33 @@
             document.getElementById('agent-name-display').textContent = adminName;
 
             let agentsList = [];
+
+            function getWarningFormHTML(agent) {
+                const level = agent.warning_level || 0;
+                const warningClass = `warning-level-${level}`;
+                
+                const level_0_selected = level === 0 ? 'selected' : '';
+                const level_1_selected = level === 1 ? 'selected' : '';
+                const level_2_selected = level === 2 ? 'selected' : '';
+                const level_3_selected = level === 3 ? 'selected' : '';
+
+                return `
+                    <div class="dossier-header">
+                        <h3 class="category-title dossier-title">${agent.name} (Niv ${agent.level})</h3>
+                        
+                        <form class="set-warning-form" data-agent-id="${agent.id}">
+                            <span class="warning-display ${warningClass}">Avertissement: Niv ${level}</span>
+                            <select name="level" class="form-select">
+                                <option value="0" ${level_0_selected}>Niv 0 (Aucun)</option>
+                                <option value="1" ${level_1_selected}>Niv 1</option>
+                                <option value="2" ${level_2_selected}>Niv 2</option>
+                                <option value="3" ${level_3_selected}>Niv 3</option>
+                            </select>
+                            <button type="submit" class="form-button">&gt;</button>
+                        </form>
+                    </div>
+                `;
+            }
 
             try {
                 
@@ -95,8 +120,11 @@
                         notesHTML = '<li class="note-item-empty">Aucune note pour cet agent.</li>';
                     }
 
+                    
+                    const headerHTML = getWarningFormHTML(agent);
+
                     agentBlock.innerHTML = `
-                        <h3 class="category-title dossier-title">${agent.name} (Niv ${agent.level})</h3>
+                        ${headerHTML}
                         <ul class="notes-list">
                             ${notesHTML}
                         </ul>
@@ -140,9 +168,10 @@
 
             
             container.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                
                 if (e.target.classList.contains('add-note-form')) {
-                    e.preventDefault();
-                    
                     const form = e.target;
                     const agentId = form.getAttribute('data-agent-id');
                     const textarea = form.querySelector('.note-textarea');
@@ -171,16 +200,41 @@
 
                         const result = await response.json();
                         if (!response.ok) throw new Error(result.error);
-
-                        messageEl.textContent = "Note ajoutée !";
-                        messageEl.className = 'form-message success';
-                        textarea.value = '';
                         
                         setTimeout(() => location.reload(), 1000);
 
                     } catch (error) {
                         messageEl.textContent = `Erreur: ${error.message}`;
                         messageEl.className = 'form-message error';
+                    }
+                }
+
+                
+                if (e.target.classList.contains('set-warning-form')) {
+                    const form = e.target;
+                    const agentId = form.getAttribute('data-agent-id');
+                    const level = form.querySelector('select').value;
+                    const displaySpan = form.querySelector('.warning-display');
+
+                    try {
+                        const response = await fetch('/api/set-warning-level', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                agentId: parseInt(agentId),
+                                level: parseInt(level)
+                            })
+                        });
+
+                        const result = await response.json();
+                        if (!response.ok) throw new Error(result.error);
+
+                        
+                        displaySpan.textContent = `Avertissement: Niv ${level}`;
+                        displaySpan.className = `warning-display warning-level-${level}`;
+
+                    } catch (error) {
+                        alert(`Erreur: ${error.message}`);
                     }
                 }
             });
