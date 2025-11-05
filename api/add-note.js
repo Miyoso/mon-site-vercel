@@ -12,15 +12,16 @@ export default async function handler(request, response) {
       return response.status(400).json({ error: 'Tous les champs sont requis' });
     }
 
+    const isWarning = addWarning || false;
+
     const client = await sql.connect();
-    
     try {
       await client.query('BEGIN');
 
       await client.query(
-        `INSERT INTO agent_notes (agent_id, author_name, note_text)
-         VALUES ($1, $2, $3);`,
-        [agent_id, author_name, note_text]
+        `INSERT INTO agent_notes (agent_id, author_name, note_text, is_warning)
+         VALUES ($1, $2, $3, $4);`,
+        [agent_id, author_name, note_text, isWarning]
       );
 
       if (addWarning) {
@@ -31,9 +32,8 @@ export default async function handler(request, response) {
           [agent_id]
         );
       }
-      
+
       await client.query('COMMIT');
-      
       return response.status(200).json({ success: true, message: 'Note ajoutée' });
 
     } catch (error) {
