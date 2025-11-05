@@ -69,7 +69,6 @@
     height: 1px;
     background-color: #333;
 }
-/* AJOUT: Ligne qui descend du Niveau 2 vers le Niveau 3 */
 .chart-sub::after {
     content: '';
     position: absolute;
@@ -104,7 +103,7 @@
 }
 .chart-node .action-button {
     display: inline-block;
-    border: 2px solid; /* La couleur est définie par .status- */
+    border: 2px solid;
     padding: 5px 15px;
     margin-top: 10px;
     font-size: 0.9rem;
@@ -136,7 +135,7 @@
 
 /* OPÉRATEURS ACTIFS */
 .operators-section {
-    margin-top: 30px; /* Réduit pour la connexion */
+    margin-top: 30px;
 }
 .section-title {
     font-size: 1.3rem;
@@ -149,63 +148,66 @@
     grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
-
-/* Style pour les boîtes de la grille */
-.chart-node.team-member {
-    min-width: unset; /* Retire la largeur min */
-    width: 100%;
+.agent-cell {
+    border: 2px solid; 
     padding: 15px;
-}
-.chart-node.team-member .name {
-    font-size: 1.5rem; /* Nom plus petit pour la grille */
-    margin: 5px 0;
-}
-.chart-node.team-member .action-button {
-    font-size: 0.8rem; /* Bouton plus petit */
-    padding: 4px 10px;
+    background-color: #080808;
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 5px 10px;
+    align-items: baseline;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: all 0.2s;
 }
 
-/* Pulsations (appliquées au .chart-node) */
-.chart-node.decrypted { 
+/* Modificateurs de couleur */
+.agent-cell.status-green {
+    border-color: #00ff00;
+    color: #00ff00;
+}
+.agent-cell.status-red {
+    border-color: #ff4141;
+    color: #ff4141;
+}
+.agent-cell.status-gray {
+    border-color: #333;
+    color: #888;
+}
+
+.agent-cell:hover {
+    background-color: #c5c5c5;
+    color: #000 !important;
+    border-color: #c5c5c5;
+    animation: glitchEffect 150ms 2;
+}
+
+.agent-cell .agent-rank {
+    grid-column: 1 / 4;
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+.agent-cell:hover .agent-rank {
+    color: #333;
+}
+
+.agent-cell .agent-id {}
+.agent-cell .agent-status {
+    word-break: break-all;
+}
+.agent-cell .agent-data {
+    word-break: break-all;
+}
+
+.agent-cell .agent-data.special {
+    grid-column: 1 / 4;
+    margin-top: 5px;
+}
+
+.agent-cell.decrypted { 
     animation: pulse-green 2.5s infinite ease-in-out; 
 }
-.chart-node.corrupted { 
+.agent-cell.corrupted { 
     animation: pulse-red 2s infinite ease-in-out; 
-}
-
-/* Animation de dissolution */
-.chart-node.is-corrupting {
-    animation: data-corruption-dissolve 0.5s linear forwards; 
-    border-color: #ff4141 !important; 
-    color: #ff4141 !important;
-}
-.chart-node.is-corrupting .name,
-.chart-node.is-corrupting .role,
-.chart-node.is-corrupting .action-button {
-    color: #ff4141 !important;
-    border-color: #ff4141 !important;
-}
-
-@keyframes data-corruption-dissolve {
-    0% {
-        opacity: 1;
-        filter: blur(0);
-        transform: translate(0, 0);
-    }
-    50% {
-        opacity: 0.5;
-        filter: blur(2px);
-        transform: translate(2px, -2px) skewX(10deg); 
-    }
-    99% {
-        opacity: 0;
-        filter: blur(12px);
-        transform: translate(0, 5px);
-    }
-    100% {
-        opacity: 0;
-        filter: blur(12px);
-        transform: translate(0, 5px);
-        display: none; 
-    }
 }
