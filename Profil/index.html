@@ -43,7 +43,7 @@
 
         <div class="alert-box">
             <span class="quote">"Attention, mettez un mot de passe différent de vos mots de passe habituels."</span>
-            <span class="signature">-- Je vois vos mots de passe -- Ada :)</span>
+            <span class="signature">-- Je vois vos mots de passe -- <span id="ada-signature">Ada</span> :)</span>
         </div>
 
         <form id="change-password-form">
@@ -73,9 +73,8 @@
         <footer class="footer-link">
             <a href="../index.html">&lt;&lt; RETURN_TO_MAINFRAME</a>
         </footer>
-    </div>
-
-    <script>
+        
+    </div> <script>
         document.addEventListener('DOMContentLoaded', () => {
             
             const user = localStorage.getItem('sas_user') || 'INCONNU';
@@ -84,7 +83,6 @@
             document.getElementById('prompt-user').textContent = user.toLowerCase();
             document.getElementById('agent-status-display').innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
             document.getElementById('ada-signature').textContent = user;
-            
             
             async function loadAgentDetails() {
                 const warningLevelEl = document.getElementById('warning-level-display');
@@ -120,8 +118,7 @@
                     warningListEl.innerHTML = `<li class="warning-note-empty" style="color: #ff6666;">${error.message}</li>`;
                 }
             }
-
-      
+            
             const passwordForm = document.getElementById('change-password-form');
             const newPasswordEl = document.getElementById('new-password');
             const confirmPasswordEl = document.getElementById('confirm-password');
@@ -183,7 +180,6 @@
                 }
             });
 
-          
             loadAgentDetails();
         });
     </script>
