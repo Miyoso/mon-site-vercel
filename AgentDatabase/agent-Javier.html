@@ -29,7 +29,7 @@
         <div class="p-6 md:p-8 space-y-8">
             
             <div>
-                <span class="text-green-300">$</span> <span class="text-white">load --dossier=AGENT_08</span>
+                <span class="text-green-300">$</span> <span class="text-white">load --dossier=AGENT_08_JAVIER</span>
                 <p class="text-cyan-400">... Tentative de déchiffrement ...</p>
                 <p class="text-red-500">ERREUR: Données corrompues. Affichage des fragments.</p>
                 <span class="text-green-300">$</span> <span class="cursor-blink"></span>
@@ -38,22 +38,30 @@
             <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
                 <h2 class="font-tech text-2xl text-white mb-4">[SECTION 01 : IDENTIFICATION]</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-slate-400">NOM DE L'AGENT :</p>
-                        <p class="text-xl text-white"><span class="data-glitched-random"></span></p>
+                <div class="flex flex-wrap md:flex-nowrap gap-6">
+                    <div class="flex-grow space-y-4">
+                        <div>
+                            <p class="text-slate-400">NOM DE L'AGENT :</p>
+                            <p class="text-xl text-white">JAVIER</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400">ALIAS CONNUS :</p>
+                            <p class="text-xl text-white"><span class="data-glitched-random"></span></p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400">STATUT ACTUEL :</p>
+                            <p class="text-xl text-yellow-400"><span class="data-glitched-random"></span></p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400">ORIGINE :</p>
+                            <p class="text-xl text-white"><span class="data-glitched-random"></span></p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-slate-400">ALIAS CONNUS :</p>
-                        <p class="text-xl text-white"><span class="data-glitched-random"></span></p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">STATUT ACTUEL :</p>
-                        <p class="text-xl text-yellow-400"><span class="data-glitched-random"></span></p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">NIVEAU DE MENACE :</p>
-                        <p class="text-xl text-red-500"><span class="data-glitched-random"></span></p>
+                    <div class="flex-shrink-0">
+                        <div class="placeholder-img">
+                            <span>[IMAGE CORROMPUE]</span>
+                            <p>petit.png</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -68,14 +76,11 @@
                         <h3 class="text-xl text-cyan-400 font-tech mb-2">// PHYSIQUE</h3>
                         <ul class="list-none space-y-1">
                             <li><span class="text-slate-400">TAILLE:</span> <span class="data-glitched-random"></span></li>
-                            <li><span class="text-slate-400">CHEVEUX:</span> <span class="data-glitched-random"></span></li>
-                            <li><span class="text-slate-400">YEUX:</span> <span class="data-glitched-random"></span></li>
                         </ul>
                     </div>
                     <div>
                         <h3 class="text-xl text-green-400 font-tech mb-2">// QUALITÉS (ASSETS)</h3>
                         <ul class="list-none space-y-1">
-                            <li><span class="data-glitched-random"></span></li>
                             <li><span class="data-glitched-random"></span></li>
                         </ul>
                     </div>
@@ -87,6 +92,7 @@
                     </div>
                 </div>
             </section>
+
             <div class="w-full border-t border-dashed border-green-800 my-4"></div>
 
             <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
@@ -94,21 +100,6 @@
                 <div class="bg-black/30 p-4 rounded">
                     <p class="text-red-400">[ACCÈS VERROUILLÉ - CHIFFREMENT AES-256]</p>
                     <p class="text-sm select-none">
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span>
-                    </p>
-                </div>
-            </section>
-
-            <section class="border border-yellow-600/30 p-4 rounded-lg bg-yellow-900/10">
-                <h2 class="font-tech text-2xl text-yellow-400 mb-4">[SECTION 04 : COMPÉTENCES & OPÉRATIONS - NIVEAU 7 REQUIS]</h2>
-                <div class="bg-black/30 p-4 rounded">
-                    <p class="text-yellow-400">[ACCÈS VERROUILLÉ - CLÉ DE DÉCHIFFREMENT MANQUANTE]</p>
-                    <p class="text-sm select-none">
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span><br>
                         <span class="data-glitched-random"></span><br>
                         <span class="data-glitched-random"></span>
                     </p>
@@ -144,13 +135,11 @@
 
             setInterval(() => {
                 glitchElements.forEach(el => {
-                    // Génère une longueur aléatoire à chaque fois pour plus de chaos
-                    const randomLength = Math.floor(Math.random() * 10) + 8; // entre 8 et 28 chars
+                    const randomLength = Math.floor(Math.random() * 20) + 8;
                     el.textContent = generateRandomString(randomLength);
                 });
-            }, 100); // Se met à jour toutes les 100ms
+            }, 100);
         });
     </script>
-
 </body>
 </html>
