@@ -770,3 +770,22 @@ h1 {
     background-color: #ff4141;
     color: #fff;
 }
+
+.form-button {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.2rem;
+    color: #00ff00; 
+    background-color: transparent; 
+    border: 1px solid #00ff00;
+    padding: 0.75rem; 
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 1rem;
+    text-shadow: 0 0 5px #00ff00; 
+}
+.form-button:hover {
+    background-color: #00ff00; 
+    color: #0a0a0a; 
+    box-shadow: 0 0 15px #00ff00; 
+    text-shadow: none;
+}
