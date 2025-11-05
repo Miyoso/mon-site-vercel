@@ -1,9 +1,9 @@
+/* --- Profil/style-profil.css (Thème KALI) --- */
 
-
-
+/* Configuration générale */
 body {
     background-color: #121212;
-    color: #00e600; 
+    color: #00e600; /* Texte de sortie par défaut */
     font-family: 'Roboto Mono', monospace; 
     font-size: 16px;
     text-shadow: 0 0 2px rgba(0, 230, 0, 0.5); 
@@ -13,7 +13,7 @@ body {
     overflow-x: hidden;
 }
 
-
+/* Scanlines */
 body::before {
     content: "";
     position: absolute;
@@ -42,22 +42,23 @@ body::before {
     border-radius: 5px;
 }
 
-
+/* --- MISE À JOUR DU PROMPT KALI --- */
 .prompt-header {
-    font-size: 1.1rem; 
+    font-size: 1.1rem; /* Taille augmentée */
     margin-bottom: 0.8rem;
     padding-left: 0.5rem;
-    color: #eaeaea; 
+    color: #eaeaea; /* Couleur par défaut (pour ┌──( )-[ ] ) */
 }
 .prompt-header .username {
-    color: #ff4141; 
+    color: #ff4141; /* ROUGE pour l'utilisateur (root) */
     text-shadow: 0 0 3px #ff4141;
 }
 .prompt-header .host {
-    color: #eaeaea; 
+    color: #eaeaea; /* BLANC pour le @system */
 }
 .prompt-header .path {
-    color: #8ab4f8; 
+    color: #8ab4f8; /* BLEU pour le chemin */
+}
 
 /* Symbole de fin de prompt (#) */
 .prompt-end {
@@ -76,10 +77,10 @@ h1 {
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
-    color: #eaeaea; 
+    color: #eaeaea; /* La commande elle-même en blanc */
 }
 
-
+/* --- Ligne de Statut (Agent + Niveau) --- */
 .status {
     font-size: 1.1rem;
     text-align: left;
@@ -95,7 +96,7 @@ h1 {
     text-shadow: 0 0 3px #ffff00;
 }
 
-
+/* --- Alerte Ada --- */
 .alert-box {
     border: 1px solid #cc0000;
     background-color: rgba(204, 0, 0, 0.08);
@@ -108,7 +109,7 @@ h1 {
 .alert-box .quote { display: block; font-style: italic; }
 .alert-box .signature { display: block; text-align: right; margin-top: 1.2rem; color: #ff9999; }
 
-
+/* --- Formulaire --- */
 .form-group {
     margin-bottom: 2.5rem;
 }
@@ -136,7 +137,7 @@ h1 {
     box-shadow: 0 0 8px rgba(0, 230, 0, 0.4); 
 }
 
-
+/* --- Bouton --- */
 .btn-submit {
     background: none;
     border: 1.5px solid #00e600;
@@ -164,7 +165,7 @@ h1 {
     margin-left: 0.5rem;
 }
 
-
+/* --- Animations et Utilitaires --- */
 .blink {
     animation: blink 1s step-end infinite;
 }
@@ -204,45 +205,3 @@ h1 {
     padding: 0.25rem 0.5rem;
 }
 
-
-.warning-notes-container {
-    margin-top: 2.5rem;
-}
-
-.warning-notes-list {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 1.5rem;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.warning-note-item {
-    border: 1px solid #333;
-    background-color: #0e0e0e;
-    padding: 1rem;
-    margin-bottom: 1rem;
-}
-
-.warning-note-meta {
-    font-size: 0.9rem;
-    color: #888;
-    display: block;
-    border-bottom: 1px dashed #333;
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-.warning-note-meta .author {
-    color: #ff6666; /* Rouge */
-}
-
-.warning-note-text {
-    font-size: 1rem;
-    color: #c5c5c5;
-    white-space: pre-wrap;
-}
-
-.warning-note-empty {
-    color: #555;
-    font-style: italic;
-}
