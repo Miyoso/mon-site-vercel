@@ -798,3 +798,40 @@ h1 {
     font-style: italic;
     font-size: 1rem;
 }
+
+.dossier-header.clickable {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.dossier-header.clickable:hover {
+    background-color: #1a1a1a;
+}
+
+.toggle-arrow {
+    display: inline-block;
+    margin-right: 10px;
+    color: #00ff00;
+    transition: transform 0.3s ease;
+}
+
+.collapsible-content {
+    max-height: 2000px;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+    border-top: 1px solid #222;
+}
+
+.agent-dossier.is-collapsed .collapsible-content {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    border-top: none;
+}
+
+.agent-dossier.is-collapsed .toggle-arrow {
+    transform: rotate(0deg);
+}
+.agent-dossier:not(.is-collapsed) .toggle-arrow {
+    transform: rotate(90deg);
+}
