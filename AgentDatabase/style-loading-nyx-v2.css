@@ -1,0 +1,69 @@
+/* AgentDatabase/style-loading-nyx.css */
+body {
+    background-color: #121212;
+    color: #eaeaea;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.console-output {
+    flex-grow: 1;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* Style du Prompt KALI */
+.prompt {
+    color: #eaeaea;
+}
+.prompt .user {
+    color: #ff4141;
+    text-shadow: 0 0 2px #ff4141;
+}
+.prompt .host {
+    color: #eaeaea;
+}
+.prompt .path {
+    color: #8ab4f8;
+}
+.prompt .symbol {
+    color: #eaeaea;
+}
+
+/* Styles des lignes de sortie */
+.line-command {
+    color: #eaeaea;
+}
+.line-info {
+    color: #00cccc;
+}
+.line-success {
+    color: #00e600;
+}
+.line-warning {
+    color: #ffff00;
+}
+.line-error {
+    color: #ff4141;
+}
+
+.cursor-blink {
+    animation: blink 1s step-end infinite;
+    display: inline-block;
+    width: 0.6em;
+    height: 1em;
+    background-color: #eaeaea;
+    vertical-align: middle;
+    margin-left: 0.2em;
+}
+@keyframes blink {
+    50% { opacity: 0; }
+}
