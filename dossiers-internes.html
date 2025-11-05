@@ -49,35 +49,19 @@
 
             let agentsList = [];
 
-            function getWarningFormHTML(agent) {
+            function getAgentHeaderHTML(agent) {
                 const level = agent.warning_level || 0;
                 const warningClass = `warning-level-${level}`;
                 
-                const level_0_selected = level === 0 ? 'selected' : '';
-                const level_1_selected = level === 1 ? 'selected' : '';
-                const level_2_selected = level === 2 ? 'selected' : '';
-                const level_3_selected = level === 3 ? 'selected' : '';
-
                 return `
                     <div class="dossier-header">
                         <h3 class="category-title dossier-title">${agent.name} (Niv ${agent.level})</h3>
-                        
-                        <form class="set-warning-form" data-agent-id="${agent.id}">
-                            <span class="warning-display ${warningClass}">Avertissement: Niv ${level}</span>
-                            <select name="level" class="form-select">
-                                <option value="0" ${level_0_selected}>Niv 0 (Aucun)</option>
-                                <option value="1" ${level_1_selected}>Niv 1</option>
-                                <option value="2" ${level_2_selected}>Niv 2</option>
-                                <option value="3" ${level_3_selected}>Niv 3</option>
-                            </select>
-                            <button type="submit" class="form-button">&gt;</button>
-                        </form>
+                        <span class="warning-display ${warningClass}">Avertissement: Niv ${level}</span>
                     </div>
                 `;
             }
 
             try {
-                
                 const [agentsResponse, notesResponse] = await Promise.all([
                     fetch('/api/get-agents'),
                     fetch('/api/get-notes')
@@ -93,14 +77,11 @@
                 agentsList = agentsData.agents.sort((a, b) => a.id - b.id);
                 const allNotes = notesData.notes;
 
-                
                 container.innerHTML = '';
                 let jumpOptionsHTML = '<option value="">-- Sélectionner un agent --</option>';
                 
                 agentsList.forEach(agent => {
-                    
                     const agentIdTag = `agent-dossier-${agent.id}`;
-                    
                     const agentNotes = allNotes.filter(note => note.agent_id === agent.id);
                     const agentBlock = document.createElement('div');
                     agentBlock.className = 'report-content agent-dossier';
@@ -120,8 +101,7 @@
                         notesHTML = '<li class="note-item-empty">Aucune note pour cet agent.</li>';
                     }
 
-                    
-                    const headerHTML = getWarningFormHTML(agent);
+                    const headerHTML = getAgentHeaderHTML(agent);
 
                     agentBlock.innerHTML = `
                         ${headerHTML}
@@ -130,16 +110,18 @@
                         </ul>
                         <form class="add-note-form" data-agent-id="${agent.id}">
                             <textarea class="note-textarea" placeholder="Ajouter une note privée..."></textarea>
+                            <div class="checkbox-group">
+                                <input type="checkbox" class="form-checkbox" id="warn-${agent.id}">
+                                <label for="warn-${agent.id}">Augmenter le niveau d'avertissement</label>
+                            </div>
                             <button type="submit" class="form-button">&gt;&gt; Ajouter la note</button>
                             <p class="form-message"></p>
                         </form>
                     `;
                     container.appendChild(agentBlock);
 
-                    
                     jumpOptionsHTML += `<option value="${agentIdTag}">${agent.name} (ID: ${agent.id})</option>`;
                 });
-
                 
                 jumpSelect.innerHTML = jumpOptionsHTML;
 
@@ -148,17 +130,13 @@
                 container.innerHTML = `<p style="color: #ff4141;">[ERREUR CRITIQUE DE CONNEXION AU MAINFRAME]</p>`;
             }
 
-            
             jumpSelect.addEventListener('change', () => {
                 const targetId = jumpSelect.value;
                 if (!targetId) return;
 
                 const targetElement = document.getElementById(targetId);
                 if (targetElement) {
-                    
                     targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    
                     targetElement.classList.add('is-highlighted');
                     setTimeout(() => {
                         targetElement.classList.remove('is-highlighted');
@@ -166,16 +144,16 @@
                 }
             });
 
-            
             container.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                
                 if (e.target.classList.contains('add-note-form')) {
+                    e.preventDefault();
+                    
                     const form = e.target;
                     const agentId = form.getAttribute('data-agent-id');
                     const textarea = form.querySelector('.note-textarea');
+                    const checkbox = form.querySelector('.form-checkbox');
                     const noteText = textarea.value;
+                    const addWarning = checkbox.checked;
                     const messageEl = form.querySelector('.form-message');
 
                     if (!noteText) {
@@ -194,7 +172,8 @@
                             body: JSON.stringify({
                                 agent_id: parseInt(agentId),
                                 author_name: adminName,
-                                note_text: noteText
+                                note_text: noteText,
+                                addWarning: addWarning
                             })
                         });
 
@@ -206,35 +185,6 @@
                     } catch (error) {
                         messageEl.textContent = `Erreur: ${error.message}`;
                         messageEl.className = 'form-message error';
-                    }
-                }
-
-                
-                if (e.target.classList.contains('set-warning-form')) {
-                    const form = e.target;
-                    const agentId = form.getAttribute('data-agent-id');
-                    const level = form.querySelector('select').value;
-                    const displaySpan = form.querySelector('.warning-display');
-
-                    try {
-                        const response = await fetch('/api/set-warning-level', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                agentId: parseInt(agentId),
-                                level: parseInt(level)
-                            })
-                        });
-
-                        const result = await response.json();
-                        if (!response.ok) throw new Error(result.error);
-
-                        
-                        displaySpan.textContent = `Avertissement: Niv ${level}`;
-                        displaySpan.className = `warning-display warning-level-${level}`;
-
-                    } catch (error) {
-                        alert(`Erreur: ${error.message}`);
                     }
                 }
             });

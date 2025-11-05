@@ -733,22 +733,6 @@ h1 {
     padding: 0;
 }
 
-.set-warning-form {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-.set-warning-form .form-select {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.9rem;
-    background-color: #000;
-}
-.set-warning-form .form-button {
-    margin: 0;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.9rem;
-}
-
 .warning-display {
     font-size: 0.9rem;
     padding: 0.25rem 0.5rem;
@@ -788,4 +772,29 @@ h1 {
     color: #0a0a0a; 
     box-shadow: 0 0 15px #00ff00; 
     text-shadow: none;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.form-checkbox {
+    width: 18px;
+    height: 18px;
+    background-color: #111;
+    border: 1px solid #333;
+    cursor: pointer;
+    appearance: none;
+}
+.form-checkbox:checked {
+    background-color: #ff4141;
+    border-color: #ff4141;
+    box-shadow: 0 0 5px #ff4141;
+}
+.checkbox-group label {
+    color: #ffff00;
+    font-style: italic;
+    font-size: 1rem;
 }
