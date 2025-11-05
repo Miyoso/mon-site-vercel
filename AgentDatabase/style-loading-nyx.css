@@ -1,7 +1,7 @@
 /* AgentDatabase/style-loading-nyx.css */
 body {
     background-color: #121212;
-    color: #eaeaea; /* Texte par défaut (blanc/gris) */
+    color: #eaeaea;
     font-family: 'Roboto Mono', monospace;
     font-size: 1rem;
     line-height: 1.5;
@@ -14,8 +14,8 @@ body {
 }
 
 .console-output {
-    flex-grow: 1; /* Force la console à prendre toute la hauteur disponible */
-    overflow-y: auto; /* Active le défilement vertical DANS la console */
+    flex-grow: 1;
+    overflow-y: auto;
     white-space: pre-wrap;
     word-break: break-all;
 }
@@ -25,34 +25,34 @@ body {
     color: #eaeaea;
 }
 .prompt .user {
-    color: #ff4141; /* Rouge (root) */
+    color: #ff4141;
     text-shadow: 0 0 2px #ff4141;
 }
 .prompt .host {
-    color: #eaeaea; /* Blanc */
+    color: #eaeaea;
 }
 .prompt .path {
-    color: #8ab4f8; /* Bleu */
+    color: #8ab4f8;
 }
 .prompt .symbol {
-    color: #eaeaea; /* Blanc */
+    color: #eaeaea;
 }
 
 /* Styles des lignes de sortie */
 .line-command {
-    color: #eaeaea; /* Commande tapée */
+    color: #eaeaea;
 }
 .line-info {
-    color: #00cccc; /* Cyan */
+    color: #00cccc;
 }
 .line-success {
-    color: #00e600; /* Vert */
+    color: #00e600;
 }
 .line-warning {
-    color: #ffff00; /* Jaune */
+    color: #ffff00;
 }
 .line-error {
-    color: #ff4141; /* Rouge */
+    color: #ff4141;
 }
 
 .cursor-blink {
@@ -60,7 +60,7 @@ body {
     display: inline-block;
     width: 0.6em;
     height: 1em;
-    background-color: #eaeaea; /* Curseur blanc */
+    background-color: #eaeaea;
     vertical-align: middle;
     margin-left: 0.2em;
 }
