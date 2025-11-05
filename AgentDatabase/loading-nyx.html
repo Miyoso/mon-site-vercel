@@ -16,31 +16,22 @@
 
     <div class="console-output" id="consoleOutput">
         </div>
-
-    <div class="nyx-trap-overlay" id="nyx-trap-overlay">
-        <div class="nyx-trap-box">
-            <p id="nyx-trap-message">Message du piège</p>
-            <div class="nyx-trap-buttons">
-                <button id="nyx-trap-yes" class="nyx-trap-button yes">Oui</button>
-                <button id="nyx-trap-no" class="nyx-trap-button no">Non</button>
-            </div>
-        </div>
-    </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
+
+            // --- LE PIÈGE SIMPLE DE NYX ---
+            alert("Tu as crus que ca serait possible ?");
+            alert("Je te vois !");
+            alert("Bien essayer !");
+            // --- FIN DU PIÈGE ---
+
             const consoleOutput = document.getElementById('consoleOutput');
             const targetFile = 'agent-nyx.html';
-            const nyxOverlay = document.getElementById('nyx-trap-overlay');
-            const nyxMessage = document.getElementById('nyx-trap-message');
-            const nyxYesButton = document.getElementById('nyx-trap-yes');
-            const nyxNoButton = document.getElementById('nyx-trap-no');
 
             const kaliPrompt = `┌──(<span class="user">root</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/secure/agents</span>]
 └─<span class="symbol">#</span> `;
 
-        
             const lines = [
                 { type: 'command', text: 'whoami' },
                 { type: 'info', text: 'root (UID: 0, GID: 0)' },
@@ -61,16 +52,13 @@
                 { type: 'info', text: 'Attempting Kernel Module injection...' },
                 { type: 'success', text: 'Kernelspace access [OK]' },
                 { type: 'info', text: 'Running brute-force on AES-256 key...' },
-                
-                { type: 'error', text: '... 0x1A... 0x4F... 0x9C... [TRAP DETECTED]' },
-                
+                { type: 'info', text: '... 0x1A... 0x4F... 0x9C... 0xDD...' },
                 { type: 'info', text: '... 0x3B... 0x7E... 0xAB... 0xFF...' },
                 { type: 'warning', text: 'Key entropy too high. Switching to side-channel attack.' },
                 { type: 'info', text: 'Analyzing power fluctuations... [1/3]' },
                 { type: 'info', text: 'Analyzing memory cache timing... [2/3]' },
                 { type: 'info', text: 'Analyzing electromagnetic emissions... [3/3]' },
                 { type: 'success', text: 'KEY FOUND: [REDACTED]' },
-              
                 { type: 'info', text: 'Mounting decrypted volume...' },
                 { type: 'success', text: 'VOLUME MOUNTED at /mnt/nyx_data' },
                 { type: 'command', text: 'cat /mnt/nyx_data/loader.log' },
@@ -86,12 +74,11 @@
                 { type: 'success', text: 'Redirection imminente.' },
             ];
             
-            let lineIndex = 0;
-            let intrusionScore = 0;
+            let i = 0;
 
             function addLine() {
-                if (lineIndex < lines.length) {
-                    const line = lines[lineIndex];
+                if (i < lines.length) {
+                    const line = lines[i];
                     const p = document.createElement('p');
                     
                     if (line.type === 'command') {
@@ -103,16 +90,12 @@
                     
                     consoleOutput.appendChild(p);
                     consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                    lineIndex++;
-
-                   
-                    if (line.text.includes('[TRAP DETECTED]')) {
-                        setTimeout(startNyxTrap, 1000);
-                    } else {
-                        let delay = line.type === 'command' ? 1000 : (Math.random() * 150 + 50);
-                        if (line.text.includes('...')) delay = 400;
-                        setTimeout(addLine, delay);
-                    }
+                    i++;
+                    
+                    let delay = line.type === 'command' ? 1000 : (Math.random() * 150 + 50);
+                    if (line.text.includes('...')) delay = 400;
+                    
+                    setTimeout(addLine, delay);
                 } else {
                     const finalPrompt = document.createElement('p');
                     finalPrompt.innerHTML = kaliPrompt + '<span class="cursor-blink"></span>';
@@ -123,45 +106,6 @@
                         window.location.href = targetFile;
                     }, 2000);
                 }
-            }
-
-            function updateIntrusionScore() {
-                const p = document.createElement('p');
-                p.className = 'intrusion-score';
-                p.textContent = `!! SCORE D'INTRUSION AUGMENTÉ À ${intrusionScore} !!`;
-                consoleOutput.appendChild(p);
-                consoleOutput.scrollTop = consoleOutput.scrollHeight;
-            }
-
-            function startNyxTrap() {
-                nyxMessage.textContent = "Es-tu idiot ?";
-                nyxOverlay.style.display = 'flex';
-
-                nyxNoButton.onclick = () => {
-                    intrusionScore++;
-                    updateIntrusionScore();
-                    
-                    if (intrusionScore === 1) {
-                        nyxMessage.textContent = "Vraiment ? Es-tu idiot ?";
-                    } else if (intrusionScore === 2) {
-                        nyxMessage.textContent = "Score: 2. Es-tu certain de ne pas être idiot ?";
-                    } else {
-                        nyxMessage.textContent = `Score: ${intrusionScore}. Arrête de cliquer, idiot.`;
-                    }
-                };
-
-                nyxYesButton.onclick = () => {
-                    nyxOverlay.style.display = 'none';
-                    const p = document.createElement('p');
-                    p.className = 'line-success';
-                    p.textContent = '...Admission honnête. Poursuite du décryptage.';
-                    consoleOutput.appendChild(p);
-                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                    
-                   
-                    lineIndex = 26; 
-                    setTimeout(addLine, 1000);
-                };
             }
 
             // Démarrage

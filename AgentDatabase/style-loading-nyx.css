@@ -1,188 +1,69 @@
-#idiot-check-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2000;
-    display: none; 
-}
-
-#idiot-check-box {
-    position: absolute;
-    background: #1a1a1a;
-    border: 1px solid #ff0000;
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-    padding: 25px;
-    border-radius: 5px;
-    text-align: center;
-    color: #eee;
-    font-family: 'Roboto Mono', monospace;
-    width: 300px;
-}
-
-#idiot-check-box p {
-    margin: 0;
-    margin-bottom: 20px;
-    font-size: 1.1em;
-}
-
-#idiot-check-box .buttons {
-    display: flex;
-    justify-content: space-around;
-}
-
-#idiot-yes, #idiot-no {
-    border: none;
-    padding: 10px 20px;
-    font-family: 'Roboto Mono', monospace;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-#idiot-yes {
-    background: #00ff00;
-    color: #111;
-}
-#idiot-yes:hover {
-    background: #fff;
-}
-
-#idiot-no {
-    background: #ff0000;
-    color: #fff;
-}
-#idiot-no:hover {
-    background: #fff;
-    color: #111;
-}
-
-#custom-alert-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    display: none; 
-}
-
-#custom-alert-box {
-    background: #1a1a1a;
-    border: 1px solid #00ff00;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-    padding: 25px;
-    border-radius: 5px;
-    text-align: center;
-    color: #eee;
-    font-family: 'Roboto Mono', monospace;
-    max-width: 400px;
-}
-
-#custom-alert-message {
-    margin: 0;
-    margin-bottom: 20px;
-    font-size: 1.1em;
-    line-height: 1.6;
-}
-
-#custom-alert-ok {
-    background: #00ff00;
-    border: none;
-    color: #111;
-    padding: 10px 25px;
-    font-family: 'Roboto Mono', monospace;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-}
-
-#custom-alert-ok:hover {
-    background: #fff;
-    color: #111;
-}
-
-/* --- STYLE DE LA CONSOLE --- */
-
+/* AgentDatabase/style-loading-nyx.css */
 body {
-   
-    background-color: #000;
-    color: #eee;
+    background-color: #121212;
+    color: #eaeaea; /* Texte par défaut (blanc/gris) */
     font-family: 'Roboto Mono', monospace;
-    font-size: 16px;
-    margin: 0;
-    padding: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .console-output {
- 
-    padding: 15px;
-    width: calc(100% - 30px);
-    height: calc(100vh - 30px); 
-    overflow-y: auto;
-    box-sizing: border-box; 
+    flex-grow: 1; /* Force la console à prendre toute la hauteur disponible */
+    overflow-y: auto; /* Active le défilement vertical DANS la console */
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
-.console-output p {
-   
-    margin: 0;
-    line-height: 1.5;
-    word-break: break-all; 
+/* Style du Prompt KALI */
+.prompt {
+    color: #eaeaea;
+}
+.prompt .user {
+    color: #ff4141; /* Rouge (root) */
+    text-shadow: 0 0 2px #ff4141;
+}
+.prompt .host {
+    color: #eaeaea; /* Blanc */
+}
+.prompt .path {
+    color: #8ab4f8; /* Bleu */
+}
+.prompt .symbol {
+    color: #eaeaea; /* Blanc */
 }
 
-
-.user { color: #ff5555; } 
-.host { color: #50fa7b; } 
-.path { color: #8be9fd; } 
-.symbol { color: #f8f8f2; }
-
-
-
+/* Styles des lignes de sortie */
 .line-command {
-    
-    color: #f1fa8c; 
-    font-weight: 700;
+    color: #eaeaea; /* Commande tapée */
 }
-
-.info {
-    
-    color: #f8f8f2; 
+.line-info {
+    color: #00cccc; /* Cyan */
 }
-
-.success {
-   
-    color: #50fa7b; 
+.line-success {
+    color: #00e600; /* Vert */
 }
-
-.warning {
-   
-    color: #f1fa8c; 
+.line-warning {
+    color: #ffff00; /* Jaune */
 }
-
-.error {
-
-    color: #ff5555; 
+.line-error {
+    color: #ff4141; /* Rouge */
 }
-
-
 
 .cursor-blink {
-    display: inline-block;
-    width: 9px;
-    height: 1.2em;
-    background-color: #f8f8f2;
     animation: blink 1s step-end infinite;
-    margin-left: 5px;
+    display: inline-block;
+    width: 0.6em;
+    height: 1em;
+    background-color: #eaeaea; /* Curseur blanc */
     vertical-align: middle;
+    margin-left: 0.2em;
 }
-
 @keyframes blink {
-    50% {
-        background-color: transparent;
-    }
+    50% { opacity: 0; }
 }
