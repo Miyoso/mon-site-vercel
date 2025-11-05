@@ -696,3 +696,25 @@ h1 {
     outline: none;
     border-color: #00ff00;
 }
+
+.jump-form {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 1rem 1rem 1rem;
+    background-color: #050505;
+    border-bottom: 1px solid #222;
+}
+.jump-form label {
+    font-size: 1.1rem;
+    color: #00ff00;
+    white-space: nowrap;
+}
+.jump-form .form-select {
+    flex-grow: 1;
+}
+
+.agent-dossier.is-highlighted {
+    box-shadow: 0 0 15px #00ff00, 0 0 5px #00ff00 inset;
+    border-color: #00ff00;
+}

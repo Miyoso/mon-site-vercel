@@ -9,6 +9,7 @@
         const REQUIRED_LEVEL = 3;
     </script>
     <script src="security.js"></script>
+
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,8 +21,19 @@
         
         <p class="status">ACCES: <span class="restricted" id="agent-name-display"></span> :: NIVEAU 3</p>
 
+        
+        <div class="report-content" style="padding: 0; margin-top: 0;">
+            <form class="jump-form">
+                <label for="agent-select-jump">//: ACCÈS RAPIDE:</label>
+                <select id="agent-select-jump" class="form-select">
+                    <option value="">-- Sélectionner un agent --</option>
+                </select>
+            </form>
+        </div>
+
+        
         <div id="dossiers-container">
-            <p style="color: #00ff00;">[CHARGEMENT DES DOSSIERS...]</p>
+            <p style="color: #00ff00; padding: 1rem;">[CHARGEMENT DES DOSSIERS...]</p>
         </div>
 
         <footer class="portal-footer">
@@ -29,16 +41,18 @@
         </footer>
     </main>
 
+    
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('dossiers-container');
-            
-            // 'adminName' est défini ici, il sera visible par tout le script
+            const jumpSelect = document.getElementById('agent-select-jump');
             const adminName = localStorage.getItem('sas_user') || 'ADMIN';
             document.getElementById('agent-name-display').textContent = adminName;
 
+            let agentsList = [];
+
             try {
-                // 1. On charge les agents ET les notes en même temps
+                
                 const [agentsResponse, notesResponse] = await Promise.all([
                     fetch('/api/get-agents'),
                     fetch('/api/get-notes')
@@ -51,16 +65,21 @@
                     throw new Error('Erreur lors du chargement des données.');
                 }
 
-                const agents = agentsData.agents.sort((a, b) => a.id - b.id);
+                agentsList = agentsData.agents.sort((a, b) => a.id - b.id);
                 const allNotes = notesData.notes;
 
-            
-                container.innerHTML = ''; 
                 
-                agents.forEach(agent => {
+                container.innerHTML = '';
+                let jumpOptionsHTML = '<option value="">-- Sélectionner un agent --</option>';
+                
+                agentsList.forEach(agent => {
+                    
+                    const agentIdTag = `agent-dossier-${agent.id}`;
+                    
                     const agentNotes = allNotes.filter(note => note.agent_id === agent.id);
                     const agentBlock = document.createElement('div');
                     agentBlock.className = 'report-content agent-dossier';
+                    agentBlock.id = agentIdTag;
                     
                     let notesHTML = '';
                     if (agentNotes.length > 0) {
@@ -88,14 +107,38 @@
                         </form>
                     `;
                     container.appendChild(agentBlock);
+
+                    
+                    jumpOptionsHTML += `<option value="${agentIdTag}">${agent.name} (ID: ${agent.id})</option>`;
                 });
+
+                
+                jumpSelect.innerHTML = jumpOptionsHTML;
 
             } catch (error) {
                 console.error('Erreur:', error);
                 container.innerHTML = `<p style="color: #ff4141;">[ERREUR CRITIQUE DE CONNEXION AU MAINFRAME]</p>`;
             }
 
-          
+            
+            jumpSelect.addEventListener('change', () => {
+                const targetId = jumpSelect.value;
+                if (!targetId) return;
+
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    
+                    targetElement.classList.add('is-highlighted');
+                    setTimeout(() => {
+                        targetElement.classList.remove('is-highlighted');
+                    }, 2000);
+                }
+            });
+
+            
             container.addEventListener('submit', async (e) => {
                 if (e.target.classList.contains('add-note-form')) {
                     e.preventDefault();
@@ -121,7 +164,7 @@
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 agent_id: parseInt(agentId),
-                                author_name: adminName, 
+                                author_name: adminName,
                                 note_text: noteText
                             })
                         });
@@ -141,8 +184,6 @@
                     }
                 }
             });
-        
-
         });
     </script>
 </body>
