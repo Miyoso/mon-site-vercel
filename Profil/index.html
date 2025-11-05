@@ -21,20 +21,16 @@
             ┌──(<span id="prompt-user" class="username">[LOADING]</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/profil</span>]
         </div>
 
-
-        <p class="status" id="agent-status-display">AGENT: [CHARGEMENT...]</p>
-
-
         <h1>
             <span class="prompt-end">└─<span class="blink">#</span></span>
             change_passphrase
         </h1>
 
-        
+        <p class="status" id="agent-status-display">AGENT: [CHARGEMENT...]</p>
 
         <div class="alert-box">
             <span class="quote">"Attention, mettez un mot de passe différent de vos mots de passe habituels."</span>
-            <span class="signature">-- Je vois vos mots de passe -- Ada :)</span>
+            <span class="signature">-- Je vois vos mots de passe -- <span id="ada-signature">Ada</span> :)</span>
         </div>
 
         <form id="change-password-form">
@@ -73,11 +69,11 @@
             const user = localStorage.getItem('sas_user') || 'INCONNU';
             const level = localStorage.getItem('sas_level') || '0';
             
-           
             document.getElementById('prompt-user').textContent = user.toLowerCase();
             document.getElementById('agent-status-display').innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
             document.getElementById('ada-signature').textContent = user;
             
+            // Le script cible ces ID :
             const passwordForm = document.getElementById('change-password-form');
             const newPasswordEl = document.getElementById('new-password');
             const confirmPasswordEl = document.getElementById('confirm-password');
