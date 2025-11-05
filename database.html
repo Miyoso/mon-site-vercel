@@ -48,6 +48,7 @@
         
         <div class="operators-section">
             <h2 class="section-title">//: OPÉRATEURS ACTIFS</h2>
+            
             <div class="operators-grid" id="operators-grid-container">
                 </div>
         </div>
@@ -66,19 +67,6 @@
             const javierBox = document.getElementById('agent-box-javier');
             const jiBox = document.getElementById('agent-box-ji');
 
-            
-            async function destroyAgentData(agentId) {
-                try {
-                    
-                    console.warn(`Simulation: Destruction des données pour Agent ID ${agentId}`);
-                    
-                    
-                } catch (error) {
-                    console.error("Erreur lors de la corruption des données:", error);
-                }
-            }
-
-
             try {
                 const response = await fetch('/api/get-agents');
                 const data = await response.json();
@@ -90,7 +78,7 @@
 
                     data.agents.forEach(agent => {
                         
-                        // -- Traitement agents-clés --
+                   
                         if (agent.id === 1 || agent.id === 3 || agent.id === 18) {
                             let box;
                             if (agent.id === 1) box = gravesBox;
@@ -102,69 +90,54 @@
                             return;
                         }
 
-                        // -- Traitement grille --
+             
+                        
                         const parts = agent.status_text.split('::').map(part => part.trim());
-                        const statusText = parts[1] || '[STATUS_UNKNOWN]';
-                        const dataText = parts[2] || null;
+                        let buttonText = parts[1] || '[STATUS INCONNU]';
+                        
+                        if (buttonText === 'DOSSIER SCELLÉ') buttonText = 'DOSSIER SCELLÉ';
+                        if (buttonText === 'STATUT NON-SANCTIONNÉ') buttonText = 'NON-SANCTIONNÉ';
 
-                        let statusClass = 'status-gray';
+                        let colorClass = 'status-gray';
                         if (agent.css_class === 'decrypted') {
-                            statusClass = 'status-green';
+                            colorClass = 'status-green';
                         } else if (agent.css_class === 'corrupted') {
-                            statusClass = 'status-red';
+                            colorClass = 'status-red';
                         }
                         
-                        let cellHTML = `
-                            <a href="${agent.profile_url}" class="agent-cell ${statusClass} ${agent.css_class || ''}" data-id="${agent.id}">
-                                <span class="agent-rank">[AGENT_STD]</span>
+        
+                        gridHTML += `
+                            <div class="chart-node team-member ${agent.css_class || ''}">
+                                <div class="role">[AGENT_STD]</div>
+                                <div class="name">${agent.name}</div>
+                                <a href="${agent.profile_url}" class="action-button ${colorClass}" data-id="${agent.id}">
+                                    [${buttonText}]
+                                </a>
+                            </div>
                         `;
-
-                        if (statusText === 'DOSSIER SCELLÉ' && dataText === '[DECEASED]') {
-                            cellHTML += `
-                                <span class="agent-id">${statusText}</span> <span>::</span>
-                                <span class="agent-data special" style="color: #ff4141;">[DECEASED]</span>
-                            `;
-                        } 
-                        else if (dataText) {
-                            cellHTML += `
-                                <span class="agent-id">${statusText}</span> <span>::</span>
-                                <span class="agent-status">${dataText}</span>
-                            `;
-                        } 
-                        else {
-                            cellHTML += `
-                                <span class="agent-id" style="grid-column: 1 / 4;">${statusText}</span>
-                            `;
-                        }
-                        
-                        cellHTML += `</a>`;
-                        gridHTML += cellHTML;
                     });
 
                     gridContainer.innerHTML = gridHTML;
 
-                    // --- PIÈGE AGENT 13 
+                  
+                   
                     const agent13Link = document.querySelector('a[data-id="13"]');
                     
                     if (agent13Link) {
                         agent13Link.addEventListener('click', function(e) {
-                         
                             e.preventDefault(); 
                             
-                           
-                            this.classList.add('is-corrupting');
+                            const parentBox = this.closest('.chart-node');
+                            parentBox.classList.add('is-corrupting');
                             
-                         
+                            this.textContent = '[DONNÉES DÉTRUITES]';
+                            this.classList.remove('status-gray');
+                            this.classList.add('status-red');
                             this.href = '#';
-
-                            
-                            setTimeout(() => {
-                                
-                            }, 1000); 
 
                         }, { once: true });
                     }
-                    
+                 
 
                 } else {
                     gridContainer.innerHTML = '<p>[ERREUR: AUCUN AGENT TROUVÉ]</p>';

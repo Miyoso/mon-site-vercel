@@ -2,16 +2,16 @@
 
 .system-status {
     text-align: center;
-    font-size: 0.9rem; /* 18px */
+    font-size: 0.9rem;
     margin-bottom: 40px;
     letter-spacing: 2px;
     color: #888;
 }
 .system-status .secured {
-    color: #00ff00; /* #00E000 */
+    color: #00ff00;
 }
 .system-status .encrypted {
-    color: #ff4141; /* #FF0000 */
+    color: #ff4141;
 }
 
 /* Structure de l'organigramme */
@@ -33,13 +33,14 @@
 
 /* Boîte d'agent (noeud) */
 .chart-node {
-    border: 1px solid #333; /* #444 */
+    border: 1px solid #333;
     background-color: #111;
     padding: 20px;
     text-align: center;
     min-width: 280px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     position: relative;
+    transition: all 0.2s;
 }
 .chart-node.lead {
     min-width: 300px;
@@ -57,7 +58,7 @@
     transform: translateX(-50%);
     width: 1px;
     height: 25px;
-    background-color: #333; /* #444 */
+    background-color: #333;
 }
 .chart-sub::before {
     content: '';
@@ -66,7 +67,18 @@
     width: 320px; 
     left: calc(50% - 160px); 
     height: 1px;
-    background-color: #333; /* #444 */
+    background-color: #333;
+}
+/* AJOUT: Ligne qui descend du Niveau 2 vers le Niveau 3 */
+.chart-sub::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 30px;
+    background-color: #333;
 }
 .chart-node.subordinate::before {
     content: '';
@@ -76,42 +88,58 @@
     transform: translateX(-50%);
     width: 1px;
     height: 26px; 
-    background-color: #333; /* #444 */
+    background-color: #333;
 }
 
 /* Contenu des boîtes */
 .chart-node .role {
-    font-size: 0.9rem; /* 18px */
-    color: #888; /* #aaa */
+    font-size: 0.9rem;
+    color: #888;
 }
 .chart-node .name {
-    font-size: 1.8rem; /* 32px */
-    color: #eaeaea; /* #00FF00 */
+    font-size: 1.8rem;
+    color: #eaeaea;
     margin: 10px 0;
     font-weight: normal;
 }
 .chart-node .action-button {
     display: inline-block;
-    border: 2px solid #00ff00; /* #00E000 */
+    border: 2px solid; /* La couleur est définie par .status- */
     padding: 5px 15px;
     margin-top: 10px;
-    font-size: 0.9rem; /* 18px */
-    color: #00ff00;
+    font-size: 0.9rem;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s;
 }
-.chart-node .action-button:hover {
-    background-color: #00ff00;
+
+/* Couleurs des boutons */
+.action-button.status-green {
+    border-color: #00ff00;
+    color: #00ff00;
+}
+.action-button.status-red {
+    border-color: #ff4141;
+    color: #ff4141;
+}
+.action-button.status-gray {
+    border-color: #888;
+    color: #888;
+}
+
+.action-button:hover {
+    background-color: #c5c5c5;
     color: #000;
+    border-color: #c5c5c5;
+    animation: glitchEffect 150ms 2;
 }
 
 /* OPÉRATEURS ACTIFS */
 .operators-section {
-    margin-top: 80px;
+    margin-top: 30px; /* Réduit pour la connexion */
 }
 .section-title {
-    font-size: 1.3rem; /* 24px */
+    font-size: 1.3rem;
     color: #00ff00;
     margin-bottom: 20px;
     font-weight: normal;
@@ -121,74 +149,63 @@
     grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
-.agent-cell {
-    border: 2px solid; 
+
+/* Style pour les boîtes de la grille */
+.chart-node.team-member {
+    min-width: unset; /* Retire la largeur min */
+    width: 100%;
     padding: 15px;
-    background-color: #080808;
-    display: grid;
-    grid-template-columns: auto auto 1fr;
-    gap: 5px 10px;
-    align-items: baseline;
-    line-height: 1.2;
-    text-decoration: none;
-    transition: all 0.2s;
+}
+.chart-node.team-member .name {
+    font-size: 1.5rem; /* Nom plus petit pour la grille */
+    margin: 5px 0;
+}
+.chart-node.team-member .action-button {
+    font-size: 0.8rem; /* Bouton plus petit */
+    padding: 4px 10px;
 }
 
-/* Modificateurs de couleur */
-.agent-cell.status-green {
-    border-color: #00ff00;
-    color: #00ff00;
-}
-.agent-cell.status-red {
-    border-color: #ff4141;
-    color: #ff4141;
-}
-.agent-cell.status-gray {
-    border-color: #333;
-    color: #888;
-}
-
-/* Style de survol pour les boîtes */
-.agent-cell:hover {
-    background-color: #c5c5c5;
-    color: #000 !important;
-    border-color: #c5c5c5;
-    animation: glitchEffect 150ms 2;
-}
-
-/* CSS RANG DE L'AGENT */
-.agent-cell .agent-rank {
-    grid-column: 1 / 4;
-    color: #888;
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-}
-.agent-cell:hover .agent-rank {
-    color: #333;
-}
-
-.agent-cell .agent-id {}
-.agent-cell .agent-status {
-    word-break: break-all;
-}
-.agent-cell .agent-data {
-    word-break: break-all;
-}
-
-.agent-cell .agent-data.special {
-    grid-column: 1 / 4;
-    margin-top: 5px;
-}
-
-.agent-cell.decrypted { 
+/* Pulsations (appliquées au .chart-node) */
+.chart-node.decrypted { 
     animation: pulse-green 2.5s infinite ease-in-out; 
 }
-.agent-cell.corrupted { 
+.chart-node.corrupted { 
     animation: pulse-red 2s infinite ease-in-out; 
 }
 
-.agent-cell.is-corrupting {
+/* Animation de dissolution */
+.chart-node.is-corrupting {
     animation: data-corruption-dissolve 0.5s linear forwards; 
     border-color: #ff4141 !important; 
     color: #ff4141 !important;
+}
+.chart-node.is-corrupting .name,
+.chart-node.is-corrupting .role,
+.chart-node.is-corrupting .action-button {
+    color: #ff4141 !important;
+    border-color: #ff4141 !important;
+}
+
+@keyframes data-corruption-dissolve {
+    0% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate(0, 0);
+    }
+    50% {
+        opacity: 0.5;
+        filter: blur(2px);
+        transform: translate(2px, -2px) skewX(10deg); 
+    }
+    99% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translate(0, 5px);
+    }
+    100% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translate(0, 5px);
+        display: none; 
+    }
 }
