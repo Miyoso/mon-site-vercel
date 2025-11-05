@@ -6,18 +6,24 @@
     <title>SAS FILE :: AGENT 13 :: [CORRUPTED]</title>
 
     <script>
+        
         const allowedAgents = [
             'Graves',
             'Javier',
-            'Nyx Blackwood',
+            'Nyx', 
             'Blitz'
         ];
 
+        
         const currentUser = localStorage.getItem('sas_user');
 
+        
         if (!allowedAgents.includes(currentUser)) {
             
-            window.location.href = '../access-denied.html';
+            alert("ce dossier ne vous est pas autorisé");
+            
+            
+            window.location.href = '../database.html';
         }
     </script>
     <link rel="stylesheet" href="../style-agent.css"> 
