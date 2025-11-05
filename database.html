@@ -50,7 +50,7 @@
             <h2 class="section-title">//: OPÉRATEURS ACTIFS</h2>
             
             <div class="operators-grid" id="operators-grid-container">
-            </div>
+                </div>
         </div>
 
         <footer class="portal-footer">
@@ -74,12 +74,11 @@
                 if (data.agents && data.agents.length > 0) {
                     
                     let gridHTML = '';
-                    
                     data.agents.sort((a, b) => a.id - b.id);
 
                     data.agents.forEach(agent => {
                         
-                       
+                   
                         if (agent.id === 1 || agent.id === 3 || agent.id === 18) {
                             let box;
                             if (agent.id === 1) box = gravesBox;
@@ -90,46 +89,37 @@
                             box.querySelector('a').href = agent.profile_url;
                             return;
                         }
+
+                    
                         
                         const parts = agent.status_text.split('::').map(part => part.trim());
-                        const statusText = parts[1] || '[STATUS_UNKNOWN]';
-                        const dataText = parts[2] || null;
+                        let buttonText = parts[1] || '[STATUS INCONNU]';
+                        
+                        if (buttonText === 'DOSSIER SCELLÉ') buttonText = 'DOSSIER SCELLÉ';
+                        if (buttonText === 'STATUT NON-SANCTIONNÉ') buttonText = 'NON-SANCTIONNÉ';
 
-                        let statusClass = 'status-gray';
+                        let colorClass = 'status-gray';
                         if (agent.css_class === 'decrypted') {
-                            statusClass = 'status-green';
+                            colorClass = 'status-green';
                         } else if (agent.css_class === 'corrupted') {
-                            statusClass = 'status-red';
+                            colorClass = 'status-red';
                         }
                         
-                        let cellHTML = `
-                            <a href="${agent.profile_url}" class="agent-cell ${statusClass} ${agent.css_class || ''}" data-id="${agent.id}">
-                                <span class="agent-rank">[AGENT_STD]</span>
+                       
+                        gridHTML += `
+                            <div class="chart-node team-member ${agent.css_class || ''}">
+                                <div class="role">[AGENT_STD]</div>
+                                <div class="name">${agent.name}</div>
+                                <a href="${agent.profile_url}" class="action-button ${colorClass}" data-id="${agent.id}">
+                                    [${buttonText}]
+                                </a>
+                            </div>
                         `;
-
-                        if (statusText === 'DOSSIER SCELLÉ' && dataText === '[DECEASED]') {
-                            cellHTML += `
-                                <span class="agent-id">${statusText}</span> <span>::</span>
-                                <span class="agent-data special" style="color: #ff4141;">[DECEASED]</span>
-                            `;
-                        } 
-                        else if (dataText) {
-                            cellHTML += `
-                                <span class="agent-id">${statusText}</span> <span>::</span>
-                                <span class="agent-status">${dataText}</span>
-                            `;
-                        } 
-                        else {
-                            cellHTML += `
-                                <span class="agent-id" style="grid-column: 1 / 4;">${statusText}</span>
-                            `;
-                        }
-                        
-                        cellHTML += `</a>`;
-                        gridHTML += cellHTML;
                     });
 
                     gridContainer.innerHTML = gridHTML;
+
+                   
 
                 } else {
                     gridContainer.innerHTML = '<p>[ERREUR: AUCUN AGENT TROUVÉ]</p>';
@@ -140,6 +130,5 @@
             }
         });
     </script>
-
 </body>
 </html>

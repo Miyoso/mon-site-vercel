@@ -14,7 +14,7 @@
     color: #ff4141;
 }
 
-/* Structure de l'organigramme */
+
 .org-chart {
     display: flex;
     flex-direction: column;
@@ -22,7 +22,7 @@
     position: relative;
 }
 
-/* Conteneur des subordonnés */
+
 .chart-sub {
     display: flex;
     justify-content: center;
@@ -31,7 +31,7 @@
     position: relative;
 }
 
-/* Boîte d'agent (noeud) */
+
 .chart-node {
     border: 1px solid #333;
     background-color: #111;
@@ -49,7 +49,7 @@
     margin: 0 20px;
 }
 
-/* Lignes de connexion */
+
 .chart-node.lead::after {
     content: '';
     position: absolute;
@@ -69,6 +69,7 @@
     height: 1px;
     background-color: #333;
 }
+
 .chart-sub::after {
     content: '';
     position: absolute;
@@ -90,7 +91,7 @@
     background-color: #333;
 }
 
-/* Contenu des boîtes */
+
 .chart-node .role {
     font-size: 0.9rem;
     color: #888;
@@ -103,7 +104,7 @@
 }
 .chart-node .action-button {
     display: inline-block;
-    border: 2px solid;
+    border: 2px solid; 
     padding: 5px 15px;
     margin-top: 10px;
     font-size: 0.9rem;
@@ -135,7 +136,7 @@
 
 /* OPÉRATEURS ACTIFS */
 .operators-section {
-    margin-top: 30px;
+    margin-top: 30px; 
 }
 .section-title {
     font-size: 1.3rem;
@@ -148,66 +149,63 @@
     grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
-.agent-cell {
-    border: 2px solid; 
+
+
+.chart-node.team-member {
+    min-width: unset; 
+    width: 100%;
     padding: 15px;
-    background-color: #080808;
-    display: grid;
-    grid-template-columns: auto auto 1fr;
-    gap: 5px 10px;
-    align-items: baseline;
-    line-height: 1.2;
-    text-decoration: none;
-    transition: all 0.2s;
+}
+.chart-node.team-member .name {
+    font-size: 1.5rem; 
+    margin: 5px 0;
+}
+.chart-node.team-member .action-button {
+    font-size: 0.8rem; 
+    padding: 4px 10px;
 }
 
-/* Modificateurs de couleur */
-.agent-cell.status-green {
-    border-color: #00ff00;
-    color: #00ff00;
-}
-.agent-cell.status-red {
-    border-color: #ff4141;
-    color: #ff4141;
-}
-.agent-cell.status-gray {
-    border-color: #333;
-    color: #888;
-}
 
-.agent-cell:hover {
-    background-color: #c5c5c5;
-    color: #000 !important;
-    border-color: #c5c5c5;
-    animation: glitchEffect 150ms 2;
-}
-
-.agent-cell .agent-rank {
-    grid-column: 1 / 4;
-    color: #888;
-    font-size: 0.9rem;
-    margin-bottom: 5px;
-}
-.agent-cell:hover .agent-rank {
-    color: #333;
-}
-
-.agent-cell .agent-id {}
-.agent-cell .agent-status {
-    word-break: break-all;
-}
-.agent-cell .agent-data {
-    word-break: break-all;
-}
-
-.agent-cell .agent-data.special {
-    grid-column: 1 / 4;
-    margin-top: 5px;
-}
-
-.agent-cell.decrypted { 
+.chart-node.decrypted { 
     animation: pulse-green 2.5s infinite ease-in-out; 
 }
-.agent-cell.corrupted { 
+.chart-node.corrupted { 
     animation: pulse-red 2s infinite ease-in-out; 
+}
+
+
+.chart-node.is-corrupting {
+    animation: data-corruption-dissolve 0.5s linear forwards; 
+    border-color: #ff4141 !important; 
+    color: #ff4141 !important;
+}
+.chart-node.is-corrupting .name,
+.chart-node.is-corrupting .role,
+.chart-node.is-corrupting .action-button {
+    color: #ff4141 !important;
+    border-color: #ff4141 !important;
+}
+
+@keyframes data-corruption-dissolve {
+    0% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate(0, 0);
+    }
+    50% {
+        opacity: 0.5;
+        filter: blur(2px);
+        transform: translate(2px, -2px) skewX(10deg); 
+    }
+    99% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translate(0, 5px);
+    }
+    100% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translate(0, 5px);
+        display: none; 
+    }
 }
