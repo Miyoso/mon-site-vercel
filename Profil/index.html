@@ -74,7 +74,9 @@
             <a href="../index.html">&lt;&lt; RETURN_TO_MAINFRAME</a>
         </footer>
         
-    </div> <script>
+    </div> 
+    
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
             
             const user = localStorage.getItem('sas_user') || 'INCONNU';
@@ -82,8 +84,9 @@
             
             document.getElementById('prompt-user').textContent = user.toLowerCase();
             document.getElementById('agent-status-display').innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
-            document.getElementById('ada-signature').textContent = user;
             
+            // La ligne "ada-signature" a été supprimée d'ici
+
             async function loadAgentDetails() {
                 const warningLevelEl = document.getElementById('warning-level-display');
                 const warningListEl = document.getElementById('warning-notes-list');
