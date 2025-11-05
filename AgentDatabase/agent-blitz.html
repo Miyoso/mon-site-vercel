@@ -3,66 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS FILE :: AGENT 13 :: [CORRUPTED]</title>
+    <title>Dossier Agent :: BLITZ_21</title>
 
     <script>
-        
+        [cite_start]
         const allowedAgents = [
             'Graves',
             'Javier',
-            'Nyx', 
+            'Nyx',
             'Blitz'
         ];
 
         
         const currentUser = localStorage.getItem('sas_user');
 
-        
+       
         if (!allowedAgents.includes(currentUser)) {
-            
-            alert("ce dossier ne vous est pas autorisé");
-            
-            
-            window.location.href = '../database.html';
+            // S'il n'y est pas, on le redirige
+            alert("ERREUR D'ACCRÉDITATION :: ACCÈS REFUSÉ");
+            window.location.href = '../access-denied.html';
         }
     </script>
-    <link rel="stylesheet" href="../style-agent.css"> 
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="style-nyx.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
 </head>
-<body>
+<body class="text-green-400 min-h-screen p-4 md:p-8 scanline">
 
-    <main class="file-container corrupted">
-        <header class="file-header corrupted-header">
-            <p class="glitch-text">//: ACCESSING FILE... SAS-DB-AGENT-13</p>
-            <p class="glitch-text success">//: PROTOCOLE 'ECHO' :: ACCÈS ACCORDÉ <span class="blinker">_</span></p>
+    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50">
+        <header class="font-tech text-lg md:text-xl p-4 bg-green-900/30 border-b-2 border-green-700/50 flex justify-between items-center">
+            <span>[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3 REQUIS]</span>
+            <span class="text-red-500 animate-pulse">● REC</span>
         </header>
 
-        <section class="file-grid corrupted-grid">
-            <div class="data-block">
-                <h3>//: DONNÉES BRUTES<span class="blinker">_</span></h3>
-                <ul class="data-list">
-                    <li><span>DATA_1:</span> <span class="data-glitched"></span></li>
-                    <li><span>DATA_2:</span> <span class="data-glitched"></span></li>
-                    <li><span>DATA_3:</span> <span class="data-glitched"></span></li>
-                </ul>
+        <div class="p-6 md:p-8 space-y-8">
+            
+            <div>
+                <span class="text-green-300">$</span> <span class="text-white">load --dossier=AGENT_BLITZ_21</span>
+                <p class="text-cyan-400">... Chargement du dossier ...</p>
+                <p class="text-green-400">Authentification réussie. Affichage des données.</p>
+                <span class="text-green-300">$</span> <span class="cursor-blink"></span>
             </div>
-            <div class="data-block">
-                <h3>//: SYSTÈME<span class="blinker">_</span></h3>
-                <ul class="data-list notes">
-                    <li>[FICHIER ENCRYPTÉ]</li>
-                    <li>[SIGNATURES MÉMORIELLES]</li>
-                    <li>[...ERREUR...]</li>
-                </ul>
-            </div>
-        </section>
 
-        <footer class="file-footer corrupted-footer">
-            <a href="../database.html" class="back-link glitch-text">&lt;&lt; RETURN_TO_DATABASE</a>
-            <p class="glitch-text">//: END_OF_FILE</p>
-        </footer>
-    </main>
+            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
+                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 01 : IDENTIFICATION]</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-slate-400">NOM DE L'AGENT :</p>
+                        <p class="text-xl text-white">Ruy Diaz</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400">ALIAS CONNUS :</p>
+                        <p class="text-xl text-white">"21", "Blitz"</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400">STATUT ACTUEL :</p>
+                        <p class="text-xl text-yellow-400">ACTIF (Renseignement)</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400">ÂGE :</p>
+                        <p class="text-xl text-white">35</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
+            
+            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
+                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h3 class="text-xl text-cyan-400 font-tech mb-2">// PHYSIQUE</h3>
+                        <ul class="list-none space-y-1">
+                            <li><span class="text-slate-400">TAILLE:</span> 1.85m</li>
+                            <li><span class="text-slate-400">POIDS:</span> 83kg</li>
+                            <li><span class="text-slate-400">YEUX:</span> Verts</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl text-green-400 font-tech mb-2">// QUALITÉS (ASSETS)</h3>
+                        <ul class="list-none space-y-1">
+                            <li>Loyal</li>
+                            <li>Discipliné</li>
+                            <li>Sang-froid</li>
+                            <li>Rigoureux</li>
+                            <li>Perspicace</li>
+                            <li>Instinctif</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl text-yellow-400 font-tech mb-2">// DÉFAUTS (LIABILITIES)</h3>
+                        <ul class="list-none space-y-1">
+                            <li>Violent</li>
+                            <li>Sanguinaire</li>
+                            <li>Arrogant</li>
+                            <li>Fataliste ("Crois trop en son destin")</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
+
+            <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
+                <h2 class="font-tech text-2xl text-red-400 mb-4">[SECTION 03 : HISTORIQUE - NIVEAU 5 REQUIS]</h2>
+                <div class="bg-black/30 p-4 rounded bio-text">
+                    [cite_start]<p>Originaire d'Amérique Latine, Ruy était un haut gradé de la milice de son pays, dans laquelle il a servi auprès de Javier et Graves. [cite: 26] [cite_start]Il est notamment connu pour ses faits d’armes lors de différentes tentatives d’invasion de son pays. [cite: 27] [cite_start]Il est donc un militaire surentraîné. [cite: 28]</p>
+                    [cite_start]<p>Ruy Diaz (anc. Agent 21) se caractérise par sa loyauté, son dévouement mais surtout sa violence; en effet, il ne laisse pas de survivant après son passage. [cite: 29, 30] [cite_start]Il fait confiance à son instinct et croit que le destin le guide. [cite: 31] [cite_start]Il sait également se mêler aux foules et manipuler ses ennemis pour les frapper de l’intérieur. [cite: 32]</p>
+                </div>
+            </section>
+
+            <section class="border border-yellow-600/30 p-4 rounded-lg bg-yellow-900/10">
+                <h2 class="font-tech text-2xl text-yellow-400 mb-4">[SECTION 04 : OPÉRATIONS SAS - NIVEAU 7 REQUIS]</h2>
+                <div class="bg-black/30 p-4 rounded">
+                    <p class="text-yellow-400">[ACCÈS VERROUILLÉ – CLÉ DE DÉCHIFFREMENT MANQUANTE]</p>
+                    <p class="encrypted text-sm select-none">
+                        [FICHIER: operations_datahaven.log]... 2f 2f 20 43 6f 6d 70 65 74...
+                        [FICHIER: analyse_psy_cortex.dat]... [DONNÉES CORROMPUES]...
+                        [FICHIER: contacts_actifs.db] (Verrouillé)...
+                        [FICHIER: transactions_crypto.bin] (Verrouillé)... 01 00 00...
+                    </p>
+                </div>
+            </section>
+
+             <div>
+                <span class="text-green-300">$</span> <span class="text-white">exit</span>
+                <p class="text-red-500">... Déconnexion ...</p>
+                
+                <div class="mt-8 text-center border-t border-green-700/50 pt-4">
+                    <a href="../database.html" class="font-tech text-green-400 hover:text-white hover:bg-green-700 p-2 transition-all">
+                        &lt;&lt; RETURN_TO_DATABASE
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const glitchElements = document.querySelectorAll('.data-glitched-random');
+            const chars = 'ABCDEF0123456789<>!@#$%^&*()_+[]{}|;:,./?';
+
+            function generateRandomString(length) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+
+            setInterval(() => {
+                glitchElements.forEach(el => {
+                    const randomLength = Math.floor(Math.random() * 20) + 8;
+                    el.textContent = generateRandomString(randomLength);
+                });
+            }, 100);
+        });
+    </script>
 
 </body>
 </html>
