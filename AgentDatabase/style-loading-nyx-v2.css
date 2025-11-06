@@ -67,3 +67,17 @@ body {
 @keyframes blink {
     50% { opacity: 0; }
 }
+
+
+.link-secret {
+    text-decoration: none; 
+    color: inherit; 
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.link-secret:hover {
+    color: #00ff00; 
+    text-shadow: 0 0 5px #00ff00; 
+    filter: blur(0); 
+}
