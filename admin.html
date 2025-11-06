@@ -38,24 +38,34 @@
 
             let agentsList = [];
 
-            // --- FONCTION: Construit le HTML pour la liste ---
+            
             function buildAgentListHTML(agents) {
                 let html = '';
                 agents.forEach(agent => {
-                    // On ne peut pas modifier le niveau 4 (Graves)
-                    const isDisabled = agent.level >= 4 ? 'disabled' : '';
+                    const isDisabled = agent.level >= 4;
+                    let deleteButtonHTML = '';
                     
+                    // On ne peut pas supprimer l'admin (Niv 4)
+                    if (!isDisabled) {
+                        deleteButtonHTML = `
+                            <button type="button" class="form-button delete-agent-btn" data-agent-id="${agent.id}" title="Supprimer cet agent">
+                                X
+                            </button>
+                        `;
+                    }
+
                     html += `
-                        <div class="admin-agent-row">
+                        <div class="admin-agent-row" id="row-agent-${agent.id}">
                             <span class="agent-name">${agent.name} (ID: ${agent.id})</span>
                             <form class="set-level-form" data-agent-id="${agent.id}">
-                                <select name="level" class="form-select" ${isDisabled}>
+                                <select name="level" class="form-select" ${isDisabled ? 'disabled' : ''}>
                                     <option value="1" ${agent.level === 1 ? 'selected' : ''}>Niveau 1</option>
                                     <option value="2" ${agent.level === 2 ? 'selected' : ''}>Niveau 2</option>
                                     <option value="3" ${agent.level === 3 ? 'selected' : ''}>Niveau 3</option>
                                     ${isDisabled ? '<option value="4" selected>Niveau 4 (Admin)</option>' : ''}
                                 </select>
-                                <button type="submit" class="form-button" ${isDisabled}>&gt;</button>
+                                <button type="submit" class="form-button" ${isDisabled ? 'disabled' : ''}>&gt;</button>
+                                ${deleteButtonHTML}
                             </form>
                         </div>
                     `;
@@ -78,14 +88,52 @@
             }
 
             
+            container.addEventListener('click', async (e) => {
+                
+                
+                if (e.target.classList.contains('delete-agent-btn')) {
+                    const button = e.target;
+                    const agentId = button.getAttribute('data-agent-id');
+                    const agentRow = document.getElementById(`row-agent-${agentId}`);
+                    const agentName = agentRow.querySelector('.agent-name').textContent;
+
+                    if (!confirm(`Voulez-vous vraiment supprimer l'agent ${agentName} ?\nCette action est IRRÉVERSIBLE.`)) {
+                        return;
+                    }
+
+                    button.textContent = '...';
+                    button.disabled = true;
+
+                    try {
+                        const response = await fetch('/api/delete-agent', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ agentId: parseInt(agentId) })
+                        });
+                        
+                        const result = await response.json();
+                        if (!response.ok) throw new Error(result.error);
+                        
+                        agentRow.style.opacity = '0';
+                        setTimeout(() => agentRow.remove(), 500);
+                        
+                    } catch (error) {
+                        button.textContent = 'ERR';
+                        alert(`Erreur: ${error.message}`);
+                        button.disabled = false;
+                    }
+                }
+            });
+
             container.addEventListener('submit', async (e) => {
+                
                 if (e.target.classList.contains('set-level-form')) {
                     e.preventDefault();
                     
                     const form = e.target;
                     const agentId = form.getAttribute('data-agent-id');
                     const newLevel = form.querySelector('select').value;
-                    const button = form.querySelector('button');
+                    const button = form.querySelector('button[type="submit"]');
                     
                     button.textContent = '...';
 
