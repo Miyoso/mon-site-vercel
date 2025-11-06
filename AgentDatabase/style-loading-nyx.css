@@ -2,6 +2,7 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+    overflow: hidden;
     background-color: #0d0d0d;
     color: #c0c0c0;
     font-family: 'Roboto Mono', monospace;
