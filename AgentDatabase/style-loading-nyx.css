@@ -1,69 +1,78 @@
-/* AgentDatabase/style-loading-nyx.css */
-body {
-    background-color: #121212;
-    color: #eaeaea;
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #0d0d0d;
+    color: #c0c0c0;
     font-family: 'Roboto Mono', monospace;
-    font-size: 1rem;
+    font-size: 14px;
     line-height: 1.5;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    overflow: hidden;
-    box-sizing: border-box;
 }
 
 .console-output {
-    flex-grow: 1;
+    height: 100vh;
     overflow-y: auto;
-    white-space: pre-wrap;
-    word-break: break-all;
+    box-sizing: border-box;
+    padding: 15px;
+    word-wrap: break-word;
 }
 
-/* Style du Prompt KALI */
 .prompt {
-    color: #eaeaea;
+    white-space: pre-wrap; 
 }
+
 .prompt .user {
-    color: #ff4141;
-    text-shadow: 0 0 2px #ff4141;
+    color: #e62020;
 }
 .prompt .host {
-    color: #eaeaea;
+    color: #e62020;
 }
 .prompt .path {
-    color: #8ab4f8;
+    color: #3b82f6;
 }
 .prompt .symbol {
-    color: #eaeaea;
+    color: #c0c0c0;
 }
 
-/* Styles des lignes de sortie */
 .line-command {
-    color: #eaeaea;
+    color: #ffffff;
+    font-weight: 700;
 }
+
 .line-info {
-    color: #00cccc;
+    color: #c0c0c0;
+    padding-left: 5px;
 }
+
 .line-success {
-    color: #00e600;
+    color: #22c55e;
+    font-weight: 700;
+    padding-left: 5px;
 }
+
 .line-warning {
-    color: #ffff00;
+    color: #f59e0b;
+    padding-left: 5px;
 }
+
 .line-error {
-    color: #ff4141;
+    color: #ef4444;
+    font-weight: 700;
+    padding-left: 5px;
 }
 
 .cursor-blink {
-    animation: blink 1s step-end infinite;
     display: inline-block;
-    width: 0.6em;
-    height: 1em;
-    background-color: #eaeaea;
+    width: 8px;
+    height: 1.2em;
+    background-color: #ffffff;
+    animation: blink 1s steps(2, start) infinite;
+    margin-left: 5px;
     vertical-align: middle;
-    margin-left: 0.2em;
 }
+
 @keyframes blink {
-    50% { opacity: 0; }
+    to {
+        background-color: transparent;
+    }
 }
