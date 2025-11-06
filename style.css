@@ -896,3 +896,11 @@ h1 {
     border-color: #333;
     cursor: not-allowed;
 }
+
+.set-level-form .form-select {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    background-color: #000;
+    color: #eaeaea; /* AJOUT : Force le texte en blanc/gris */
+    border: 1px solid #333; /* AJOUT : Ajoute une bordure visible */
+}
