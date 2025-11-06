@@ -3,83 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOSSIER CONFIDENTIEL :: NYX_CORTEX</title>
+    <title>Dossier Audio Confidentiel</title>
 
-    <script>
-        const REQUIRED_LEVEL = 3;
-    </script>
-    <script src="../security.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="style-nyx.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
     
     <link rel="stylesheet" href="style.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
-
 </head>
-<body class="text-green-400 min-h-screen p-4 md:p-8 scanline">
+<body>
 
-    <div class="max-w-6xl mx-auto border-2 border-red-700/50 shadow-2xl shadow-red-900/50">
-        <header class="font-tech text-lg md:text-xl p-4 bg-red-900/30 border-b-2 border-red-700/50 flex justify-between items-center">
-            <span>[TERMINAL CONFIDENTIEL // ACCÈS NIVEAU 7 REQUIS]</span>
-            <span class="text-red-500 animate-pulse">● REC</span>
-        </header>
-        <div class="p-6 md:p-8 space-y-8">
-            <div>
-                <span class="text-green-300">$</span> <span class="text-white">load --file=analyse_psy_cortex.dat</span>
-                <p class="text-cyan-400">... Déchiffrement du conteneur sécurisé ...</p>
-                <p class="text-red-500">ACCÈS CONFIDENTIEL CONFIRMÉ.</p>
-                <span class="text-green-300">$</span> <span class="cursor-blink"></span>
+    <audio id="mon-audio" src="School_classroom_amb_#3-1762423618105.mp3" preload="auto"></audio>
+
+    <div id="bouton-visualiseur">
+        <i id="icone-livre" class="fa-solid fa-book"></i>
+        <div id="visualiseur-conteneur" class="pointille-ligne">
             </div>
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[ANALYSE PSYCHOLOGIQUE CORTEX]</h2>
-                
-                <div class="bio-text">
-                    <p>&gt; SUJET: BLACKWOOD, NYX</p>
-                    <p>&gt; PROFIL: "GHOST"</p>
-                    <br>
-                    
-                    
-
-                    <audio id="mon-audio" src="Nyx.mp3" preload="auto"></audio>
-
-                    <div id="bouton-visualiseur" class="mt-8">
-                        <i id="icone-livre" class="fa-solid fa-book text-4xl text-blue-400"></i>
-                        <div id="visualiseur-conteneur" class="pointille-ligne">
-                            </div>
-                    </div>
-                    
-                </div>
-            </section>
-            
-            <div>
-                <span class="text-green-300">$</span> <span class="text-white">exit</span>
-                <p class="text-red-500">... Déconnexion ...</p>
-                <div class="mt-8 text-center border-t border-green-700/50 pt-4">
-                    <a href="agent-nyx.html" class="font-tech text-green-400 hover:text-white hover:bg-green-700 p-2 transition-all">
-                        &lt;&lt; RETURN_TO_DOSSIER_NYX
-                    </a>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
-    // Attendre que le DOM soit chargé
     window.addEventListener('DOMContentLoaded', () => {
 
-        // --- 1. Récupérer nos éléments ---
         const bouton = document.getElementById('bouton-visualiseur');
         const audio = document.getElementById('mon-audio');
         const conteneur = document.getElementById('visualiseur-conteneur');
-        const iconeLivre = document.getElementById('icone-livre'); // Nouvelle référence
+        const iconeLivre = document.getElementById('icone-livre');
         
-        // --- 2. Initialisation de l'API Audio ---
         let audioContext;
         let analyseur;
         let source;
@@ -87,10 +38,8 @@
         let barresVisualiseur = [];
         let estInitialise = false;
 
-        // Nombre de barres que nous voulons
-        const NOMBRE_DE_BARRES = 32;
+        const NOMBRE_DE_BARRES = 32; // Nombre de barres du visualiseur
 
-        // --- 3. Fonction d'initialisation (ne s'exécute qu'une fois) ---
         function initialiserAudio() {
             if (estInitialise) return;
 
@@ -104,7 +53,6 @@
             const bufferLength = analyseur.frequencyBinCount;
             dataArray = new Uint8Array(bufferLength);
 
-            // --- 4. Créer les barres HTML ---
             conteneur.innerHTML = ''; 
             for (let i = 0; i < NOMBRE_DE_BARRES; i++) {
                 const barre = document.createElement('div');
@@ -116,25 +64,30 @@
             estInitialise = true;
         }
 
-        // --- 5. La boucle d'animation ---
         function boucleAnimation() {
             requestAnimationFrame(boucleAnimation);
 
-            analyseur.getByteFrequencyData(dataArray);
+            // Vérifie si le contexte audio est encore actif et si l'audio joue
+            if (audioContext && audioContext.state === 'running' && !audio.paused) {
+                analyseur.getByteFrequencyData(dataArray);
 
-            const step = Math.floor(dataArray.length / NOMBRE_DE_BARRES);
-            for (let i = 0; i < NOMBRE_DE_BARRES; i++) {
-                let hauteurMoyenne = dataArray[i * step];
-                const hauteurBarre = (hauteurMoyenne / 255) * 15; // Ajusté pour une ligne fine
-                const barre = barresVisualiseur[i];
-                
-                if (barre) {
-                    barre.style.height = (hauteurBarre > 1 ? hauteurBarre : 1) + 'px'; // Hauteur min de 1px
+                const step = Math.floor(dataArray.length / NOMBRE_DE_BARRES);
+                for (let i = 0; i < NOMBRE_DE_BARRES; i++) {
+                    let hauteurMoyenne = dataArray[i * step];
+                    // Ajusté la hauteur pour une ligne plus fine et plus réactive
+                    const hauteurBarre = (hauteurMoyenne / 255) * 10; // Max 10px de hauteur
+                    const barre = barresVisualiseur[i];
+                    
+                    if (barre) {
+                        barre.style.height = (hauteurBarre > 1 ? hauteurBarre : 1) + 'px'; // Hauteur min de 1px
+                    }
                 }
+            } else {
+                // Si l'audio est en pause ou arrêté, ramener les barres à leur état initial
+                barresVisualiseur.forEach(barre => barre.style.height = '1px');
             }
         }
 
-        // --- 6. Gérer le clic sur le bouton ---
         bouton.addEventListener('click', () => {
             if (!estInitialise) {
                 initialiserAudio();
@@ -147,25 +100,27 @@
             if (audio.paused) {
                 audio.play();
                 iconeLivre.classList.remove('fa-book');
-                iconeLivre.classList.add('fa-book-open'); // Change l'icône
+                iconeLivre.classList.add('fa-book-open');
                 conteneur.classList.remove('pointille-ligne'); // Retire le style pointillé
                 boucleAnimation();
             } else {
                 audio.pause();
                 iconeLivre.classList.remove('fa-book-open');
-                iconeLivre.classList.add('fa-book'); // Remet l'icône de livre fermé
+                iconeLivre.classList.add('fa-book');
                 conteneur.classList.add('pointille-ligne'); // Remet le style pointillé
             }
         });
 
-        // Met à jour l'icône de livre lorsque l'audio se termine
         audio.addEventListener('ended', () => {
             iconeLivre.classList.remove('fa-book-open');
             iconeLivre.classList.add('fa-book');
-            conteneur.classList.add('pointille-ligne'); // Réinitialise l'apparence
-            // Optionnel: Réinitialiser la hauteur des barres à leur min.
+            conteneur.classList.add('pointille-ligne'); 
             barresVisualiseur.forEach(barre => barre.style.height = '1px');
         });
+
+        // Initialiser l'état initial du bouton (livre fermé, ligne pointillée)
+        iconeLivre.classList.add('fa-book');
+        conteneur.classList.add('pointille-ligne');
     });
     </script>
 </body>
