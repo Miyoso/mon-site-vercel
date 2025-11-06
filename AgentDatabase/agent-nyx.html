@@ -9,6 +9,7 @@
         const REQUIRED_LEVEL = 1;
     </script>
     <script src="../security.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="style-nyx.css">
@@ -38,22 +39,30 @@
             <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
                 <h2 class="font-tech text-2xl text-white mb-4">[SECTION 01 : IDENTIFICATION PUBLIQUE]</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-slate-400">NOM DE L'AGENT :</p>
-                        <p class="text-xl text-white">BLACKWOOD, NYX</p>
+                <div class="flex flex-wrap md:flex-nowrap gap-6">
+                    <div class="flex-grow space-y-4">
+                        <div>
+                            <p class="text-slate-400">NOM DE L'AGENT :</p>
+                            <p class="text-xl text-white">BLACKWOOD, NYX</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400">ALIAS CONNUS :</p>
+                            <p class="text-xl text-white">"ZERO", "NULL", "GHOST"</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400">STATUT ACTUEL :</p>
+                            <p class="text-xl text-yellow-400">ACTIF (NON-SANCTIONNÉ)</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-400">NIVEAU DE MENACE :</p>
+                            <p class="text-xl text-red-500">VARIABLE (ÉLEVÉ)</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-slate-400">ALIAS CONNUS :</p>
-                        <p class="text-xl text-white">"ZERO", "NULL", "GHOST"</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">STATUT ACTUEL :</p>
-                        <p class="text-xl text-yellow-400">ACTIF (NON-SANCTIONNÉ)</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">NIVEAU DE MENACE :</p>
-                        <p class="text-xl text-red-500">VARIABLE (ÉLEVÉ)</p>
+                    <div class="flex-shrink-0">
+                        <div class="placeholder-img">
+                            <span>[IMAGE CORROMPUE]</span>
+                            <p>CORRUPTED</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -64,7 +73,6 @@
                 <h2 class="font-tech text-2xl text-white mb-4">[SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
                     <div>
                         <h3 class="text-xl text-cyan-400 font-tech mb-2">// PHYSIQUE</h3>
                         <ul class="list-none space-y-1">
@@ -73,25 +81,31 @@
                             <li><span class="text-slate-400">YEUX:</span> Bleus</li>
                         </ul>
                     </div>
-        
                     <div>
                         <h3 class="text-xl text-green-400 font-tech mb-2">// QUALITÉS (ASSETS)</h3>
                         <ul class="list-none space-y-1">
-                            <li>Instinct affûté</li>
+                            <li>Loyale</li>
+                            <li>Courageuse</li>
                             <li>Perspicace</li>
-                            
+                            <li>Disciplinée</li>
+                            <li>Méthodique</li>
+                            <li>Analytique</li>
+                            <li>Protectrice</li>
                         </ul>
                     </div>
-        
                     <div>
                         <h3 class="text-xl text-yellow-400 font-tech mb-2">// DÉFAUTS (LIABILITIES)</h3>
                         <ul class="list-none space-y-1">
-                            <li>Peureuse</li>
+                            <li>Méfiante (Paranoïaque)</li>
+                            <li>Manipulatrice</li>
+                            <li>Froide</li>
+                            <li>Impulsive</li>
+                            <li>Culpabilisée</li>
                         </ul>
                     </div>
-        
                 </div>
             </section>
+
             <div class="w-full border-t border-dashed border-green-800 my-4"></div>
 
             <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
@@ -132,7 +146,6 @@
              <div>
                 <span class="text-green-300">$</span> <span class="text-white">exit</span>
                 <p class="text-red-500">... Déconnexion ...</p>
-                <p class="text-slate-500">SESSION TERMINÉE.</p>
                 
                 <div class="mt-8 text-center border-t border-green-700/50 pt-4">
                     <a href="../database.html" class="font-tech text-green-400 hover:text-white hover:bg-green-700 p-2 transition-all">
@@ -143,6 +156,28 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const glitchElements = document.querySelectorAll('.data-glitched-random');
+            const chars = 'ABCDEF0123456789<>!@#$%^&*()_+[]{}|;:,./?';
+
+            function generateRandomString(length) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+
+            setInterval(() => {
+                glitchElements.forEach(el => {
+                    const randomLength = Math.floor(Math.random() * 10) + 8;
+                    el.textContent = generateRandomString(randomLength);
+                });
+            }, 100);
+        });
+    </script>
 
 </body>
 </html>
