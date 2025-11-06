@@ -50,6 +50,7 @@ body {
     bottom: 20px; /* Distance du bas du bouton */
     left: 50%;
     transform: translateX(-50%);
+    transform: translateZ(0);
     overflow: hidden; /* S'assure que les barres ne dépassent pas */
 }
 
