@@ -1,11 +1,13 @@
-/* STYLES POUR LE VISUALISEUR AUDIO */
+/* STYLES POUR LE VISUALISEUR AUDIO (MODIFIÉS) */
 #bouton-visualiseur {
     width: 250px; 
     height: 70px;
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid #32CD32; 
+    background-color: transparent; /* Fond transparent */
+    border: 1px solid #2563EB; /* Bordure bleue */
+    border-radius: 5px; /* Bords légèrement arrondis */
     cursor: pointer;
     display: flex;
+    flex-direction: column; /* Icône au-dessus du visualiseur */
     align-items: center;
     justify-content: center;
     position: relative;
@@ -14,28 +16,50 @@
     margin-bottom: 1rem;
 }
 
+#icone-livre {
+    color: #2563EB; /* Couleur de l'icône de livre (bleu) */
+    font-size: 3em; /* Taille de l'icône */
+    margin-bottom: 5px; /* Petit espace sous le livre */
+}
+
 #visualiseur-conteneur {
     display: flex;
     align-items: flex-end; 
-    height: 50px;
-    width: 100%;
-    justify-content: center;
+    height: 15px; /* Hauteur très fine pour le visualiseur */
+    width: 80%; /* Occupe une partie de la largeur du bouton */
+    justify-content: space-between; /* Espacement uniforme */
+    position: absolute; /* Positionne le visualiseur en bas */
+    bottom: 5px; /* Distance du bas du bouton */
+    left: 50%;
+    transform: translateX(-50%);
 }
 
+/* Style de base pour CHAQUE barre (MODIFIÉ) */
 .barre-visualiseur {
-    width: 4px;
-    height: 4px;
-    background-color: #32CD32;
-    margin: 0 2px;
+    width: 3px; /* Barres plus fines */
+    height: 1px; /* Hauteur minimale */
+    background-color: #2563EB; /* Barres bleues */
+    margin: 0 1px; /* Moins d'espace entre les barres */
     transition: height 0.05s;
 }
 
-#icone-play {
-    color: rgba(50, 205, 50, 0.5);
-    font-size: 30px;
-    position: absolute; 
-    z-index: 10;
-    font-family: 'Share Tech Mono', monospace;
+/* Style de la ligne pointillée */
+.pointille-ligne {
+    background-image: linear-gradient(to right, #2563EB 50%, transparent 50%);
+    background-size: 8px 1px; /* Taille des "points" et de l'espace */
+    background-repeat: repeat-x;
+    height: 1px; /* Hauteur de la ligne */
+    width: 80%;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: block; /* S'assure qu'elle est visible */
+}
+
+/* Cache les barres du visualiseur quand la ligne pointillée est active */
+#bouton-visualiseur.paused #visualiseur-conteneur .barre-visualiseur {
+    display: none;
 }
 
 /* STYLES PROVENANT DE style-loading-nyx.css */
@@ -88,7 +112,7 @@
     display: inline-block;
     width: 0.6em;
     height: 1em;
-    background-color: #eaeaea; /* Note : ceci pourrait être #32CD32 pour coller au thème */
+    background-color: #eaeaea;
     vertical-align: middle;
     margin-left: 0.2em;
 }

@@ -18,6 +18,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
 
 </head>
 <body class="text-green-400 min-h-screen p-4 md:p-8 scanline">
@@ -38,14 +40,18 @@
                 <h2 class="font-tech text-2xl text-white mb-4">[ANALYSE PSYCHOLOGIQUE CORTEX]</h2>
                 
                 <div class="bio-text">
+                    <p>&gt; SUJET: BLACKWOOD, NYX</p>
+                    <p>&gt; PROFIL: "GHOST"</p>
+                    <br>
+                    
                     
 
                     <audio id="mon-audio" src="Nyx.mp3" preload="auto"></audio>
 
-                    <div id="bouton-visualiseur">
-                        <div id="visualiseur-conteneur">
+                    <div id="bouton-visualiseur" class="mt-8">
+                        <i id="icone-livre" class="fa-solid fa-book text-4xl text-blue-400"></i>
+                        <div id="visualiseur-conteneur" class="pointille-ligne">
                             </div>
-                        <span id="icone-play">▶</span> 
                     </div>
                     
                 </div>
@@ -71,7 +77,7 @@
         const bouton = document.getElementById('bouton-visualiseur');
         const audio = document.getElementById('mon-audio');
         const conteneur = document.getElementById('visualiseur-conteneur');
-        const iconePlay = document.getElementById('icone-play');
+        const iconeLivre = document.getElementById('icone-livre'); // Nouvelle référence
         
         // --- 2. Initialisation de l'API Audio ---
         let audioContext;
@@ -88,33 +94,23 @@
         function initialiserAudio() {
             if (estInitialise) return;
 
-            // Créer le contexte audio
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
-            // Créer l'analyseur
             analyseur = audioContext.createAnalyser();
-            // Définir la "précision" de l'analyse. Doit être une puissance de 2.
             analyseur.fftSize = 128; 
-            
-            // Créer la source depuis notre élément <audio>
             source = audioContext.createMediaElementSource(audio);
-            
-            // Connecter les "nœuds" audio ensemble
-            // Source -> Analyseur -> Destination (les haut-parleurs)
             source.connect(analyseur);
             analyseur.connect(audioContext.destination);
 
-            // Créer le tableau pour stocker les données de fréquence
             const bufferLength = analyseur.frequencyBinCount;
             dataArray = new Uint8Array(bufferLength);
 
             // --- 4. Créer les barres HTML ---
-            conteneur.innerHTML = ''; // Vider le conteneur
+            conteneur.innerHTML = ''; 
             for (let i = 0; i < NOMBRE_DE_BARRES; i++) {
                 const barre = document.createElement('div');
                 barre.classList.add('barre-visualiseur');
                 conteneur.appendChild(barre);
-                barresVisualiseur.push(barre); // Stocker la référence
+                barresVisualiseur.push(barre);
             }
 
             estInitialise = true;
@@ -122,50 +118,53 @@
 
         // --- 5. La boucle d'animation ---
         function boucleAnimation() {
-            // Demander à redessiner au prochain "frame"
             requestAnimationFrame(boucleAnimation);
 
-            // Récupérer les données de fréquence audio dans notre tableau
             analyseur.getByteFrequencyData(dataArray);
 
-            // Mettre à jour la hauteur de chaque barre
             const step = Math.floor(dataArray.length / NOMBRE_DE_BARRES);
             for (let i = 0; i < NOMBRE_DE_BARRES; i++) {
                 let hauteurMoyenne = dataArray[i * step];
-                
-                // dataArray contient des valeurs de 0 à 255
-                const hauteurBarre = (hauteurMoyenne / 255) * 50; // 50px = hauteur max du conteneur
+                const hauteurBarre = (hauteurMoyenne / 255) * 15; // Ajusté pour une ligne fine
                 const barre = barresVisualiseur[i];
                 
                 if (barre) {
-                    // On met une hauteur minimale
-                    barre.style.height = (hauteurBarre > 4 ? hauteurBarre : 4) + 'px';
+                    barre.style.height = (hauteurBarre > 1 ? hauteurBarre : 1) + 'px'; // Hauteur min de 1px
                 }
             }
         }
 
         // --- 6. Gérer le clic sur le bouton ---
         bouton.addEventListener('click', () => {
-            // L'API Audio DOIT être initialisée après un clic de l'utilisateur
             if (!estInitialise) {
                 initialiserAudio();
             }
 
-            // Reprendre le contexte audio s'il était suspendu
             if (audioContext.state === 'suspended') {
                 audioContext.resume();
             }
 
-            // Gérer le Play / Pause
             if (audio.paused) {
                 audio.play();
-                iconePlay.textContent = '❚❚'; // Symbole Pause
-                // Lancer l'animation
+                iconeLivre.classList.remove('fa-book');
+                iconeLivre.classList.add('fa-book-open'); // Change l'icône
+                conteneur.classList.remove('pointille-ligne'); // Retire le style pointillé
                 boucleAnimation();
             } else {
                 audio.pause();
-                iconePlay.textContent = '▶'; // Symbole Play
+                iconeLivre.classList.remove('fa-book-open');
+                iconeLivre.classList.add('fa-book'); // Remet l'icône de livre fermé
+                conteneur.classList.add('pointille-ligne'); // Remet le style pointillé
             }
+        });
+
+        // Met à jour l'icône de livre lorsque l'audio se termine
+        audio.addEventListener('ended', () => {
+            iconeLivre.classList.remove('fa-book-open');
+            iconeLivre.classList.add('fa-book');
+            conteneur.classList.add('pointille-ligne'); // Réinitialise l'apparence
+            // Optionnel: Réinitialiser la hauteur des barres à leur min.
+            barresVisualiseur.forEach(barre => barre.style.height = '1px');
         });
     });
     </script>
