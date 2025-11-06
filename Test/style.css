@@ -1,0 +1,47 @@
+body {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    background-color: #1a1a1a;
+    font-family: sans-serif;
+}
+
+/* Le bouton principal */
+#bouton-visualiseur {
+    width: 200px;
+    height: 80px;
+    background-color: #333;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden; /* Cache ce qui dépasse */
+}
+
+/* Le conteneur pour les barres */
+#visualiseur-conteneur {
+    display: flex;
+    align-items: flex-end; /* Aligne les barres en bas */
+    height: 60px; /* Hauteur max des barres */
+    width: 100%;
+    justify-content: center;
+}
+
+/* Le style de base pour CHAQUE barre */
+.barre-visualiseur {
+    width: 5px;
+    height: 5px; /* Hauteur minimale */
+    background-color: white;
+    margin: 0 2px;
+    transition: height 0.05s; /* Petite transition pour lisser */
+}
+
+/* L'icône play/pause (simpliste) */
+#icone-play {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 30px;
+    position: absolute; /* Se place par-dessus les barres */
+    z-index: 10;
+}
