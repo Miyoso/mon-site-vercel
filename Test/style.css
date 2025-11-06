@@ -27,8 +27,8 @@ body {
 }
 
 #bouton-visualiseur:hover {
-    box-shadow: 0px 0px 30px rgba(37, 99, 235, 0.8); /* Ombre plus intense au survol */
-    transform: translateY(-2px); /* Léger mouvement vers le haut */
+    box-shadow: 0px 0px 30px rgba(37, 99, 235, 0.8); 
+    
 }
 
 /* L'icône du livre */
