@@ -7,74 +7,74 @@ body {
     background-color: #E0E0E0; /* Fond gris clair */
     background-image: radial-gradient(#C8C8C8 1px, transparent 1px); /* Points gris clair */
     background-size: 20px 20px; /* Taille des points et de l'espace */
-    font-family: 'Roboto Mono', monospace; /* Garder une police de terminal si vous voulez ajouter du texte plus tard */
+    font-family: 'Roboto Mono', monospace; 
 }
 
 /* Le conteneur du bouton audio */
 #bouton-visualiseur {
-    width: 350px; /* Plus large pour correspondre à l'image */
-    height: 120px; /* Plus haut */
-    background-color: #000000; /* Fond noir du bouton */
-    border: 2px solid #2563EB; /* Bordure bleue plus prononcée */
-    border-radius: 8px; /* Bords arrondis */
+    width: 350px; 
+    height: 120px; 
+    background-color: #000000; 
+    border: 2px solid #2563EB; 
+    border-radius: 8px; 
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 0px 0px 20px rgba(37, 99, 235, 0.5); /* Ombre bleue pour un effet lumineux */
-    transition: all 0.2s ease-in-out; /* Transition douce au survol */
+    box-shadow: 0px 0px 20px rgba(37, 99, 235, 0.5); 
+    transition: all 0.2s ease-in-out; 
+    position: relative; /* ESSENTIEL pour la superposition */
 }
 
 #bouton-visualiseur:hover {
     box-shadow: 0px 0px 30px rgba(37, 99, 235, 0.8); 
-    transform: translateY(-3px); 
 }
 
 /* L'icône du livre */
 #icone-livre {
-    color: #FFFFFF; /* Icône blanche */
-    font-size: 3.5em; /* Taille de l'icône */
-    margin-bottom: 20px; /* Espace entre l'icône et la ligne/visualiseur */
+    color: #FFFFFF; 
+    font-size: 3.5em; 
+    margin-bottom: 20px; 
     z-index: 2; /* S'assure que le livre est au-dessus de tout */
 }
 
-/* Conteneur des barres du visualiseur / ligne pointillée */
-#visualiseur-conteneur {
-    display: flex;
-    align-items: flex-end; 
-    height: 15px; /* Hauteur fixe pour la ligne et les barres */
-    width: 80%; /* Occupe une partie de la largeur du bouton */
-    justify-content: space-between;
-    position: absolute; /* Permet de positionner précisément sous le livre */
-    bottom: 20px; /* Distance du bas du bouton */
-    left: 50%;
-    transform: translateX(-50%);
-    transform: translateZ(0);
-    overflow: hidden; /* S'assure que les barres ne dépassent pas */
-}
-
-/* Style de la ligne pointillée (appliqué au #visualiseur-conteneur par JS) */
-.pointille-ligne {
-    background-image: linear-gradient(to right, #FFFFFF 50%, transparent 50%); /* Points blancs */
+/* LIGNE POINTILLÉE (Statique) */
+.ligne-pointillee-statique {
+    position: absolute;
+    bottom: 20px;
+    left: 10%; /* (100% - 80%) / 2 */
+    width: 80%;
+    height: 1px;
+    background-image: linear-gradient(to right, #FFFFFF 50%, transparent 50%);
     background-size: 8px 1px;
     background-repeat: repeat-x;
     background-position: center;
-    height: 1px; /* Hauteur visuelle de la ligne */
-    width: 100%; /* S'étale sur toute la largeur du conteneur */
+    z-index: 1; /* Derrière les barres animées */
+    transform: translateZ(0); /* Force le rendu GPU pour corriger le bug */
+}
+
+/* Conteneur des barres du visualiseur */
+#visualiseur-conteneur {
+    display: flex;
+    align-items: flex-end; /* Les barres poussent vers le HAUT */
+    height: 15px; /* Hauteur max de l'animation */
+    width: 80%; 
+    justify-content: space-between;
+    overflow: hidden; 
+    position: absolute; /* Superposé à la ligne statique */
+    bottom: 20px; /* Positionné exactement sur la ligne statique */
+    left: 10%;
+    z-index: 2; /* Devant la ligne statique */
+    transform: translateZ(0); /* Force le rendu GPU pour corriger le bug */
 }
 
 /* Style de base pour CHAQUE barre */
 .barre-visualiseur {
     width: 3px;
-    height: 1px; /* Hauteur minimale */
-    background-color: #FFFFFF; /* Barres blanches */
+    height: 0px; /* Hauteur minimale (0px pour révéler la ligne pointillée) */
+    background-color: #FFFFFF; 
     margin: 0 1px;
-    transition: height 0.05s ease-out; /* Transition plus douce */
-    display: block; /* S'assurer qu'elles sont visibles par défaut */
-}
-
-/* Cache les barres lorsque la ligne pointillée est active (quand en pause) */
-.pointille-ligne .barre-visualiseur {
-    display: none;
+    transition: height 0.05s ease-out; 
+    display: block; 
 }
