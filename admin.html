@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS - Panel Admin (Niv 4)</title>
+
+    <script>
+        const REQUIRED_LEVEL = 4;
+    </script>
+    <script src="security.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="terminal">
+        <h1>PANEL ADMIN<span class="blinker">_</span></h1>
+        
+        <p class="status">ACCES: <span class="restricted" id="admin-name-display"></span> :: NIVEAU 4</p>
+
+        <div class="report-content" id="admin-panel-container">
+            <p style="color: #00ff00;">[CHARGEMENT DES PROFILS AGENTS...]</p>
+        </div>
+
+        <footer class="portal-footer">
+            <a href="index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
+        </footer>
+    </main>
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('admin-panel-container');
+            const adminName = localStorage.getItem('sas_user') || 'ADMIN';
+            document.getElementById('admin-name-display').textContent = adminName;
+
+            let agentsList = [];
+
+            // --- FONCTION: Construit le HTML pour la liste ---
+            function buildAgentListHTML(agents) {
+                let html = '';
+                agents.forEach(agent => {
+                    // On ne peut pas modifier le niveau 4 (Graves)
+                    const isDisabled = agent.level >= 4 ? 'disabled' : '';
+                    
+                    html += `
+                        <div class="admin-agent-row">
+                            <span class="agent-name">${agent.name} (ID: ${agent.id})</span>
+                            <form class="set-level-form" data-agent-id="${agent.id}">
+                                <select name="level" class="form-select" ${isDisabled}>
+                                    <option value="1" ${agent.level === 1 ? 'selected' : ''}>Niveau 1</option>
+                                    <option value="2" ${agent.level === 2 ? 'selected' : ''}>Niveau 2</option>
+                                    <option value="3" ${agent.level === 3 ? 'selected' : ''}>Niveau 3</option>
+                                    ${isDisabled ? '<option value="4" selected>Niveau 4 (Admin)</option>' : ''}
+                                </select>
+                                <button type="submit" class="form-button" ${isDisabled}>&gt;</button>
+                            </form>
+                        </div>
+                    `;
+                });
+                return html;
+            }
+
+            
+            try {
+                const response = await fetch('/api/get-agents');
+                const data = await response.json();
+                if (!data.agents) throw new Error('Données non reçues');
+
+                agentsList = data.agents.sort((a, b) => a.id - b.id);
+                container.innerHTML = buildAgentListHTML(agentsList);
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                container.innerHTML = `<p style="color: #ff4141;">[ERREUR CRITIQUE DE CONNEXION]</p>`;
+            }
+
+            
+            container.addEventListener('submit', async (e) => {
+                if (e.target.classList.contains('set-level-form')) {
+                    e.preventDefault();
+                    
+                    const form = e.target;
+                    const agentId = form.getAttribute('data-agent-id');
+                    const newLevel = form.querySelector('select').value;
+                    const button = form.querySelector('button');
+                    
+                    button.textContent = '...';
+
+                    try {
+                        const response = await fetch('/api/set-agent-level', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                agentId: parseInt(agentId),
+                                newLevel: parseInt(newLevel)
+                            })
+                        });
+
+                        const result = await response.json();
+                        if (!response.ok) throw new Error(result.error);
+                        
+                        button.textContent = 'OK';
+                        setTimeout(() => { button.textContent = '>'; }, 1000);
+
+                    } catch (error) {
+                        button.textContent = 'ERR';
+                        alert(`Erreur: ${error.message}`);
+                        setTimeout(() => { button.textContent = '>'; }, 2000);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

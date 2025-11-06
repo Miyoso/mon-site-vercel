@@ -835,3 +835,42 @@ h1 {
 .agent-dossier:not(.is-collapsed) .toggle-arrow {
     transform: rotate(90deg);
 }
+
+
+.admin-agent-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #222;
+}
+.admin-agent-row:last-child {
+    border-bottom: none;
+}
+
+.admin-agent-row .agent-name {
+    font-size: 1.1rem;
+    color: #eaeaea;
+}
+
+.set-level-form {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.set-level-form .form-select {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    background-color: #000;
+}
+.set-level-form .form-button {
+    margin: 0;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+}
+.set-level-form .form-button:disabled {
+    background: #333;
+    color: #888;
+    border-color: #333;
+    cursor: not-allowed;
+}
