@@ -701,7 +701,7 @@ h1 {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0 1rem 1rem 1rem;
+    padding: 0.75rem 1rem; 
     background-color: #050505;
     border-bottom: 1px solid #222;
 }
