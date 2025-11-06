@@ -77,7 +77,7 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <h3 class="text-xl text-cyan-400 font-tech mb-2">// PHYSIQUE</h3>
+                        <h3 class="text-xl text-cyan-400 font-tech mb-2">// PHYSIQUE (SENSIBLE)</h3>
                         <ul class="list-none space-y-1">
                             <li><span class="text-slate-400">TAILLE:</span> <span class="data-glitched-random"></span></li>
                             <li><span class="text-slate-400">POIDS:</span> <span class="data-glitched-random"></span></li>
@@ -103,8 +103,8 @@
 
             <div class="w-full border-t border-dashed border-green-800 my-4"></div>
 
-            <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
-                <h2 class="font-tech text-2xl text-red-400 mb-4">[SECTION 03 : HISTORIQUE - FICHIER IAA]</h2>
+            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
+                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 03 : HISTORIQUE - FICHIER IAA]</h2>
                 <div class="bg-black/30 p-4 rounded bio-text">
                     <p>&gt; Ancien membre du ELN (Armée de libération nationale).</p>
                     <p>&gt; Capturé par l'IAA en 2019.</p>
@@ -114,21 +114,24 @@
                 </div>
             </section>
 
-            <section class="border border-yellow-600/30 p-4 rounded-lg bg-yellow-900/10">
-                <h2 class="font-tech text-2xl text-yellow-400 mb-4">[SECTION 04 : FIN DE MISSION (SAS)]</h2>
+            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
+                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 04 : FIN DE MISSION (SAS)]</h2>
                 <div class="bg-black/30 p-4 rounded bio-text">
                     <p>&gt; Vente d'armes à feux à une organisation indépendante au Panama.</p>
                     <p>&gt; Fournir des informations de renseignement sur les différents groupes de narco-trafiquants.</p>
-                    <p class=&quot;text-yellow-400 mt-2&quot;>&gt; [NOTE IAA]: "Merci d'encadrer notre agent sous votre juridiction et de ne révéler ce contrat sous aucun prétexte."</p>
+                    <p class="text-yellow-400 mt-2">&gt; [NOTE IAA]: "Merci d'encadrer notre agent sous votre juridiction et de ne révéler ce contrat sous aucun prétexte."</p>
                 </div>
             </section>
 
             <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
-                <h2 class="font-tech text-2xl text-red-400 mb-4">[SECTION 05 : SURVEILLANCE IAA - SANS SUITE]</h2>
-                <div class="bg-black/30 p-4 rounded bio-text">
-                    <p>&gt; Cible: Gouvernement de San Andreas.</p>
-                    <p>&gt; Cible: San Andreas Security (SAS).</p>
-                    <p>&gt; Cible: Récolte d'information sur "Motek".</p>
+                <h2 class="font-tech text-2xl text-red-400 mb-4">[SECTION 05 : SURVEILLANCE IAA - NIVEAU 7 REQUIS]</h2>
+                <div class="bg-black/30 p-4 rounded">
+                    <p class="text-red-400">[ACCÈS VERROUILLÉ – DOSSIER SANS SUITE]</p>
+                    <p class="encrypted text-sm select-none">
+                        Cible: Gouvernement de San Andreas.
+                        Cible: San Andreas Security (SAS).
+                        Cible: Récolte d'information sur "Motek".
+                    </p>
                 </div>
             </section>
 
@@ -161,7 +164,7 @@
 
             setInterval(() => {
                 glitchElements.forEach(el => {
-                    const randomLength = Math.floor(Math.random() * 20) + 8;
+                    const randomLength = Math.floor(Math.random() * 10) + 8;
                     el.textContent = generateRandomString(randomLength);
                 });
             }, 100);
