@@ -14,13 +14,10 @@
 </head>
 <body>
 
-    <div class="console-output" id="consoleOutput">
-        </div>
+    <div class="console-output" id="consoleOutput"></div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-
-            // --- Les pop-ups "alert()" ont été supprimés d'ici ---
 
             const consoleOutput = document.getElementById('consoleOutput');
             const targetFile = 'agent-nyx.html';
@@ -66,7 +63,7 @@
                 { type: 'error', text: 'ALERT: Tentative d\'accès non autorisé. Contournement actif.' },
                 { type: 'info', text: 'CLEAN: Purge des résidus (GHOST_CLEAN)...' },
                 { type: 'info', text: 'COMPILE: Données brutes...' },
-                { type: 'success', text: 'COMPLETE: Chargement du dossier [NYX_007].' },
+                { type: 'success', text: 'COMPLETE: Chargement du dossier [NYX].' },
                 { type: 'success', text: 'Redirection imminente.' },
             ];
             
@@ -78,10 +75,11 @@
                     const p = document.createElement('p');
                     
                     if (line.type === 'command') {
+                        p.className = 'prompt';
                         p.innerHTML = kaliPrompt + `<span class="line-command">${line.text}</span>`;
                     } else {
                         p.textContent = line.text;
-                        p.className = line.type;
+                        p.className = 'line-' + line.type;
                     }
                     
                     consoleOutput.appendChild(p);
@@ -92,8 +90,10 @@
                     if (line.text.includes('...')) delay = 400;
                     
                     setTimeout(addLine, delay);
+
                 } else {
                     const finalPrompt = document.createElement('p');
+                    finalPrompt.className = 'prompt';
                     finalPrompt.innerHTML = kaliPrompt + '<span class="cursor-blink"></span>';
                     consoleOutput.appendChild(finalPrompt);
                     consoleOutput.scrollTop = consoleOutput.scrollHeight;
@@ -104,7 +104,6 @@
                 }
             }
 
-            // Démarrage
             addLine();
             
         });
