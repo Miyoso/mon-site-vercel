@@ -1,15 +1,15 @@
-/* STYLES POUR LE VISUALISEUR AUDIO (MODIFIÉS) */
+/* STYLES POUR LE VISUALISEUR AUDIO (CORRIGÉS) */
 #bouton-visualiseur {
     width: 250px; 
-    height: 70px;
-    background-color: transparent; /* Fond transparent */
+    height: 100px; /* J'ai augmenté la hauteur pour que tout rentre bien */
+    background-color: #000000; /* Fond noir (comme l'image désirée) */
     border: 1px solid #2563EB; /* Bordure bleue */
-    border-radius: 5px; /* Bords légèrement arrondis */
+    border-radius: 5px;
     cursor: pointer;
     display: flex;
-    flex-direction: column; /* Icône au-dessus du visualiseur */
-    align-items: center;
-    justify-content: center;
+    flex-direction: column; /* Empiler les éléments verticalement */
+    align-items: center; /* Centrer horizontalement */
+    justify-content: center; /* Centrer verticalement */
     position: relative;
     overflow: hidden;
     margin-top: 1.5rem;
@@ -17,50 +17,45 @@
 }
 
 #icone-livre {
-    color: #2563EB; /* Couleur de l'icône de livre (bleu) */
-    font-size: 3em; /* Taille de l'icône */
-    margin-bottom: 5px; /* Petit espace sous le livre */
+    color: #FFFFFF; /* Icône blanche (comme l'image désirée) */
+    font-size: 3em; 
+    margin-bottom: 15px; /* Espace entre l'icône et la ligne */
 }
 
+/* Conteneur du visualiseur (N'EST PLUS EN position: absolute) */
 #visualiseur-conteneur {
     display: flex;
-    align-items: flex-end; 
-    height: 15px; /* Hauteur très fine pour le visualiseur */
-    width: 80%; /* Occupe une partie de la largeur du bouton */
-    justify-content: space-between; /* Espacement uniforme */
-    position: absolute; /* Positionne le visualiseur en bas */
-    bottom: 5px; /* Distance du bas du bouton */
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-/* Style de base pour CHAQUE barre (MODIFIÉ) */
-.barre-visualiseur {
-    width: 3px; /* Barres plus fines */
-    height: 1px; /* Hauteur minimale */
-    background-color: #2563EB; /* Barres bleues */
-    margin: 0 1px; /* Moins d'espace entre les barres */
-    transition: height 0.05s;
-}
-
-/* Style de la ligne pointillée */
-.pointille-ligne {
-    background-image: linear-gradient(to right, #2563EB 50%, transparent 50%);
-    background-size: 8px 1px; /* Taille des "points" et de l'espace */
-    background-repeat: repeat-x;
-    height: 1px; /* Hauteur de la ligne */
+    align-items: flex-end; /* Aligner les barres en bas */
+    height: 15px; /* Hauteur max des barres */
     width: 80%;
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: block; /* S'assure qu'elle est visible */
+    justify-content: space-between;
+    /* Tous les 'position: absolute' ont été retirés, il est maintenant un enfant flex normal */
 }
 
-/* Cache les barres du visualiseur quand la ligne pointillée est active */
-#bouton-visualiseur.paused #visualiseur-conteneur .barre-visualiseur {
+/* Style de la ligne pointillée (appliqué au conteneur via JS) */
+.pointille-ligne {
+    /* Applique l'image de fond pointillée */
+    background-image: linear-gradient(to right, #FFFFFF 50%, transparent 50%); /* Ligne blanche */
+    background-size: 8px 1px;
+    background-repeat: repeat-x;
+    background-position: center; /* Centre la ligne dans le conteneur de 15px */
+}
+
+/* Style de base pour CHAQUE barre */
+.barre-visualiseur {
+    width: 3px;
+    height: 1px;
+    background-color: #FFFFFF; /* Barres blanches */
+    margin: 0 1px;
+    transition: height 0.05s;
+    display: block; /* S'assurer qu'elles sont visibles par défaut */
+}
+
+/* QUAND PAUSE: cache les barres (car le conteneur a la classe .pointille-ligne) */
+.pointille-ligne .barre-visualiseur {
     display: none;
 }
+
 
 /* STYLES PROVENANT DE style-loading-nyx.css */
 /* NOTE : Le sélecteur 'body' a été omis pour éviter les conflits avec Tailwind */
