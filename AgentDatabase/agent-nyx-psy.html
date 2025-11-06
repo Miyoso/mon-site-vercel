@@ -14,7 +14,48 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-</head>
+
+    <style>
+        #bouton-visualiseur {
+            width: 250px; /* Un peu plus large */
+            height: 70px;
+            background-color: rgba(0, 0, 0, 0.3); /* Fond sombre */
+            border: 1px solid #32CD32; /* Bordure verte (similaire à text-green-400) */
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1.5rem; /* Espace au-dessus */
+            margin-bottom: 1rem; /* Espace en-dessous */
+        }
+
+        #visualiseur-conteneur {
+            display: flex;
+            align-items: flex-end; 
+            height: 50px; /* Hauteur max barres */
+            width: 100%;
+            justify-content: center;
+        }
+
+        .barre-visualiseur {
+            width: 4px;
+            height: 4px; /* Hauteur min */
+            background-color: #32CD32; /* Barres vertes */
+            margin: 0 2px;
+            transition: height 0.05s;
+        }
+
+        #icone-play {
+            color: rgba(50, 205, 50, 0.5); /* Vert transparent */
+            font-size: 30px;
+            position: absolute; 
+            z-index: 10;
+            font-family: 'Share Tech Mono', monospace; /* Utilise la police du thème */
+        }
+    </style>
+    </head>
 <body class="text-green-400 min-h-screen p-4 md:p-8 scanline">
 
     <div class="max-w-6xl mx-auto border-2 border-red-700/50 shadow-2xl shadow-red-900/50">
@@ -46,8 +87,17 @@
                     <p>&gt; Lors du contact initial avec les agents, le sujet a explicitement mentionné que cette interaction représentait pour elle un "échappatoire", indiquant une recherche active de voie de sortie de sa situation actuelle.</p>
                     <br>
                     
-                    <p class="text-red-500">&gt; > NOTE D'ADA :: Le sujet a connaissance de l'existence de ce dossier. Elle le recherche activement, avec l'intention présumée de le supprimer.</p>
-                </div>
+                    <p class="text-red-500">&gt; &gt; NOTE D'ADA :: Le sujet a connaissance de l'existence de ce dossier. Elle le recherche activement, avec l'intention présumée de le supprimer.</p>
+
+                    <audio id="mon-audio" src="musique.mp3" preload="auto"></audio>
+
+                    <div id="bouton-visualiseur">
+                        <div id="visualiseur-conteneur">
+                            </div>
+                        <span id="icone-play">▶</span> 
+                    </div>
+                    
+                    </div>
             </section>
             
             <div>
@@ -61,5 +111,113 @@
             </div>
         </div>
     </div>
+
+    <script>
+    // Attendre que le DOM soit chargé
+    window.addEventListener('DOMContentLoaded', () => {
+
+        // --- 1. Récupérer nos éléments ---
+        const bouton = document.getElementById('bouton-visualiseur');
+        const audio = document.getElementById('mon-audio');
+        const conteneur = document.getElementById('visualiseur-conteneur');
+        const iconePlay = document.getElementById('icone-play');
+        
+        // --- 2. Initialisation de l'API Audio ---
+        let audioContext;
+        let analyseur;
+        let source;
+        let dataArray;
+        let barresVisualiseur = [];
+        let estInitialise = false;
+
+        // Nombre de barres que nous voulons
+        const NOMBRE_DE_BARRES = 32;
+
+        // --- 3. Fonction d'initialisation (ne s'exécute qu'une fois) ---
+        function initialiserAudio() {
+            if (estInitialise) return;
+
+            // Créer le contexte audio
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Créer l'analyseur
+            analyseur = audioContext.createAnalyser();
+            // Définir la "précision" de l'analyse. Doit être une puissance de 2.
+            analyseur.fftSize = 128; 
+            
+            // Créer la source depuis notre élément <audio>
+            source = audioContext.createMediaElementSource(audio);
+            
+            // Connecter les "nœuds" audio ensemble
+            // Source -> Analyseur -> Destination (les haut-parleurs)
+            source.connect(analyseur);
+            analyseur.connect(audioContext.destination);
+
+            // Créer le tableau pour stocker les données de fréquence
+            const bufferLength = analyseur.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+
+            // --- 4. Créer les barres HTML ---
+            conteneur.innerHTML = ''; // Vider le conteneur
+            for (let i = 0; i < NOMBRE_DE_BARRES; i++) {
+                const barre = document.createElement('div');
+                barre.classList.add('barre-visualiseur');
+                conteneur.appendChild(barre);
+                barresVisualiseur.push(barre); // Stocker la référence
+            }
+
+            estInitialise = true;
+        }
+
+        // --- 5. La boucle d'animation ---
+        function boucleAnimation() {
+            // Demander à redessiner au prochain "frame"
+            requestAnimationFrame(boucleAnimation);
+
+            // Récupérer les données de fréquence audio dans notre tableau
+            analyseur.getByteFrequencyData(dataArray);
+
+            // Mettre à jour la hauteur de chaque barre
+            // On fait la moyenne pour utiliser moins de barres que de données
+            const step = Math.floor(dataArray.length / NOMBRE_DE_BARRES);
+            for (let i = 0; i < NOMBRE_DE_BARRES; i++) {
+                let hauteurMoyenne = dataArray[i * step];
+                
+                // dataArray contient des valeurs de 0 à 255
+                const hauteurBarre = (hauteurMoyenne / 255) * 50; // 50px = hauteur max du conteneur
+                const barre = barresVisualiseur[i];
+                
+                if (barre) {
+                    // On met une hauteur minimale
+                    barre.style.height = (hauteurBarre > 4 ? hauteurBarre : 4) + 'px';
+                }
+            }
+        }
+
+        // --- 6. Gérer le clic sur le bouton ---
+        bouton.addEventListener('click', () => {
+            // L'API Audio DOIT être initialisée après un clic de l'utilisateur
+            if (!estInitialise) {
+                initialiserAudio();
+            }
+
+            // Reprendre le contexte audio s'il était suspendu
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            // Gérer le Play / Pause
+            if (audio.paused) {
+                audio.play();
+                iconePlay.textContent = '❚❚'; // Symbole Pause
+                // Lancer l'animation
+                boucleAnimation();
+            } else {
+                audio.pause();
+                iconePlay.textContent = '▶'; // Symbole Play
+            }
+        });
+    });
+    </script>
 </body>
 </html>
