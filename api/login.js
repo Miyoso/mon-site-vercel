@@ -11,12 +11,12 @@ const ADA_LEVEL = 7;
 
 async function recordLoginAttempt(username, success, request) {
     
-    const ipAddress = request.headers['x-real-ip'] || request.headers['x-forwarded-for'] || 'UNKNOWN';
+    
 
     try {
         await sql`
             INSERT INTO login_logs (username, success, ip_address)
-            VALUES (${username}, ${success}, ${ipAddress});
+            VALUES (${username}, ${success}, "0.0.0.0");
         `;
     } catch (error) {
         console.error("Erreur lors de l'enregistrement du log :", error);
