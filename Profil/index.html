@@ -3,187 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS - Gestion Sécurité</title>
+    <title>SAS - Profil Agent</title>
 
-    <script> const REQUIRED_LEVEL = 1; </script>
+    <script>
+        const REQUIRED_LEVEL = 1; 
+    </script>
     <script src="../security.js"></script>
-    
+    <link rel="stylesheet" href="../style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style-profil.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-
-    <div class="security-container">
-
-        <div class="prompt-header">
-            ┌──(<span id="prompt-user" class="username">[LOADING]</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/profil</span>]
-        </div>
-
-        <p class="status" id="agent-status-display">AGENT: [CHARGEMENT...]</p>
-
-        <div class="warning-notes-container">
-            <h1>
-                <span class="prompt-end">└─<span class="blink">#</span></span>
-                dossier_avertissement
-            </h1>
-            <p class="status" id="warning-level-display">NIVEAU D'AVERTISSEMENT: [CHARGEMENT...]</p>
-            
-            <ul class="warning-notes-list" id="warning-notes-list">
-                <li class="warning-note-empty">[CHARGEMENT DES NOTES...]</li>
-            </ul>
-        </div>
-
-        <h1>
-            <span class="prompt-end">└─<span class="blink">#</span></span>
-            change_passphrase
-        </h1>
-
-        <div class="alert-box">
-            <span class="quote">"Attention, mettez un mot de passe différent de vos mots de passe habituels."</span>
-            <span class="signature">-- Je vois vos mots de passe -- Ada :)</span>
-        </div>
-
-        <form id="change-password-form">
-            <div class="form-group">
-                <label for="new-password">
-                    <span class="prompt-end" style="color: #888;">&gt;</span>
-                    NOUVEAU MOT DE PASSE:
-                </label>
-                <input type="password" id="new-password" class="form-input" required>
-            </div>
-
-            <div class="form-group">
-                <label for="confirm-password">
-                    <span class="prompt-end" style="color: #888;">&gt;</span>
-                    CONFIRMER LE MOT DE PASSE:
-                </label>
-                <input type="password" id="confirm-password" class="form-input" required>
-            </div>
-
-            <button type="submit" class="btn-submit">
-                &gt;&gt; Exécuter
-            </button>
-            
-            <p id="form-message" class="form-message"></p>
-        </form>
-
-        <footer class="footer-link">
-            <a href="../index.html">&lt;&lt; RETURN_TO_MAINFRAME</a>
-        </footer>
+    <main class="terminal">
+        <h1 id="profile-title">PROFIL AGENT<span class="blinker">_</span></h1>
         
-    </div> 
+        <p class="status">ACCES: <span class="restricted" id="agent-name-display"></span> :: NIVEAU <span id="agent-level-display">?</span></p>
+
+        <div class="report-content" id="profile-container">
+            <h2 id="agent-details-header">[COORDONNÉES PERSONNELLES]</h2>
+            <div id="details-section">
+                <p style="color: #00ff00;">[Chargement des données...]</p>
+            </div>
+            
+            <h2 id="warning-header">[ALERTES ET AVERTISSEMENTS]</h2>
+            <div id="warning-section">
+                <p style="color: #00ff00;">[Vérification du dossier...]</p>
+            </div>
+            
+            <h2 id="password-header">[MAJ MOT DE PASSE]</h2>
+            <form id="update-password-form" class="inventory-form">
+                <input type="password" name="current_password" placeholder="Mot de passe actuel" required>
+                <input type="password" name="new_password" placeholder="Nouveau mot de passe" required>
+                <input type="password" name="confirm_password" placeholder="Confirmer nouveau mot de passe" required>
+                <button type="submit">METTRE À JOUR</button>
+                <p id="password-message" style="color: #ff4141; margin-top: 10px;"></p>
+            </form>
+            
+        </div>
+
+        <footer class="portal-footer">
+            <a href="../index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
+        </footer>
+    </main>
+
     
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = localStorage.getItem('sas_user');
+            const agentId = localStorage.getItem('sas_agent_id');
+            const level = localStorage.getItem('sas_level');
             
-            const user = localStorage.getItem('sas_user') || 'INCONNU';
-            const level = localStorage.getItem('sas_level') || '0';
-            
-            document.getElementById('prompt-user').textContent = user.toLowerCase();
-            document.getElementById('agent-status-display').innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
-            
-            // La ligne "ada-signature" a été supprimée d'ici
+            document.getElementById('agent-name-display').textContent = user || 'AGENT INCONNU';
+            document.getElementById('agent-level-display').textContent = level || '?';
+            document.getElementById('profile-title').textContent = `PROFIL AGENT ${user.toUpperCase()}`;
 
-            async function loadAgentDetails() {
-                const warningLevelEl = document.getElementById('warning-level-display');
-                const warningListEl = document.getElementById('warning-notes-list');
+            const detailsSection = document.getElementById('details-section');
+            const warningSection = document.getElementById('warning-section');
+            const updatePasswordForm = document.getElementById('update-password-form');
+            const passwordMessage = document.getElementById('password-message');
 
+ 
+            if (user) {
                 try {
-                    const response = await fetch(\`../api/read?resource=agent-details&username=${user}`);
+                   
+                    const response = await fetch(`../api/read?resource=agent-details&username=${user}`);
                     const data = await response.json();
 
-                    if (!response.ok) throw new Error(data.error);
+                    if (data.error) throw new Error(data.error);
+                    
+                    
+                    const warningLevel = data.warningLevel || 0;
+                    detailsSection.innerHTML = `
+                        <p>Niveau d'Accréditation: <strong>NIVEAU ${level}</strong></p>
+                        <p>Niveau d'Alerte Actuel: <strong style="color: ${warningLevel > 0 ? '#ff6666' : '#00ff00'};">NIVEAU ${warningLevel}</strong></p>
+                        <p>Agent ID: <strong>${agentId}</strong></p>
+                    `;
 
-                    warningLevelEl.textContent = `NIVEAU D'AVERTISSEMENT: ${data.warningLevel}`;
-
-                    if (data.warningNotes.length > 0) {
-                        let notesHTML = '';
+                    // Affichage des avertissements
+                    if (data.warningNotes && data.warningNotes.length > 0) {
+                        let notesHTML = '<ul class="note-list">';
                         data.warningNotes.forEach(note => {
+                            const date = new Date(note.created_at).toLocaleDateString();
                             notesHTML += `
-                                <li class="warning-note-item">
-                                    <span class="warning-note-meta">
-                                        De: <span class="author">${note.author_name}</span> (Le ${new Date(note.created_at).toLocaleDateString()})
-                                    </span>
-                                    <p class="warning-note-text">${note.note_text}</p>
+                                <li class="note-warning">
+                                    <span class="warning-date">[${date}]</span>
+                                    <span class="warning-author">Par ${note.author_name}:</span>
+                                    <p class="warning-text">${note.note_text}</p>
                                 </li>
                             `;
                         });
-                        warningListEl.innerHTML = notesHTML;
+                        notesHTML += '</ul>';
+                        warningSection.innerHTML = notesHTML;
                     } else {
-                        warningListEl.innerHTML = '<li class="warning-note-empty">Aucune note d\'avertissement dans votre dossier.</li>';
+                        warningSection.innerHTML = '<p style="color: #00ff00;">AUCUN AVERTISSEMENT ACTIF DANS LE DOSSIER.</p>';
                     }
-
                 } catch (error) {
-                    warningLevelEl.textContent = "NIVEAU D'AVERTISSEMENT: [ERREUR]";
-                    warningListEl.innerHTML = `<li class="warning-note-empty" style="color: #ff6666;">${error.message}</li>`;
+                    console.error('Erreur chargement détails:', error);
+                    detailsSection.innerHTML = `<p style="color: #ff4141;">[ERREUR: IMPOSSIBLE DE VÉRIFIER LE DOSSIER]</p>`;
+                    warningSection.innerHTML = `<p style="color: #ff4141;">[ERREUR: IMPOSSIBLE DE VÉRIFIER LE DOSSIER]</p>`;
                 }
             }
+
+
             
-            const passwordForm = document.getElementById('change-password-form');
-            const newPasswordEl = document.getElementById('new-password');
-            const confirmPasswordEl = document.getElementById('confirm-password');
-            const messageEl = document.getElementById('form-message');
-
-            function validatePassword(password) {
-                if (password.length < 5) {
-                    return "Erreur: Mot de passe trop court (5 min).";
-                }
-                const specialCharRegex = /[^A-Za-z0-9]/;
-                if (!specialCharRegex.test(password)) {
-                    return "Erreur: Doit contenir au moins 1 caractère spécial (!, @, #, $, etc.)";
-                }
-                return null;
-            }
-
-            passwordForm.addEventListener('submit', async (e) => {
+            updatePasswordForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                messageEl.textContent = 'MISE A JOUR EN COURS...';
-                messageEl.className = 'form-message';
-
-                const newPassword = newPasswordEl.value;
-                const confirmPassword = confirmPasswordEl.value;
-
+                
+                const currentPassword = updatePasswordForm.current_password.value;
+                const newPassword = updatePasswordForm.new_password.value;
+                const confirmPassword = updatePasswordForm.confirm_password.value;
+                
+                passwordMessage.textContent = '';
+                
                 if (newPassword !== confirmPassword) {
-                    messageEl.textContent = 'ERREUR: NON-CONCORDANCE';
-                    messageEl.className = 'form-message error';
+                    passwordMessage.textContent = '//: ERROR :: NOUVEAUX MOTS DE PASSE INÉGAUX';
                     return;
                 }
                 
-                const validationError = validatePassword(newPassword);
-                if (validationError) {
-                    messageEl.textContent = validationError.toUpperCase();
-                    messageEl.className = 'form-message error';
+                if (newPassword.length < 5) {
+                    passwordMessage.textContent = '//: ERROR :: MOT DE PASSE TROP COURT (MIN 5 CAR)';
                     return;
                 }
+                
+                const submitButton = updatePasswordForm.querySelector('button[type="submit"]');
+                submitButton.textContent = '... EN COURS ...';
 
                 try {
-                    const response = await fetch('../api/change-password', {
+                    const response = await fetch('../api/update-password', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
-                            username: user, 
-                            newPassword: newPassword 
+                            agentId: parseInt(agentId),
+                            currentPassword: currentPassword,
+                            newPassword: newPassword
                         })
                     });
 
                     const result = await response.json();
-                    if (!response.ok) throw new Error(result.error);
                     
-                    messageEl.textContent = 'SUCCES! MOT DE PASSE MIS A JOUR.';
-                    messageEl.className = 'form-message success';
-                    newPasswordEl.value = '';
-                    confirmPasswordEl.value = '';
-
+                    if (result.success) {
+                        passwordMessage.textContent = '//: SUCCÈS :: MOT DE PASSE MIS À JOUR';
+                        updatePasswordForm.reset();
+                        submitButton.textContent = 'MIS À JOUR OK';
+                    } else {
+                        throw new Error(result.error || 'Erreur inconnue.');
+                    }
                 } catch (error) {
-                    messageEl.textContent = `ERREUR: ${error.message}`;
-                    messageEl.className = 'form-message error';
+                    passwordMessage.textContent = `//: ERREUR :: ${error.message.toUpperCase()}`;
+                    submitButton.textContent = 'ERREUR';
+                } finally {
+                    setTimeout(() => { submitButton.textContent = 'METTRE À JOUR'; }, 2000);
                 }
             });
 
-            loadAgentDetails();
         });
     </script>
 </body>
