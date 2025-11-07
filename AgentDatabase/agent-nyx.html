@@ -242,14 +242,14 @@
                                 }),
                                 new Promise(resolve => setTimeout(resolve, 5000))
                             ]);
-                            
                             const data = await response.json();
 
                             if (response.ok && data.success && data.redirect) {
                                 document.body.innerHTML = `
                                     <div class="flex flex-col items-center justify-center h-screen bg-black text-green-400 font-tech text-2xl">
-                                                                            </div>`;
-                                setTimeout(() => window.location.href = data.redirect, 30000);
+                                        <div class="animate-pulse">> ACCÈS AUTORISÉ</div>
+                                    </div>`;
+                                setTimeout(() => window.location.href = data.redirect, 1000);
                             } else {
                                 
                                 sessionStorage.setItem('login_error', data.message || "CODE INVALIDE");
