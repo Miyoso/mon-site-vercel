@@ -41,6 +41,9 @@
 
                 if (!data.logs) throw new Error('Données de logs non reçues.');
 
+            // Save IP :: 0.0.0.0 pour des raisons de confidentialité (Jeux)
+            // Parce que je peux choper la vraie si je veux hehe
+
                 let logHTML = `
                     <div class="logs-grid-header">
                         <span>STATUS</span>

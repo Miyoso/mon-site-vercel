@@ -9,14 +9,15 @@ const ADA_LEVEL = 7;
 // ----------------------------------------------
 
 
-async function recordLoginAttempt(username, success, request) {
-    
-    
+async function recordLoginAttempt(username, success) {
+    // Save 0.0.0.0 pour des raisons de confidentialité (Jeux)
+    // Parce que je peux choper la vraie si je veux hehe
+    const ipAddressFictif = '0.0.0.0';
 
     try {
         await sql`
             INSERT INTO login_logs (username, success, ip_address)
-            VALUES (${username}, ${success}, "0.0.0.0");
+            VALUES (${username}, ${success}, ${ipAddressFictif});
         `;
     } catch (error) {
         console.error("Erreur lors de l'enregistrement du log :", error);
@@ -32,28 +33,29 @@ export default async function handler(request, response) {
     const { username, password } = request.body;
 
     if (!username || !password) {
-      await recordLoginAttempt('BLANK_USER', false, request);
+     
+      await recordLoginAttempt('BLANK_USER', false);
       return response.status(400).json({ success: false, message: 'AGENT_ID et PASSPHRASE requis' });
     }
 
-    
+  
     if (username === ADA_USERNAME) {
         const isAdaPasswordValid = await bcrypt.compare(password, ADA_PASSWORD_HASH);
         
         if (isAdaPasswordValid) {
-             await recordLoginAttempt(username, true, request); // Log SUCCÈS
+             await recordLoginAttempt(username, true); // Log SUCCÈS
              return response.status(200).json({
                 success: true,
                 user: ADA_USERNAME,
                 level: ADA_LEVEL
             });
         } else {
-             await recordLoginAttempt(username, false, request); // Log ÉCHEC
+             await recordLoginAttempt(username, false); // Log ÉCHEC
              return response.status(401).json({ success: false, message: '//: ERROR :: PASSPHRASE_INCORRECT' });
         }
     }
 
-    
+  
     const { rows } = await sql`
         SELECT id, name, level, password 
         FROM agents 
@@ -61,7 +63,7 @@ export default async function handler(request, response) {
     `;
 
     if (rows.length === 0) {
-      await recordLoginAttempt(username, false, request); // Log ÉCHEC (Agent inconnu)
+      await recordLoginAttempt(username, false); 
       return response.status(404).json({ success: false, message: '//: ERROR :: AGENT_ID_UNKNOWN' });
     }
 
@@ -69,14 +71,14 @@ export default async function handler(request, response) {
     const isPasswordValid = await bcrypt.compare(password, agent.password);
 
     if (isPasswordValid) {
-      await recordLoginAttempt(username, true, request); // Log SUCCÈS
+      await recordLoginAttempt(username, true); 
       return response.status(200).json({
         success: true,
         user: agent.name,
         level: agent.level
       });
     } else {
-      await recordLoginAttempt(username, false, request); // Log ÉCHEC
+      await recordLoginAttempt(username, false); 
       return response.status(401).json({ success: false, message: '//: ERROR :: PASSPHRASE_INCORRECT' });
     }
 
