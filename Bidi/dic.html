@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOT@KALI:~# ELITE_AIM.SH</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --term-green: #39ff14;
+            --term-dim: #1b5e15;
+            --glow: 0 0 10px var(--term-green);
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--bg-color);
+            color: var(--term-green);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            text-transform: uppercase;
+        }
+
+        /* Scanline effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+            pointer-events: none; z-index: 999;
+        }
+
+        h1 { text-shadow: var(--glow); margin-bottom: 5px; }
+        h1::before { content: "./"; }
+
+  
+        .interface-section {
+            width: 800px;
+            margin-bottom: 20px;
+        }
+
+     
+        #auth-terminal {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: #000;
+            border: 1px solid var(--term-green);
+            padding: 15px;
+            box-shadow: var(--glow);
+        }
+        #pseudo-input {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--term-green);
+            color: var(--term-green);
+            font-family: inherit;
+            font-size: 1.2rem;
+            outline: none;
+            flex-grow: 1;
+            text-transform: uppercase;
+        }
+        #pseudo-input::placeholder { color: var(--term-dim); }
+
+        /* --- GAME INFO --- */
+        #info-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        .info-item {
+            background: #000;
+            padding: 10px 20px;
+            border: 1px solid var(--term-green);
+        }
+        .highlight { color: white; text-shadow: 0 0 5px white; }
+
+  
+        #game-area {
+            width: 800px;
+            height: 450px;
+            background-color: #000500;
+            position: relative;
+            border: 2px solid var(--term-green);
+            overflow: hidden;
+            cursor: crosshair;
+            user-select: none;
+        }
+        #target {
+            width: 40px; height: 40px;
+            background-color: var(--term-green);
+            position: absolute; display: none;
+            box-shadow: var(--glow);
+        }
+        #target::after {
+            content: ''; position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 6px; height: 6px; background-color: var(--bg-color);
+        }
+        #target.perfect-hit { background-color: white !important; box-shadow: 0 0 20px white; }
+
+ 
+        #leaderboard {
+            border: 1px solid var(--term-dim);
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        #leaderboard h3 { margin-top: 0; border-bottom: 1px dashed var(--term-green); padding-bottom: 10px; }
+        .leader-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 0.9rem;
+        }
+        .leader-entry:nth-child(1) { color: white; text-shadow: var(--glow); } /* Le 1er brille */
+
+        
+        #start-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.5rem;
+            font-family: inherit;
+            background: black; color: var(--term-green);
+            border: 2px solid var(--term-green);
+            cursor: pointer;
+            text-shadow: var(--glow);
+            transition: 0.2s;
+        }
+        #start-btn:hover:not(:disabled) { background: var(--term-green); color: black; }
+        #start-btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--term-dim); color: var(--term-dim); text-shadow: none; }
+
+    </style>
+</head>
+<body>
+
+    <h1>EXECUTE_ELITE_AIM.EXE</h1>
+
+    <div id="auth-terminal" class="interface-section">
+        <span>ROOT@KALI:~# ENTER_HACKER_ID:</span>
+        <input type="text" id="pseudo-input" maxlength="15" placeholder="UNKNOWN_USER" spellcheck="false">
+    </div>
+
+    <div id="info-bar" class="interface-section">
+        <div class="info-item">[ T: <span id="time" class="highlight">30</span>s ]</div>
+        <div class="info-item">[ SCORE: <span id="score" class="highlight">0</span> ]</div>
+        <div class="info-item">[ LOCAL_BEST: <span id="local-best" class="highlight">0</span> ]</div>
+    </div>
+
+    <div id="game-area" class="interface-section">
+        <div id="target"></div>
+    </div>
+
+    <div class="interface-section">
+        <button id="start-btn">>> INITIALIZE_SEQUENCE</button>
+    </div>
+
+    <div id="leaderboard" class="interface-section">
+        <h3>>> GLOBAL_ELITE_OPERATIVES_TOP_10 <<</h3>
+        <div id="leaderboard-list">
+            <div>[ CONNECTING TO MAINFRAME... ]</div>
+        </div>
+    </div>
+
+    <script>
+       
+        const ELEMENTS = {
+            startBtn: document.getElementById('start-btn'),
+            gameArea: document.getElementById('game-area'),
+            target: document.getElementById('target'),
+            score: document.getElementById('score'),
+            time: document.getElementById('time'),
+            localBest: document.getElementById('local-best'),
+            pseudoInput: document.getElementById('pseudo-input'),
+            leaderboardList: document.getElementById('leaderboard-list')
+        };
+
+        let gameState = {
+            score: 0,
+            timeLeft: 30,
+            isPlaying: false,
+            interval: null,
+            pseudo: 'ANO'
+        };
+
+        
+        ELEMENTS.localBest.textContent = localStorage.getItem('hackerLocalBest') || 0;
+
+        
+        function startGame() {
+            if (gameState.isPlaying) return;
+            
+            // Validation du pseudo
+            const pseudoRaw = ELEMENTS.pseudoInput.value.trim();
+            if (!pseudoRaw) {
+                alert("PSEUDO TOUT DE SUITE");
+                ELEMENTS.pseudoInput.focus();
+                return;
+            }
+            gameState.pseudo = pseudoRaw.toUpperCase(); 
+            ELEMENTS.pseudoInput.disabled = true; 
+
+            // Init
+            gameState.isPlaying = true;
+            gameState.score = 0;
+            gameState.timeLeft = 30;
+            updateUI();
+            
+            ELEMENTS.startBtn.disabled = true;
+            ELEMENTS.startBtn.textContent = ">> SEQUENCE RUNNING...";
+            ELEMENTS.target.style.display = 'block';
+            moveTarget();
+
+            gameState.interval = setInterval(() => {
+                gameState.timeLeft--;
+                updateUI();
+                if (gameState.timeLeft <= 0) endGame();
+            }, 1000);
+        }
+
+        async function endGame() {
+            gameState.isPlaying = false;
+            clearInterval(gameState.interval);
+            ELEMENTS.target.style.display = 'none';
+            ELEMENTS.startBtn.textContent = ">> UPLOADING DATA...";
+
+            // Sauvegarde locale
+            const currentBest = parseInt(localStorage.getItem('hackerLocalBest') || 0);
+            if (gameState.score > currentBest) {
+                localStorage.setItem('hackerLocalBest', gameState.score);
+                ELEMENTS.localBest.textContent = gameState.score;
+            }
+
+          
+            try {
+                await submitScoreToDB(gameState.pseudo, gameState.score);
+                alert(`[MISSION COMPLETE] SCORE: ${gameState.score} // UPLOADED TO MAINFRAME.`);
+            } catch (e) {
+                console.error(e);
+                alert(`[ERROR] UPLOAD FAILED: CONNECTION SEVERED.`);
+            }
+
+            // Reset UI & Refresh Leaderboard
+            ELEMENTS.startBtn.disabled = false;
+            ELEMENTS.startBtn.textContent = ">> RE-INITIALIZE";
+            ELEMENTS.pseudoInput.disabled = false;
+            fetchLeaderboard();
+        }
+
+        function moveTarget() {
+            const maxX = ELEMENTS.gameArea.clientWidth - ELEMENTS.target.offsetWidth;
+            const maxY = ELEMENTS.gameArea.clientHeight - ELEMENTS.target.offsetHeight;
+            ELEMENTS.target.style.left = `${Math.floor(Math.random() * maxX)}px`;
+            ELEMENTS.target.style.top = `${Math.floor(Math.random() * maxY)}px`;
+        }
+
+        function updateUI() {
+            ELEMENTS.score.textContent = gameState.score;
+            ELEMENTS.time.textContent = gameState.timeLeft;
+        }
+
+     
+        ELEMENTS.startBtn.addEventListener('click', startGame);
+
+        ELEMENTS.gameArea.addEventListener('mousedown', (e) => {
+            if (!gameState.isPlaying) return;
+            
+            const rect = ELEMENTS.gameArea.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+            const tRect = ELEMENTS.target;
+            const tCenterX = tRect.offsetLeft + tRect.offsetWidth / 2;
+            const tCenterY = tRect.offsetTop + tRect.offsetHeight / 2;
+            
+            const dist = Math.sqrt((clickX - tCenterX)**2 + (clickY - tCenterY)**2);
+            const radius = tRect.offsetWidth / 2;
+
+            if (dist <= radius * 1.2) { // Hit (avec tolérance carrée)
+                if (dist <= 10) { // Perfect hit
+                    gameState.score += 5;
+                    ELEMENTS.target.classList.add('perfect-hit');
+                    setTimeout(() => ELEMENTS.target.classList.remove('perfect-hit'), 100);
+                } else {
+                    gameState.score += 1;
+                }
+                moveTarget();
+            } else {
+                gameState.score -= 1; 
+            }
+            updateUI();
+        });
+
+    
+        async function fetchLeaderboard() {
+            try {
+                
+                const res = await fetch('/api/get-leaderboard');
+                if (!res.ok) throw new Error('Mainframe unreachable');
+                const data = await res.json();
+                renderLeaderboard(data);
+            } catch (err) {
+                ELEMENTS.leaderboardList.innerHTML = `<div style="color:var(--term-dim)">[ OFFLINE MODE - CANNOT SYNC ]</div>`;
+            }
+        }
+
+        async function submitScoreToDB(pseudo, score) {
+            await fetch('/api/submit-score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pseudo, score })
+            });
+        }
+
+        function renderLeaderboard(data) {
+            if (data.length === 0) {
+                ELEMENTS.leaderboardList.innerHTML = "<div>[ NO DATA FOUND ]</div>";
+                return;
+            }
+            ELEMENTS.leaderboardList.innerHTML = data.map((entry, index) => `
+                <div class="leader-entry">
+                    <span>#${(index + 1).toString().padStart(2, '0')} // ${entry.pseudo}</span>
+                    <span>[ ${entry.score.toString().padStart(4, '0')} PTS ]</span>
+                </div>
+            `).join('');
+        }
+
+        // Initial fetch on load
+        fetchLeaderboard();
+    </script>
+</body>
+</html>
