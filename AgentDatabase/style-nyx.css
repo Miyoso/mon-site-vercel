@@ -105,3 +105,55 @@ body {
     margin-bottom: 1rem;
     color: #00e600; 
 }
+
+/* style-nyx.css */
+
+/* Effet Scanline sur tout l'écran */
+.scanline {
+    position: relative;
+}
+.scanline::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 2;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+}
+
+/* Police personnalisée si nécessaire, sinon Tailwind gère déjà beaucoup */
+.font-tech {
+    font-family: 'Share Tech Mono', monospace;
+}
+
+/* Liens secrets */
+.link-secret {
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+}
+.link-secret:hover::after {
+    content: " [LOCKED]";
+    color: #ef4444; /* Rouge Tailwind red-500 */
+    margin-left: 5px;
+}
+
+/* Animation du curseur */
+.cursor-blink::after {
+    content: '_';
+    animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+/* Classes utilitaires pour l'effet "encrypted" */
+.encrypted {
+    word-break: break-all;
+    opacity: 0.7;
+}
