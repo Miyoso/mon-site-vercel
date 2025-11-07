@@ -30,8 +30,6 @@
 
     <audio id="audioPlayer" src="Nyx.mp3"></audio>
 
-    <div id="test-carre"></div>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const audioButton = document.getElementById('audioButton');
@@ -39,7 +37,6 @@
             const lineContainer = document.getElementById('line');
             const secretLine = document.getElementById('secretLine');
             const teaserText = document.querySelector('.teaser-text');
-            
             const audioPlayer = document.getElementById('audioPlayer');
             
             let lineTimer;
@@ -48,25 +45,23 @@
                 const isPlaying = audioButton.classList.contains('playing');
 
                 if (isPlaying) {
-                    
+                    // --- STOP ---
                     audioPlayer.pause(); 
-                    
                     audioButton.classList.remove('playing');
-                    icon.textContent = '\u{1F4D5}';
+                    icon.textContent = '\u{1F4D5}'; // Livre fermé
                     teaserText.textContent = '> LECTURE SUSPENDUE_';
                     lineContainer.innerHTML = '';
                     clearTimeout(lineTimer);
                     secretLine.classList.remove('active');
-
                 } else {
-                    
+                    // --- PLAY ---
                     audioPlayer.play(); 
-                    
                     audioButton.classList.add('playing');
-                    icon.textContent = '\u{1F4D6}';
+                    icon.textContent = '\u{1F4D6}'; // Livre ouvert
                     teaserText.textContent = '> ANALYSE DU FLUX AUDIO...';
                     lineContainer.innerHTML = '';
                     
+                    // Création des vagues
                     for (let i = 0; i < 30; i++) {
                         const bar = document.createElement('div');
                         bar.classList.add('wave-bar');
@@ -74,6 +69,7 @@
                         lineContainer.appendChild(bar);
                     }
 
+                    // Minuteur de 5 secondes pour faire apparaître la barre
                     lineTimer = setTimeout(() => {
                         secretLine.classList.add('active');
                         teaserText.textContent = '> DONNÉES ENREGISTRÉES_';
@@ -81,7 +77,7 @@
                 }
             });
 
-            
+            // Réinitialisation si l'audio se termine
             audioPlayer.addEventListener('ended', () => {
                 audioButton.classList.remove('playing');
                 icon.textContent = '\u{1F4D5}';
@@ -91,8 +87,6 @@
                 secretLine.classList.remove('active');
             });
         });
-
-        
     </script>
 
 </body>
