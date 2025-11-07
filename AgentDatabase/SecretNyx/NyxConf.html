@@ -31,6 +31,8 @@
     </header>
 
     <main>
+        <p class="teaser-text">> INITIATION DE LA LECTURE REQUISE_</p>
+        
         <div class="audio-button" id="audioButton">
             <div class="icon" id="icon">&#x1F4D5;</div> 
             <div class="line-container" id="line"></div>
@@ -38,7 +40,7 @@
 
         <div id="secretLine" class="secret-line"></div>
 
-        <p class="teaser-text">> INITIATION DE LA LECTURE REQUISE_</p>
+        
     </main>
 
     <footer>
@@ -62,24 +64,24 @@
                 const isPlaying = audioButton.classList.contains('playing');
 
                 if (isPlaying) {
-                    // --- STOP ---
+                    
                     audioPlayer.pause(); 
                     audioButton.classList.remove('playing');
                     icon.textContent = '\u{1F4D5}';
                     teaserText.textContent = '> LECTURE SUSPENDUE_';
                     lineContainer.innerHTML = '';
                     
-                    // ON NE CACHE PLUS LA LIGNE ICI
+                   
                     clearTimeout(lineTimer); 
-                    // secretLine.classList.remove('active'); <--- Ligne supprimée
+                    
 
                 } else {
-                    // --- PLAY ---
+                    
                     audioPlayer.play(); 
                     audioButton.classList.add('playing');
                     icon.textContent = '\u{1F4D6}';
                     
-                    // Si la ligne est DÉJÀ là, on garde le texte "Données enregistrées"
+                    
                     if (!secretLine.classList.contains('active')) {
                          teaserText.textContent = '> ANALYSE DU FLUX AUDIO...';
                     }
@@ -93,7 +95,7 @@
                         lineContainer.appendChild(bar);
                     }
 
-                    // Si la ligne n'est pas encore là, on lance le timer
+                    
                     if (!secretLine.classList.contains('active')) {
                         lineTimer = setTimeout(() => {
                             secretLine.classList.add('active');
@@ -106,14 +108,13 @@
             audioPlayer.addEventListener('ended', () => {
                 audioButton.classList.remove('playing');
                 icon.textContent = '\u{1F4D5}';
-                // On change le texte seulement si la ligne n'est PAS active
+                
                  if (!secretLine.classList.contains('active')) {
                     teaserText.textContent = '> FIN DE TRANSMISSION_';
                 }
                 lineContainer.innerHTML = '';
                 clearTimeout(lineTimer);
-                // ON NE CACHE PLUS LA LIGNE ICI NON PLUS
-                // secretLine.classList.remove('active'); <--- Ligne supprimée
+                
             });
         });
     </script>
