@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCHIVE_LOG</title>
+    <title>ARCHIVE_LOG_DEBUG</title>
     <link rel="stylesheet" href="SecretNyx.css">
 </head>
 <body>
@@ -32,6 +32,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            console.log("Page chargée. Script démarré."); // MOUCHARD 1
+
             const audioButton = document.getElementById('audioButton');
             const icon = document.getElementById('icon');
             const lineContainer = document.getElementById('line');
@@ -45,23 +47,26 @@
                 const isPlaying = audioButton.classList.contains('playing');
 
                 if (isPlaying) {
-                    // --- STOP ---
+                    console.log("Clic: STOP demandé"); // MOUCHARD 2
                     audioPlayer.pause(); 
                     audioButton.classList.remove('playing');
-                    icon.textContent = '\u{1F4D5}'; // Livre fermé
+                    icon.textContent = '\u{1F4D5}';
                     teaserText.textContent = '> LECTURE SUSPENDUE_';
                     lineContainer.innerHTML = '';
+                    
+                    console.log("Timer annulé"); // MOUCHARD 3
                     clearTimeout(lineTimer);
                     secretLine.classList.remove('active');
+
                 } else {
-                    // --- PLAY ---
-                    audioPlayer.play(); 
+                    console.log("Clic: PLAY demandé"); // MOUCHARD 4
+                    audioPlayer.play().catch(e => console.error("Erreur lecture audio:", e));
+                    
                     audioButton.classList.add('playing');
-                    icon.textContent = '\u{1F4D6}'; // Livre ouvert
+                    icon.textContent = '\u{1F4D6}';
                     teaserText.textContent = '> ANALYSE DU FLUX AUDIO...';
                     lineContainer.innerHTML = '';
                     
-                    // Création des vagues
                     for (let i = 0; i < 30; i++) {
                         const bar = document.createElement('div');
                         bar.classList.add('wave-bar');
@@ -69,16 +74,22 @@
                         lineContainer.appendChild(bar);
                     }
 
-                    // Minuteur de 5 secondes pour faire apparaître la barre
+                    console.log("Timer de 5s démarré..."); // MOUCHARD 5
                     lineTimer = setTimeout(() => {
-                        secretLine.classList.add('active');
+                        console.log("5 secondes écoulées ! Activation de la ligne."); // MOUCHARD 6
+                        if (secretLine) {
+                             secretLine.classList.add('active');
+                             console.log("Classe 'active' ajoutée à secretLine"); // MOUCHARD 7
+                        } else {
+                             console.error("ERREUR: secretLine introuvable !");
+                        }
                         teaserText.textContent = '> DONNÉES ENREGISTRÉES_';
                     }, 5000);
                 }
             });
 
-            // Réinitialisation si l'audio se termine
             audioPlayer.addEventListener('ended', () => {
+                console.log("Audio terminé naturellement"); // MOUCHARD 8
                 audioButton.classList.remove('playing');
                 icon.textContent = '\u{1F4D5}';
                 teaserText.textContent = '> FIN DE TRANSMISSION_';
