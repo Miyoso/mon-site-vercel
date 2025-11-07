@@ -3,8 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARCHIVE_LOG_DEBUG</title>
+    <title>ARCHIVE_LOG</title>
     <link rel="stylesheet" href="SecretNyx.css">
+
+    <style>
+        /* On met ça ici pour être SÛR que Vercel le prenne en compte */
+        .secret-line {
+            width: 4px;
+            height: 0px;
+            background-color: #0f0; /* Vert fluo bien visible */
+            margin-top: 10px;
+            opacity: 0;
+            transition: height 2s ease-out, opacity 0.5s ease-out;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); /* Grosse lueur pour bien la voir */
+        }
+
+        .secret-line.active {
+            height: 150px !important; /* !important force l'affichage */
+            opacity: 1 !important;
+        }
+    </style>
 </head>
 <body>
 
@@ -32,8 +50,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("Page chargée. Script démarré."); // MOUCHARD 1
-
             const audioButton = document.getElementById('audioButton');
             const icon = document.getElementById('icon');
             const lineContainer = document.getElementById('line');
@@ -47,21 +63,15 @@
                 const isPlaying = audioButton.classList.contains('playing');
 
                 if (isPlaying) {
-                    console.log("Clic: STOP demandé"); // MOUCHARD 2
                     audioPlayer.pause(); 
                     audioButton.classList.remove('playing');
                     icon.textContent = '\u{1F4D5}';
                     teaserText.textContent = '> LECTURE SUSPENDUE_';
                     lineContainer.innerHTML = '';
-                    
-                    console.log("Timer annulé"); // MOUCHARD 3
                     clearTimeout(lineTimer);
                     secretLine.classList.remove('active');
-
                 } else {
-                    console.log("Clic: PLAY demandé"); // MOUCHARD 4
-                    audioPlayer.play().catch(e => console.error("Erreur lecture audio:", e));
-                    
+                    audioPlayer.play(); 
                     audioButton.classList.add('playing');
                     icon.textContent = '\u{1F4D6}';
                     teaserText.textContent = '> ANALYSE DU FLUX AUDIO...';
@@ -74,22 +84,15 @@
                         lineContainer.appendChild(bar);
                     }
 
-                    console.log("Timer de 5s démarré..."); // MOUCHARD 5
+                    // Timer de 5 secondes
                     lineTimer = setTimeout(() => {
-                        console.log("5 secondes écoulées ! Activation de la ligne."); // MOUCHARD 6
-                        if (secretLine) {
-                             secretLine.classList.add('active');
-                             console.log("Classe 'active' ajoutée à secretLine"); // MOUCHARD 7
-                        } else {
-                             console.error("ERREUR: secretLine introuvable !");
-                        }
+                        secretLine.classList.add('active');
                         teaserText.textContent = '> DONNÉES ENREGISTRÉES_';
                     }, 5000);
                 }
             });
 
             audioPlayer.addEventListener('ended', () => {
-                console.log("Audio terminé naturellement"); // MOUCHARD 8
                 audioButton.classList.remove('playing');
                 icon.textContent = '\u{1F4D5}';
                 teaserText.textContent = '> FIN DE TRANSMISSION_';
