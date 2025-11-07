@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARCHIVE_LOG</title>
+    <link rel="stylesheet" href="SecretNyx.css">
+</head>
+<body>
+
+    <header>
+        <h2>> ACCÈS LOGS SÉCURISÉS</h2>
+        <h1>FICHIER_ARCHIVE.log</h1>
+    </header>
+
+    <main>
+        <div class="audio-button" id="audioButton">
+            <div class="icon" id="icon">&#x1F4D5;</div> 
+            <div class="line-container" id="line"></div>
+        </div>
+
+        <div id="secretLine" class="secret-line"></div>
+
+        <p class="teaser-text">> INITIATION DE LA LECTURE REQUISE_</p>
+    </main>
+
+    <footer>
+        LOG SYSTEM • ENCODING: UTF-8 • TIMESTAMP: 2023-10-27
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const audioButton = document.getElementById('audioButton');
+            const icon = document.getElementById('icon');
+            const lineContainer = document.getElementById('line');
+            const secretLine = document.getElementById('secretLine');
+            const teaserText = document.querySelector('.teaser-text');
+            
+            const audioPlayer = document.getElementById('audioPlayer');
+            
+            let lineTimer;
+
+            audioButton.addEventListener('click', () => {
+                const isPlaying = audioButton.classList.contains('playing');
+
+                if (isPlaying) {
+                    
+                    audioPlayer.pause(); 
+                    
+                    audioButton.classList.remove('playing');
+                    icon.textContent = '\u{1F4D5}';
+                    teaserText.textContent = '> LECTURE SUSPENDUE_';
+                    lineContainer.innerHTML = '';
+                    clearTimeout(lineTimer);
+                    secretLine.classList.remove('active');
+
+                } else {
+                    
+                    audioPlayer.play(); 
+                    
+                    audioButton.classList.add('playing');
+                    icon.textContent = '\u{1F4D6}';
+                    teaserText.textContent = '> ANALYSE DU FLUX AUDIO...';
+                    lineContainer.innerHTML = '';
+                    
+                    for (let i = 0; i < 30; i++) {
+                        const bar = document.createElement('div');
+                        bar.classList.add('wave-bar');
+                        bar.style.animationDelay = `${Math.random() * 1.0}s`; 
+                        lineContainer.appendChild(bar);
+                    }
+
+                    lineTimer = setTimeout(() => {
+                        secretLine.classList.add('active');
+                        teaserText.textContent = '> DONNÉES ENREGISTRÉES_';
+                    }, 8000);
+                }
+            });
+
+            
+            audioPlayer.addEventListener('ended', () => {
+                audioButton.classList.remove('playing');
+                icon.textContent = '\u{1F4D5}';
+                teaserText.textContent = '> FIN DE TRANSMISSION_';
+                lineContainer.innerHTML = '';
+                clearTimeout(lineTimer);
+                secretLine.classList.remove('active');
+            });
+        });
+
+        <audio id="audioPlayer" src="Nyx.mp3"></audio>
+    </script>
+
+</body>
+</html>
