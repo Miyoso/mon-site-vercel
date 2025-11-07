@@ -1,9 +1,9 @@
-/* AgentDatabase/style-loading-nyx-v2.css */
+
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Empêche le défilement de la page entière */
+    overflow: hidden; 
 }
 
 body {
@@ -20,24 +20,24 @@ body {
 
 .console-output {
     flex-grow: 1;
-    overflow-y: auto;     /* Permet le défilement interne */
+    overflow-y: auto;     
     white-space: pre-wrap;
     word-break: break-all;
     
-    /* Masquer les barres de défilement pour un look 'pur' terminal */
-    scrollbar-width: none;  /* Firefox */
-    -ms-overflow-style: none;  /* IE and Edge */
+   
+    scrollbar-width: none;  
+    -ms-overflow-style: none;  
 }
 
-/* Masquer scrollbar pour Chrome/Safari/Opera */
+
 .console-output::-webkit-scrollbar {
     display: none;
 }
 
-/* Style du Prompt KALI */
+
 .prompt {
     color: #eaeaea;
-    margin: 0; /* Évite les sauts de marge inattendus */
+    margin: 0; 
 }
 .prompt .user {
     color: #ff4141;
@@ -53,9 +53,9 @@ body {
     color: #eaeaea;
 }
 
-/* Styles des lignes de sortie */
+
 .console-output p {
-    margin: 0 0 0.2rem 0; /* Espacement réduit entre les lignes pour fluidité */
+    margin: 0 0 0.2rem 0; 
 }
 .line-command { color: #eaeaea; }
 .line-info { color: #00cccc; }
