@@ -152,26 +152,77 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const glitchElements = document.querySelectorAll('.data-glitched-random');
-            const chars = 'ABCDEF0123456789<>!@#$%^&*()_+[]{}|;:,./?';
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- EFFETS GLITCH (inchangé) ---
+        const glitchElements = document.querySelectorAll('.data-glitched-random');
+        const chars = 'ABCDEF0123456789<>!@#$%^&*()_+[]{}|;:,./?';
+        setInterval(() => {
+            glitchElements.forEach(el => {
+                el.textContent = Array.from({length: Math.floor(Math.random() * 10) + 8}, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+            });
+        }, 150);
 
-            function generateRandomString(length) {
-                let result = '';
-                for (let i = 0; i < length; i++) {
-                    result += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return result;
-            }
+        // --- NOUVELLE SÉCURITÉ VIA SERVEUR ---
+        const trigger = document.getElementById('trigger-secret');
+        
+        trigger.addEventListener('click', async () => {
+            // On demande un identifiant et un mot de passe pour ce script
+            // Pour votre cas "ZERO", vous pourriez n'envoyer que le password et fixer l'username dans le script serveur, 
+            // mais restons sur la logique de votre script actuel.
+            const username = prompt(">> IDENTIFICATION REQUISE <<\nENTREZ L'AGENT_ID :");
+            if (!username) return;
+            
+            const password = prompt(">> SÉCURITÉ NIVEAU 7 <<\nENTREZ LE CODE D'ACCÈS :");
+            if (!password) return;
 
-            setInterval(() => {
-                glitchElements.forEach(el => {
-                    const randomLength = Math.floor(Math.random() * 10) + 8;
-                    el.textContent = generateRandomString(randomLength);
+            // Feedback visuel immédiat
+            document.body.innerHTML = `
+                <div style="color:#0f0; font-family:monospace; padding:20px; background:#000; height:100vh;">
+                    > CONNEXION AU SERVEUR CENTRAL...<br>
+                    > VÉRIFICATION DES CRÉDENTIELS...
+                </div>`;
+
+            try {
+                // Appel au script serveur
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
                 });
-            }, 100);
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                     // SUCCÈS : Le serveur a validé.
+                     document.body.innerHTML += `
+                        <div style="color:#0f0; font-family:monospace; padding:0 20px;">
+                            > AUTHENTIFICATION RÉUSSIE.<br>
+                            > BIENVENUE AGENT ${data.user} (NIVEAU ${data.level}).<br>
+                            > DÉCHIFFREMENT DU FICHIER...
+                        </div>`;
+                     
+                     // Redirection après un court délai
+                     setTimeout(() => {
+                         // Vous pouvez garder l'astuce du nom de fichier si vous voulez
+                         // Ou simplement rediriger vers le fichier maintenant qu'on est sûr de l'identité.
+                         window.location.href = 'SecretNyx/NyxConf.html';
+                     }, 2000);
+
+                } else {
+                    // ÉCHEC : Le serveur a refusé.
+                    alert(`!!! ACCÈS REFUSÉ !!!\nSERVEUR RÉPOND : ${data.message || 'ERREUR INCONNUE'}`);
+                    // Recharger la page pour retenter proprement
+                    window.location.reload();
+                }
+
+            } catch (error) {
+                console.error('Erreur réseau:', error);
+                alert("!!! ERREUR DE CONNEXION AU SERVEUR !!!");
+                window.location.reload();
+            }
         });
-    </script>
+    });
+</script>
 
 </body>
 </html>
