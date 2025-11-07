@@ -7,7 +7,7 @@ const ADA_PASSWORD_HASH = '$2a$12$IzPCtcn80IDrHEHPOpDBiOnw8qK/Nz/SrZJU0mXcbzpgk3
 const ADA_LEVEL = 7;
 
 
-const SECRET_FILE_HASH = '$2a$12$fU.Ew9lmDBLpZMtJcN8A1u31Eydswn1me1CWVsk58SiP/7nIGR/Gu';
+const SECRET_FILE_HASH = '$2a$12$OZlX2DnFqqADVGK2VtOcG.Z49hxDYrmFmNuhcvwG1yWpjPDf.Md/q';
 
 const SECRET_FILE_URL = '../AgentDatabase/SecretNyx/NyxConf.html';
 
