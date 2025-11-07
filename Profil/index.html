@@ -90,25 +90,25 @@
                 const warningListEl = document.getElementById('warning-notes-list');
 
                 try {
-                    // CORRECTION ICI: Utilise un chemin absolu (/api/...)
-                    const response = await fetch(\`/api/read?resource=agent-details&username=${user}\`);
+                    
+                    const response = await fetch(\`../api/read?resource=agent-details&username=${user}\`);
                     const data = await response.json();
 
                     if (!response.ok) throw new Error(data.error);
 
-                    warningLevelEl.textContent = `NIVEAU D'AVERTISSEMENT: ${data.warningLevel}`;
+                    warningLevelEl.textContent = \`NIVEAU D'AVERTISSEMENT: \${data.warningLevel}\`;
 
                     if (data.warningNotes.length > 0) {
                         let notesHTML = '';
                         data.warningNotes.forEach(note => {
-                            notesHTML += `
+                            notesHTML += \`
                                 <li class="warning-note-item">
                                     <span class="warning-note-meta">
-                                        De: <span class="author">${note.author_name}</span> (Le ${new Date(note.created_at).toLocaleDateString()})
+                                        De: <span class="author">\${note.author_name}</span> (Le \${new Date(note.created_at).toLocaleDateString()})
                                     </span>
-                                    <p class="warning-note-text">${note.note_text}</p>
+                                    <p class="warning-note-text">\${note.note_text}</p>
                                 </li>
-                            `;
+                            \`;
                         });
                         warningListEl.innerHTML = notesHTML;
                     } else {
@@ -117,7 +117,7 @@
 
                 } catch (error) {
                     warningLevelEl.textContent = "NIVEAU D'AVERTISSEMENT: [ERREUR]";
-                    warningListEl.innerHTML = `<li class="warning-note-empty" style="color: #ff6666;">${error.message}</li>`;
+                    warningListEl.innerHTML = \`<li class="warning-note-empty" style="color: #ff6666;">\${error.message}</li>\`;
                 }
             }
             
@@ -159,8 +159,8 @@
                 }
 
                 try {
-                    
-                    const response = await fetch('/api/change-password', {
+                    // CORRECTION ICI: Utilise le chemin RELATIF correct (../api/...)
+                    const response = await fetch('../api/change-password', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ 
