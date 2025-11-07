@@ -3,127 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dossier Agent :: 08 [ENCRYPTED]</title>
+    <title>Dossier Agent :: Graves [ENCRYPTED]</title>
 
-    <script>
-        const REQUIRED_LEVEL = 1;
-    </script>
-    <script src="../security.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="style-nyx.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
 </head>
-<body class="text-green-400 min-h-screen p-4 md:p-8 scanline">
+<body class="text-green-400 min-h-screen p-4 md:p-8 scanline bg-black font-mono">
 
-    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50">
-        <header class="font-tech text-lg md:text-xl p-4 bg-green-900/30 border-b-2 border-green-700/50 flex justify-between items-center">
-            <span>[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3 REQUIS]</span>
-            <span class="text-red-500 animate-pulse">● REC</span>
+    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50 bg-black/90 backdrop-blur">
+        <header class="font-tech text-lg md:text-xl p-4 bg-green-950/50 border-b-2 border-green-700/50 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md">
+             <span class="tracking-widest">[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3]</span>
+            <span class="text-red-500 animate-pulse flex items-center gap-2">
+                <span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> REC
+            </span>
         </header>
 
         <div class="p-6 md:p-8 space-y-8">
             
-            <div>
-                <span class="text-green-300">$</span> <span class="text-white">load --dossier=AGENT_08</span>
-                <p class="text-cyan-400">... Tentative de déchiffrement ...</p>
-                <p class="text-red-500">ERREUR: Données corrompues. Affichage des fragments.</p>
-                <span class="text-green-300">$</span> <span class="cursor-blink"></span>
+            <div class="font-mono text-sm md:text-base">
+                <div><span class="text-green-500">$</span> <span class="text-white">load --dossier=AGENT_08</span></div>
+                <div class="text-cyan-400 mt-1">... Tentative de déchiffrement ...</div>
+                <div class="text-red-500 mt-1">ERREUR: CORRUPTION CRITIQUE DÉTECTÉE.</div>
+                <div class="text-yellow-400">> Chargement des fragments partiels... [WARNING]</div>
+                <div><span class="text-green-500">$</span> <span class="cursor-blink"></span></div>
             </div>
 
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 01 : IDENTIFICATION]</h2>
+            <section class="border border-green-600/30 p-6 rounded bg-black/40 relative overflow-hidden group hover:border-green-500/50 transition-all duration-500">
+                <div class="absolute top-0 right-0 p-2 text-xs text-red-800 font-tech opacity-70">ERR_CODE: 0x8820-DEAD</div>
+                 <h2 class="font-tech text-2xl text-white mb-6 flex items-center">
+                    <span class="text-green-500 mr-2">></span> [SECTION 01 : IDENTIFICATION]
+                </h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-slate-400">NOM DE L'AGENT :</p>
-                        <p class="text-xl text-white"><span class="data-glitched-random"></span></p>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-grow space-y-4 font-mono">
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">NOM DE L'AGENT:</span>
+                            <span class="text-xl text-white font-bold tracking-wider"><span class="data-glitched-random"></span></span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">ALIAS CONNUS:</span>
+                            <span class="text-white"><span class="data-glitched-random"></span></span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">STATUT ACTUEL:</span>
+                            <span class="text-yellow-400 font-bold">[ <span class="data-glitched-random"></span> ]</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2">
+                            <span class="text-slate-500">NIVEAU MENACE:</span>
+                            <span class="text-red-500 font-bold animate-pulse"><span class="data-glitched-random"></span></span>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-slate-400">ALIAS CONNUS :</p>
-                        <p class="text-xl text-white"><span class="data-glitched-random"></span></p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">STATUT ACTUEL :</p>
-                        <p class="text-xl text-yellow-400"><span class="data-glitched-random"></span></p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">NIVEAU DE MENACE :</p>
-                        <p class="text-xl text-red-500"><span class="data-glitched-random"></span></p>
+
+                    <div class="flex-shrink-0 flex justify-center md:justify-end">
+                        <div class="border-2 border-red-500/30 p-1 w-40 h-48 flex items-center justify-center bg-red-950/20 text-center flex-col relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-red-500/10 to-transparent animate-scan h-full w-full"></div>
+                            <span class="text-red-500 font-tech text-lg mb-2">[DONNÉES PERDUES]</span>
+                            <p class="text-xs text-red-400/70 font-mono">ERR_404::IMAGE_CORRUPTED</p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
-            
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]</h2>
+            <section class="border border-green-600/30 p-6 rounded bg-black/40 relative overflow-hidden hover:border-green-500/50 transition-all duration-500">
+                <h2 class="font-tech text-2xl text-white mb-6 flex items-center">
+                     <span class="text-green-500 mr-2">></span> [SECTION 02 : PROFIL FRAGMENTÉ]
+                </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <h3 class="text-xl text-cyan-400 font-tech mb-2">// PHYSIQUE</h3>
-                        <ul class="list-none space-y-1">
-                            <li><span class="text-slate-400">TAILLE:</span> <span class="data-glitched-random"></span></li>
-                            <li><span class="text-slate-400">CHEVEUX:</span> <span class="data-glitched-random"></span></li>
-                            <li><span class="text-slate-400">YEUX:</span> <span class="data-glitched-random"></span></li>
+                    <div class="bg-cyan-950/10 p-4 rounded border border-cyan-900/30">
+                        <h3 class="text-lg text-cyan-400 font-tech mb-3 border-b border-cyan-900/50 pb-2">// PHYSIQUE</h3>
+                        <ul class="list-none space-y-2 text-sm">
+                            <li class="flex justify-between"><span class="text-slate-500">TAILLE:</span> <span class="data-glitched-random"></span></li>
+                            <li class="flex justify-between"><span class="text-slate-500">CHEVEUX:</span> <span class="data-glitched-random"></span></li>
+                            <li class="flex justify-between"><span class="text-slate-500">YEUX:</span> <span class="data-glitched-random"></span></li>
                         </ul>
                     </div>
-                    <div>
-                        <h3 class="text-xl text-green-400 font-tech mb-2">// QUALITÉS (ASSETS)</h3>
-                        <ul class="list-none space-y-1">
+                    <div class="bg-green-950/10 p-4 rounded border border-green-900/30">
+                        <h3 class="text-lg text-green-400 font-tech mb-3 border-b border-green-900/50 pb-2">// QUALITÉS (ASSETS)</h3>
+                         <ul class="space-y-1 text-sm list-disc list-inside text-green-300/80">
                             <li><span class="data-glitched-random"></span></li>
                             <li><span class="data-glitched-random"></span></li>
                         </ul>
                     </div>
-                    <div>
-                        <h3 class="text-xl text-yellow-400 font-tech mb-2">// DÉFAUTS (LIABILITIES)</h3>
-                        <ul class="list-none space-y-1">
+                    <div class="bg-yellow-950/10 p-4 rounded border border-yellow-900/30">
+                        <h3 class="text-lg text-yellow-400 font-tech mb-3 border-b border-yellow-900/50 pb-2">// DÉFAUTS (LIABILITIES)</h3>
+                        <ul class="space-y-1 text-sm list-disc list-inside text-yellow-500/80">
                            <li><span class="data-glitched-random"></span></li>
                         </ul>
                     </div>
                 </div>
             </section>
-            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
 
-            <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
-                <h2 class="font-tech text-2xl text-red-400 mb-4">[SECTION 03 : HISTORIQUE - NIVEAU 5 REQUIS]</h2>
-                <div class="bg-black/30 p-4 rounded">
-                    <p class="text-red-400">[ACCÈS VERROUILLÉ - CHIFFREMENT AES-256]</p>
-                    <p class="text-sm select-none">
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span>
+            <section class="border border-red-800/50 p-6 rounded bg-red-950/10 relative overflow-hidden">
+                 <div class="absolute top-0 right-0 bg-red-900/50 text-red-200 text-xs px-3 py-1 font-tech">NIVEAU 5 REQUIS</div>
+                <h2 class="font-tech text-2xl text-red-500 mb-4 flex items-center">
+                    <span class="mr-2 animate-pulse">🔒</span> [SECTION 03 : HISTORIQUE]
+                </h2>
+                <div class="bg-black/50 p-4 rounded border border-red-900/30 font-mono text-sm text-red-400/60 relative min-h-[150px]">
+                    <div class="absolute inset-0 flex items-center justify-center z-10">
+                         <span class="bg-black/80 px-4 py-2 text-red-500 font-tech border border-red-500/50 rotate-[-5deg] shadow-lg backdrop-blur-sm">
+                             [ ÉCHEC DÉCHIFFREMENT AES-256 ]
+                         </span>
+                    </div>
+                    <p class="blur-[3px] select-none opacity-40 break-all">
+                        <span class="data-glitched-random"></span> 4c 6f 72 65 6d 20 69 70 73 75 6d <span class="data-glitched-random"></span>
+                        00 00 00 00 00 00 00 00 <span class="data-glitched-random"></span> df 45 87 9a
+                        <br><br>
+                        <span class="data-glitched-random"></span> CRITICAL FAILURE <span class="data-glitched-random"></span>
                     </p>
                 </div>
             </section>
 
-            <section class="border border-yellow-600/30 p-4 rounded-lg bg-yellow-900/10">
-                <h2 class="font-tech text-2xl text-yellow-400 mb-4">[SECTION 04 : COMPÉTENCES & OPÉRATIONS - NIVEAU 7 REQUIS]</h2>
-                <div class="bg-black/30 p-4 rounded">
-                    <p class="text-yellow-400">[ACCÈS VERROUILLÉ - CLÉ DE DÉCHIFFREMENT MANQUANTE]</p>
-                    <p class="text-sm select-none">
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span><br>
-                        <span class="data-glitched-random"></span>
-                    </p>
+            <section class="border border-yellow-700/50 p-6 rounded bg-yellow-950/10 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-yellow-900/50 text-yellow-200 text-xs px-3 py-1 font-tech">NIVEAU 7 REQUIS</div>
+                <h2 class="font-tech text-2xl text-yellow-500 mb-4 flex items-center">
+                    <span class="mr-2">⚠️</span> [SECTION 04 : COMPÉTENCES & OPÉRATIONS]
+                </h2>
+                <div class="bg-black/50 p-4 rounded border border-yellow-900/30 font-mono text-sm text-yellow-600/80">
+                     <p class="mb-3 text-yellow-500">[ ! ] ATTENTION : CLÉ DE DÉCHIFFREMENT MANQUANTE.</p>
+                    <ul class="space-y-2 opacity-50">
+                        <li class="flex items-center">
+                            <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
+                            [OPÉRATION: <span class="data-glitched-random w-20"></span>] 
+                            <span class="ml-auto text-xs">[CORROMPU]</span>
+                        </li>
+                         <li class="flex items-center">
+                            <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
+                             [OPÉRATION: <span class="data-glitched-random w-24"></span>] 
+                            <span class="ml-auto text-xs">[CORROMPU]</span>
+                        </li>
+                    </ul>
                 </div>
             </section>
 
-             <div>
-                <span class="text-green-300">$</span> <span class="text-white">exit</span>
-                <p class="text-red-500">... Déconnexion ...</p>
-                
-                <div class="mt-8 text-center border-t border-green-700/50 pt-4">
-                    <a href="../database.html" class="font-tech text-green-400 hover:text-white hover:bg-green-700 p-2 transition-all">
-                        &lt;&lt; RETURN_TO_DATABASE
-                    </a>
+             <div class="pt-6 border-t border-green-800/30 flex justify-between items-end">
+                <div class="text-xs text-green-700 font-mono">
+                    SESSION ID: <span class="data-glitched-random"></span><br>
+                    STATUS: DISCONNECTED_
                 </div>
+                <a href="../database.html" class="font-tech text-sm bg-green-950 hover:bg-green-900 text-green-400 px-4 py-2 border border-green-700 rounded transition-all duration-300 hover:shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+                    << RETURN_TO_DATABASE
+                </a>
             </div>
 
         </div>
@@ -144,11 +168,15 @@
 
             setInterval(() => {
                 glitchElements.forEach(el => {
-                    // Génère une longueur aléatoire à chaque fois pour plus de chaos
-                    const randomLength = Math.floor(Math.random() * 10) + 8; // entre 8 et 28 chars
+                    
+                    let randomLength;
+                    if (el.classList.contains('w-20')) randomLength = 8;
+                    else if (el.classList.contains('w-24')) randomLength = 12;
+                    else randomLength = Math.floor(Math.random() * 10) + 8; 
+                    
                     el.textContent = generateRandomString(randomLength);
                 });
-            }, 100); // Se met à jour toutes les 100ms
+            }, 80); 
         });
     </script>
 

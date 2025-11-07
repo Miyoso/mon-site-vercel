@@ -101,7 +101,7 @@
             </section>
 
             <section class="border border-red-800/50 p-6 rounded bg-red-950/10 relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-red-900/50 text-red-200 text-xs px-3 py-1 font-tech">NIVEAU 5 REQUIS</div>
+                <div class="absolute top-0 right-0 bg-red-900/50 text-red-200 text-xs px-3 py-1 font-tech">NIVEAU 3 REQUIS</div>
                 <h2 class="font-tech text-2xl text-red-500 mb-4 flex items-center">
                     <span class="mr-2 animate-pulse">🔒</span> [03 : HISTORIQUE CLASSIFIÉ]
                 </h2>
@@ -123,18 +123,18 @@
             </section>
 
             <section class="border border-yellow-700/50 p-6 rounded bg-yellow-950/10 relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-yellow-900/50 text-yellow-200 text-xs px-3 py-1 font-tech">NIVEAU 7 REQUIS</div>
+                <div class="absolute top-0 right-0 bg-yellow-900/50 text-yellow-200 text-xs px-3 py-1 font-tech">NIVEAU 5 REQUIS</div>
                 <h2 class="font-tech text-2xl text-yellow-500 mb-4 flex items-center">
-                    <span class="mr-2">⚠️</span> [04 : OPÉRATIONS SPÉCIALES]
+                    <span class="mr-2">⚠️</span> [04 : FICHIERS SPÉCIAUX]
                 </h2>
                 <div class="bg-black/50 p-4 rounded border border-yellow-900/30 font-mono text-sm text-yellow-600/80">
                     <p class="mb-3 text-yellow-500">[ ! ] ATTENTION : CERTAINS FICHIERS NÉCESSITENT UNE AUTHENTIFICATION MANUELLE.</p>
                     <ul class="space-y-2">
                         <li class="flex items-center"><span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> [FICHIER: operations_datahaven.log] <span class="ml-auto opacity-50 text-xs">[CORROMPU]</span></li>
                        
-                        <li class="flex items-center"><span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span><span id="trigger-secret"> [FICHIER: analyse_psy_cortex.dat] </span><span class="ml-auto opacity-50 text-xs">[LOCKED]</span></li> 
+                        <li class="flex items-center"><span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span><span id="trigger-secret"> [FICHIER: archives_n.dat] </span><span class="ml-auto opacity-50 text-xs">[LOCKED]</span></li> 
 
-                        <li class="flex items-center"><span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> [FICHIER: contacts_actifs.db] <span class="ml-auto opacity-50 text-xs">[VERROUILLÉ]</span></li>
+                        <li class="flex items-center"><span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> [FICHIER: contacts_actifs.db] <span class="ml-auto opacity-50 text-xs">[LOCKED]</span></li>
                         <li><span class="data-glitched-random opacity-30"></span></li>
                     </ul>
                 </div>
@@ -158,7 +158,7 @@
             <div class="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(transparent_50%,rgba(255,0,0,0.2)_50%)] bg-[length:100%_4px]"></div>
             
             <div class="text-red-500 text-xl mb-6 font-bold flex items-center border-b border-red-900/50 pb-4 font-tech tracking-wider">
-                <span class="animate-pulse mr-3 text-2xl">🛑</span> ALERTE SÉCURITÉ NIVEAU 7
+                <span class="animate-pulse mr-3 text-2xl">🛑</span> ALERTE SÉCURITÉ NIVEAU 5
             </div>
             <p id="custom-alert-message" class="text-red-300 mb-8 text-lg leading-relaxed font-bold">
                 </p>
@@ -233,7 +233,7 @@
                         `;
 
                         try {
-                            // On force une attente de 2 secondes minimum pour voir le chargement
+                            
                             const [response] = await Promise.all([
                                 fetch('/api/login', {
                                     method: 'POST',
