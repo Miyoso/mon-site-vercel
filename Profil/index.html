@@ -90,8 +90,8 @@
                 const warningListEl = document.getElementById('warning-notes-list');
 
                 try {
-                   
-                    const response = await fetch(\`../api/read?resource=agent-details&username=${user}\`);
+                    // UTILISATION DU CHEMIN RELATIF CORRIGÉ: "../api/read?..."
+                    const response = await fetch(`../api/read?resource=agent-details&username=${user}`);
                     const data = await response.json();
 
                     if (!response.ok) throw new Error(data.error);
@@ -116,8 +116,10 @@
                     }
 
                 } catch (error) {
+                    // Affiche l'erreur pour le débogage
+                    console.error('Erreur de chargement des détails de l\'agent:', error);
                     warningLevelEl.textContent = "NIVEAU D'AVERTISSEMENT: [ERREUR]";
-                    warningListEl.innerHTML = `<li class="warning-note-empty" style="color: #ff6666;">${error.message}</li>`;
+                    warningListEl.innerHTML = `<li class="warning-note-empty" style="color: #ff6666;">ERREUR: Problème de connexion API.</li>`;
                 }
             }
             
@@ -159,7 +161,7 @@
                 }
 
                 try {
-                    
+                    // UTILISATION DU CHEMIN RELATIF CORRIGÉ: "../api/change-password"
                     const response = await fetch('../api/change-password', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
