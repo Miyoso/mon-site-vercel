@@ -1,4 +1,11 @@
-/* AgentDatabase/style-loading-nyx.css */
+/* AgentDatabase/style-loading-nyx-v2.css */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Empêche le défilement de la page entière */
+}
+
 body {
     background-color: #121212;
     color: #eaeaea;
@@ -8,21 +15,29 @@ body {
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    overflow: hidden;
     box-sizing: border-box;
 }
 
 .console-output {
     flex-grow: 1;
-    overflow-y: auto;
+    overflow-y: auto;     /* Permet le défilement interne */
     white-space: pre-wrap;
     word-break: break-all;
+    
+    /* Masquer les barres de défilement pour un look 'pur' terminal */
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+}
+
+/* Masquer scrollbar pour Chrome/Safari/Opera */
+.console-output::-webkit-scrollbar {
+    display: none;
 }
 
 /* Style du Prompt KALI */
 .prompt {
     color: #eaeaea;
+    margin: 0; /* Évite les sauts de marge inattendus */
 }
 .prompt .user {
     color: #ff4141;
@@ -39,21 +54,14 @@ body {
 }
 
 /* Styles des lignes de sortie */
-.line-command {
-    color: #eaeaea;
+.console-output p {
+    margin: 0 0 0.2rem 0; /* Espacement réduit entre les lignes pour fluidité */
 }
-.line-info {
-    color: #00cccc;
-}
-.line-success {
-    color: #00e600;
-}
-.line-warning {
-    color: #ffff00;
-}
-.line-error {
-    color: #ff4141;
-}
+.line-command { color: #eaeaea; }
+.line-info { color: #00cccc; }
+.line-success { color: #00e600; }
+.line-warning { color: #ffff00; }
+.line-error { color: #ff4141; }
 
 .cursor-blink {
     animation: blink 1s step-end infinite;
@@ -66,18 +74,4 @@ body {
 }
 @keyframes blink {
     50% { opacity: 0; }
-}
-
-
-.link-secret {
-    text-decoration: none; 
-    color: inherit; 
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.link-secret:hover {
-    color: #00ff00; 
-    text-shadow: 0 0 5px #00ff00; 
-    filter: blur(0); 
 }

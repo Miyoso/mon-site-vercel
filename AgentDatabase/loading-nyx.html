@@ -69,6 +69,11 @@
             
             let i = 0;
 
+            // Fonction pour forcer le scroll en bas
+            function scrollToBottom() {
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+
             function addLine() {
                 if (i < lines.length) {
                     const line = lines[i];
@@ -83,7 +88,7 @@
                     }
                     
                     consoleOutput.appendChild(p);
-                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                    scrollToBottom();
                     i++;
                     
                     let delay = line.type === 'command' ? 1000 : (Math.random() * 150 + 50);
@@ -96,13 +101,16 @@
                     finalPrompt.className = 'prompt';
                     finalPrompt.innerHTML = kaliPrompt + '<span class="cursor-blink"></span>';
                     consoleOutput.appendChild(finalPrompt);
-                    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                    scrollToBottom();
                     
                     setTimeout(() => {
                         window.location.href = targetFile;
                     }, 2000);
                 }
             }
+
+            // Garder le scroll en bas si la fenêtre est redimensionnée
+            window.addEventListener('resize', scrollToBottom);
 
             addLine();
             
