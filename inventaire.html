@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAS - Inventaire (Niv 3)</title>
+
     <script>
         const REQUIRED_LEVEL = 3;
     </script>
     <script src="security.js"></script>
+
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,24 +17,80 @@
 </head>
 <body>
     <main class="terminal">
-        <h1>INVENTAIRE GLOBAL<span class="blinker">_</span></h1>
+        <h1>INVENTAIRE (NIV 3)<span class="blinker">_</span></h1>
         
-        <p class="status">ACCES: <span class="restricted" id="inventory-name-display"></span> :: NIVEAU 3</p>
+        <p class="status">STATUS: <span class="secure">DECRYPTED</span> :: ACCES: <span class="restricted" id="agent-name-display"></span></p>
 
-        <div class="report-content">
-            <h2>Ajouter/Modifier Item</h2>
-            <form id="add-item-form" class="inventory-form">
-                <input type="text" name="name" placeholder="Nom de l'Item" required>
-                <input type="text" name="category" placeholder="Catégorie (Ex: ARMES, VEHICULES)" required>
-                <input type="number" name="quantity" placeholder="Quantité" min="0" required>
-                <input type="hidden" name="id" id="item-id-hidden"> 
-                <button type="submit" id="submit-button">AJOUTER</button>
+        <div class="report-content" id="inventory-container">
+            <p>[CHARGEMENT DE L'INVENTAIRE...]</p>
+        </div>
+
+        <div class="report-content" id="forms-container">
+            <h3 class="category-title" id="form-title-add">//: AJOUTER UN NOUVEL OBJET</h3>
+            <form id="add-item-form" class="form-grid">
+                
+                <div class="form-group">
+                    <label for="add-category">Catégorie</label>
+                    <input type="text" id="add-category" name="category" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-item-name">Nom de l'objet</label>
+                    <input type="text" id="add-item-name" name="item_name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-serial">N° de série</label>
+                    <input type="text" id="add-serial" name="serial_number" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="add-status">Statut initial</label>
+                    <select id="add-status" name="status" class="form-select" required>
+                        <option value="Opérationnel">Opérationnel</option>
+                        <option value="Stock">Stock</option>
+                        <option value="En maintenance">En maintenance</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="form-button full-width">&gt;&gt; AJOUTER L'OBJET</button>
+                <p id="add-form-message" class="form-message full-width"></p>
             </form>
 
-            <div class="inventory-list" id="inventory-container">
-                <p style="color: #00ff00;">[CHARGEMENT DE L'INVENTAIRE...]</p>
-            </div>
-            
+            <h3 class="category-title" id="form-title-update">//: METTRE À JOUR UN OBJET</h3>
+            <form id="update-item-form" class="assignment-form">
+                
+                <label for="update-item-select">//: 1. SÉLECTIONNER L'OBJET</label>
+                <select id="update-item-select" name="itemId" class="form-select" required>
+                    <option value="">-- En attente de l'API... --</option>
+                </select>
+                
+                <label for="update-agent-select">//: 2. ASSIGNER À</label>
+                <select id="update-agent-select" name="agentName" class="form-select" required>
+                    <option value="">-- En attente de l'API... --</option>
+                </select>
+
+                <label for="update-status-select">//: 3. CHANGER STATUT</label>
+                <select id="update-status-select" name="status" class="form-select" required>
+                    <option value="Opérationnel">Opérationnel</option>
+                    <option value="Stock">Stock</option>
+                    <option value="En maintenance">En maintenance</option>
+                    <option value="Perdu">Perdu</option>
+                </select>
+                
+                <button type="submit" class="form-button">&gt;&gt; CONFIRMER LA MISE À JOUR</button>
+                <p id="update-form-message" class="form-message"></p>
+            </form>
+
+            <h3 class="category-title" id="form-title-delete">//: SUPPRIMER UN OBJET (IRRÉVERSIBLE)</h3>
+            <form id="delete-item-form" class="assignment-form">
+                
+                <label for="delete-item-select">//: SÉLECTIONNER L'OBJET À SUPPRIMER</label>
+                <select id="delete-item-select" name="itemId" class="form-select" required>
+                    <option value="">-- En attente de l'API... --</option>
+                </select>
+                
+                <button type="submit" class="form-button delete">&gt;&gt; SUPPRIMER DÉFINITIVEMENT</button>
+                <p id="delete-form-message" class="form-message"></p>
+            </form>
+
         </div>
 
         <footer class="portal-footer">
@@ -40,157 +98,187 @@
         </footer>
     </main>
 
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('inventory-container');
-            const form = document.getElementById('add-item-form');
-            const submitButton = document.getElementById('submit-button');
-            const inventoryName = localStorage.getItem('sas_user') || 'ADMIN';
-            document.getElementById('inventory-name-display').textContent = inventoryName;
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
+            document.getElementById('agent-name-display').textContent = agentName;
+            const inventoryContainer = document.getElementById('inventory-container');
+            
+            const updateItemSelect = document.getElementById('update-item-select');
+            const updateAgentSelect = document.getElementById('update-agent-select');
+            const deleteItemSelect = document.getElementById('delete-item-select');
 
-            // Fonction pour charger et afficher l'inventaire
-            async function loadInventory() {
-                container.innerHTML = '<p style="color: #00ff00;">[CHARGEMENT DE L\'INVENTAIRE...]</p>';
+            async function fetchAndDisplayInventory() {
                 try {
-                    // --- MODIFICATION ICI : Appel à la nouvelle API READ (Inventaire) ---
-                    const inventoryResponse = await fetch('/api/read?resource=inventory');
-                    const inventoryData = await inventoryResponse.json();
+                    // MODIFIÉ : Utilise l'API READ
+                    const response = await fetch('/api/read?resource=inventory');
+                    const data = await response.json();
+                    if (!data.items) throw new Error('Données d\'inventaire non reçues');
 
-                    if (!inventoryData.items) throw new Error('Données d\'inventaire non reçues');
+                    inventoryContainer.innerHTML = '';
                     
-                    // --- MODIFICATION ICI : Appel à la nouvelle API READ (Agents pour la logistique) ---
-                    const agentsResponse = await fetch('/api/read?resource=agents');
-                    const agentsData = await agentsResponse.json();
-                    
-                    if (!agentsData.agents) throw new Error('Données d\'agents non reçues');
-                    
-                    // Créer un dictionnaire de noms d'agents par ID
-                    const agentNames = agentsData.agents.reduce((acc, agent) => {
-                        acc[agent.id] = agent.name;
-                        return acc;
-                    }, {});
+                    let htmlToInsert = '';
+                    let currentCategory = '';
+                    let itemOptionsHTML = '<option value="">-- Sélectionner un objet --</option>';
 
-                    let inventoryHTML = `
-                        <div class="inventory-header">
-                            <span>ID</span>
-                            <span>ITEM</span>
-                            <span>CATÉGORIE</span>
-                            <span>QTE</span>
-                            <span>MAJ PAR</span>
-                            <span>ACTIONS</span>
-                        </div>
-                        <div class="inventory-grid">
-                    `;
-                    
-                    inventoryData.items.forEach(item => {
-                        // Utiliser le dictionnaire pour le nom
-                        const modifierName = item.modified_by_agent_id ? agentNames[item.modified_by_agent_id] || 'INCONNU' : 'N/A';
-                        
-                        inventoryHTML += `
-                            <span data-label="ID">${item.id}</span>
-                            <span data-label="ITEM">${item.name}</span>
-                            <span data-label="CATÉGORIE">${item.category}</span>
-                            <span data-label="QTE">${item.quantity}</span>
-                            <span data-label="MAJ PAR">${modifierName}</span>
-                            <span data-label="ACTIONS">
-                                <button class="form-button edit-item-btn" data-id="${item.id}" data-name="${item.name}" data-category="${item.category}" data-quantity="${item.quantity}">MOD</button>
-                                <button class="form-button delete-item-btn" data-id="${item.id}">SUPPR</button>
-                            </span>
+                    data.items.forEach(item => {
+                        if (item.category !== currentCategory) {
+                            if (currentCategory !== '') htmlToInsert += `</ul>`;
+                            currentCategory = item.category;
+                            htmlToInsert += `<h3 class="category-title">//: ${currentCategory.toUpperCase()}</h3><ul class="inventory-list">`;
+                        }
+                        htmlToInsert += `
+                            <li>
+                                <span class="item-name">${item.item_name}</span>
+                                <ul class="item-details">
+                                    <li><span class="detail-label">N° de série:</span> ${item.serial_number || 'N/A'}</li>
+                                    <li><span class="detail-label">Attribution:</span> ${item.assigned_to || 'Aucune'}</li>
+                                    <li><span class="detail-label">Statut:</span> ${item.status}</li>
+                                </ul>
+                            </li>
                         `;
+                        itemOptionsHTML += `<option value="${item.id}">${item.item_name} (N°: ${item.serial_number})</option>`;
                     });
-
-                    inventoryHTML += `</div>`;
-                    container.innerHTML = inventoryHTML;
+                    htmlToInsert += `</ul>`;
+                    
+                    inventoryContainer.innerHTML = htmlToInsert;
+                    updateItemSelect.innerHTML = itemOptionsHTML;
+                    deleteItemSelect.innerHTML = itemOptionsHTML;
 
                 } catch (error) {
                     console.error('Erreur:', error);
-                    container.innerHTML = `<p style="color: #ff4141;">[ERREUR CRITIQUE DE CONNEXION] : ${error.message}</p>`;
+                    inventoryContainer.innerHTML = '<p>[ERREUR DE CONNEXION AU MAINFRAME]</p>';
                 }
             }
-            
-            // ... (Le reste du script pour l'ajout, la modification et la suppression reste inchangé) ...
-            
-            // Événement d'édition (Remplit le formulaire)
-            container.addEventListener('click', (e) => {
-                if (e.target.classList.contains('edit-item-btn')) {
-                    const button = e.target;
-                    document.querySelector('#item-id-hidden').value = button.dataset.id;
-                    document.querySelector('input[name="name"]').value = button.dataset.name;
-                    document.querySelector('input[name="category"]').value = button.dataset.category;
-                    document.querySelector('input[name="quantity"]').value = button.dataset.quantity;
-                    submitButton.textContent = 'MODIFIER';
-                }
-                
-                // Événement de suppression (Appel à /api/delete-inventory)
-                if (e.target.classList.contains('delete-item-btn')) {
-                    const itemId = e.target.dataset.id;
-                    if (!confirm(`Confirmer la suppression de l'item ID ${itemId} ?`)) {
-                        return;
-                    }
+
+            async function fetchAgentsForForm() {
+                try {
+                    // MODIFIÉ : Utilise l'API READ
+                    const response = await fetch('/api/read?resource=agents');
+                    const data = await response.json();
+                    if (!data.agents) throw new Error('Agents non reçus');
+
+                    let agentOptionsHTML = '<option value="Réserve SAS">-- Réserve SAS --</option>';
+                    data.agents.forEach(agent => {
+                        agentOptionsHTML += `<option value="${agent.name}">${agent.name} (Niv ${agent.level})</option>`;
+                    });
                     
-                    fetch('/api/delete-inventory', {
+                    updateAgentSelect.innerHTML = agentOptionsHTML;
+
+                } catch (error) {
+                    console.error('Erreur agents:', error);
+                    updateAgentSelect.innerHTML = '<option value="">Erreur API</option>';
+                }
+            }
+
+            const addForm = document.getElementById('add-item-form');
+            const addMessageEl = document.getElementById('add-form-message');
+            
+            addForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                addMessageEl.textContent = 'Ajout en cours...';
+                addMessageEl.className = 'form-message';
+                
+                try {
+                    const formData = new FormData(addForm);
+                    const data = Object.fromEntries(formData.entries());
+
+                    const response = await fetch('/api/add-item', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ itemId: parseInt(itemId) })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            loadInventory();
-                            alert('Item supprimé.');
-                        } else {
-                            alert(`Erreur: ${data.error}`);
-                        }
-                    })
-                    .catch(error => alert(`Erreur serveur: ${error.message}`));
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+                    
+                    addMessageEl.textContent = 'Objet ajouté ! Mise à jour...';
+                    addMessageEl.className = 'form-message success';
+                    addForm.reset();
+                    
+                    setTimeout(fetchAndDisplayInventory, 500);
+
+                } catch (error) {
+                    addMessageEl.textContent = `Erreur: ${error.message}`;
+                    addMessageEl.className = 'form-message error';
                 }
             });
 
-            // Événement de soumission (Appel à /api/add-inventory)
-            form.addEventListener('submit', (e) => {
+            const updateForm = document.getElementById('update-item-form');
+            const updateMessageEl = document.getElementById('update-form-message');
+            
+            updateForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                updateMessageEl.textContent = 'Mise à jour en cours...';
+                updateMessageEl.className = 'form-message';
+
+                try {
+                    const data = {
+                        itemId: updateForm.itemId.value,
+                        agentName: updateForm.agentName.value,
+                        status: updateForm.status.value
+                    };
+                    
+                    const response = await fetch('/api/update-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+                    
+                    updateMessageEl.textContent = 'Objet mis à jour ! Mise à jour...';
+                    updateMessageEl.className = 'form-message success';
+                    
+                    setTimeout(fetchAndDisplayInventory, 500);
+
+                } catch (error) {
+                    updateMessageEl.textContent = `Erreur: ${error.message}`;
+                    updateMessageEl.className = 'form-message error';
+                }
+            });
+
+            const deleteForm = document.getElementById('delete-item-form');
+            const deleteMessageEl = document.getElementById('delete-form-message');
+            
+            deleteForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                const itemId = document.querySelector('#item-id-hidden').value;
-                const endpoint = itemId ? '/api/update-inventory' : '/api/add-inventory';
+                const itemId = deleteForm.itemId.value;
                 
-                const formData = {
-                    name: form.name.value,
-                    category: form.category.value,
-                    quantity: parseInt(form.quantity.value),
-                    agentId: parseInt(localStorage.getItem('sas_agent_id')), // Assurez-vous que l'ID est stocké
-                };
-                
-                if (itemId) {
-                    formData.itemId = parseInt(itemId);
+                if (!confirm("Voulez-vous vraiment supprimer cet objet ?\nCette action est IRRÉVERSIBLE.")) {
+                    return;
                 }
 
-                submitButton.textContent = '...';
+                deleteMessageEl.textContent = 'Suppression en cours...';
+                deleteMessageEl.className = 'form-message';
 
-                fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        loadInventory();
-                        form.reset();
-                        document.querySelector('#item-id-hidden').value = '';
-                        submitButton.textContent = 'AJOUTER';
-                    } else {
-                        alert(`Erreur: ${data.error}`);
-                        submitButton.textContent = 'ERREUR';
-                    }
-                })
-                .catch(error => {
-                    alert(`Erreur serveur: ${error.message}`);
-                    submitButton.textContent = 'ERREUR';
-                });
+                try {
+                    const response = await fetch('/api/delete-item', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ itemId })
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+                    
+                    deleteMessageEl.textContent = 'Objet supprimé ! Mise à jour...';
+                    deleteMessageEl.className = 'form-message success';
+                    
+                    setTimeout(fetchAndDisplayInventory, 500);
+
+                } catch (error) {
+                    deleteMessageEl.textContent = `Erreur: ${error.message}`;
+                    deleteMessageEl.className = 'form-message error';
+                }
             });
-            
-            loadInventory();
+
+            fetchAndDisplayInventory();
+            fetchAgentsForForm();
         });
     </script>
 </body>
