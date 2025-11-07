@@ -1,17 +1,18 @@
 {
-  "type": "module",
-  "name": "mon-site-vercel",
+  "name": "elite-aim-trainer",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Un jeu d'entraînement au clic style hacker",
+  "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@vercel/postgres": "^0.9.0",
-    "bcrypt": "^6.0.0"
+    "@vercel/postgres": "^0.7.2"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
