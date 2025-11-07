@@ -6,20 +6,32 @@
     <title>Dossier Agent :: Graves [ENCRYPTED]</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style-nyx.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        /* Suppression de l'effet scanline pour cette page spécifique si nécessaire,
-           sinon la classe 'scanline' peut simplement être retirée du body.
-           Ici, on surcharge pour s'assurer qu'elle ne s'affiche pas. */
-        .scanline::before, .scanline::after {
-            display: none !important;
+        .font-tech {
+            font-family: 'Share Tech Mono', monospace;
         }
         body {
-            background-color: #000000 !important; /* Fond noir forcé */
+            background-color: #000000 !important;
+            background-image: radial-gradient(rgba(0, 150, 0, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes scan {
+            0% { background-position: 0 -100vh; }
+            100% { background-position: 0 100vh; }
+        }
+        .animate-scan {
+            animation: scan 3s linear infinite;
+        }
+        .cursor-blink::after {
+            content: '_';
+            animation: blink 1s step-start infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
         }
     </style>
 </head>
@@ -115,13 +127,10 @@
                     <span class="mr-2 animate-pulse">🔒</span> [SECTION 03 : HISTORIQUE]
                 </h2>
                 <div class="bg-black/50 p-4 rounded border border-red-900/30 font-mono text-sm text-red-400/60 relative min-h-[150px]">
-                    <div class="absolute inset-0 flex items-center justify-center z-10">
-                         
-                    </div>
-                    <p class="blur-[3px] select-none opacity-40 break-all">
+                    <p class="blur-[1px] select-none opacity-70 break-all">
                          44 6f 73 73 69 65 72 20 63 6f 6e 66 69 64 65 6e 74 69 65 6c 2e 20 48 69 73 74 6f 69 72 65 20 74 72 6f 70 20 63 6f 6d 70 6c 69 71 75 c3 a9 65 20 65 74 20 67 72 61 76 65 20 70 6f 75 72 20 c3 aa 74 72 65 20 64 c3 a9 63 72 69 74 65 2e
                         <br><br>
-                        
+                         [ENCRYPTED DATA STREAM - DO NOT ATTEMPT TO DECRYPT WITHOUT AUTHORIZATION]
                     </p>
                 </div>
             </section>
@@ -131,20 +140,43 @@
                 <h2 class="font-tech text-2xl text-yellow-500 mb-4 flex items-center">
                     <span class="mr-2">⚠️</span> [SECTION 04 : COMPÉTENCES & OPÉRATIONS]
                 </h2>
-                <div class="bg-black/50 p-4 rounded border border-yellow-900/30 font-mono text-sm text-yellow-600/80">
-                     <p class="mb-3 text-yellow-500">[ ! ] ATTENTION : CLÉ DE DÉCHIFFREMENT MANQUANTE.</p>
-                    <ul class="space-y-2 opacity-50">
-                        <li class="flex items-center">
-                            <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
-                            [OPÉRATION: <span class="data-glitched-random w-20"></span>] 
-                            <span class="ml-auto text-xs">[CORROMPU]</span>
-                        </li>
-                         <li class="flex items-center">
-                            <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
-                             [OPÉRATION: <span class="data-glitched-random w-24"></span>] 
-                            <span class="ml-auto text-xs">[CORROMPU]</span>
-                        </li>
-                    </ul>
+                
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none overflow-hidden">
+                         <div class="border-4 border-red-600/40 text-red-600/40 font-black text-3xl md:text-5xl p-4 -rotate-12 tracking-widest opacity-80 font-tech uppercase backdrop-blur-[1px]">
+                             CONFIDENTIEL
+                         </div>
+                    </div>
+
+                    <div class="bg-black/50 p-4 rounded border border-yellow-900/30 font-mono text-sm text-yellow-600/80 blur-[3px] select-none transition-all duration-700 hover:blur-[2px]">
+                         <p class="mb-3 text-yellow-500 opacity-50">[ ! ] LISTE OPÉRATIONNELLE REQUIERT CLÉ RSA-4096.</p>
+                        <ul class="space-y-2 opacity-40">
+                            <li class="flex items-center">
+                                <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
+                                [OPÉRATION: <span class="data-glitched-random w-24"></span>]
+                            </li>
+                             <li class="flex items-center">
+                                <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
+                                 [OPÉRATION: <span class="data-glitched-random w-20"></span>]
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
+                                 [CODE: NIGHTFALL - <span class="data-glitched-random w-16"></span>]
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
+                                 [EXTRACTION CIBLE: <span class="data-glitched-random w-24"></span>]
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
+                                 [PROTOCOLE FANTÔME ACTIVÉ]
+                            </li>
+                            <li class="flex items-center">
+                                <span class="w-4 h-4 mr-2 inline-block bg-red-900/50 rounded-full border border-red-500/50"></span> 
+                                 [OPÉRATION: <span class="data-glitched-random w-20"></span>]
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </section>
 
@@ -153,9 +185,9 @@
                     SESSION ID: <span class="data-glitched-random"></span><br>
                     STATUS: DISCONNECTED_
                 </div>
-                <a href="../database.html" class="font-tech text-sm bg-green-950 hover:bg-green-900 text-green-400 px-4 py-2 border border-green-700 rounded transition-all duration-300 hover:shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+                <button class="font-tech text-sm bg-green-950 hover:bg-green-900 text-green-400 px-4 py-2 border border-green-700 rounded transition-all duration-300 hover:shadow-[0_0_15px_rgba(74,222,128,0.2)] opacity-50 cursor-not-allowed">
                     << RETURN_TO_DATABASE
-                </a>
+                </button>
             </div>
 
         </div>
@@ -176,13 +208,14 @@
 
             setInterval(() => {
                 glitchElements.forEach(el => {
-                    
-                    let randomLength;
-                    if (el.classList.contains('w-20')) randomLength = 8;
-                    else if (el.classList.contains('w-24')) randomLength = 12;
-                    else randomLength = Math.floor(Math.random() * 10) + 8; 
-                    
-                    el.textContent = generateRandomString(randomLength);
+                    if (Math.random() > 0.85) { 
+                        let randomLength;
+                        if (el.classList.contains('w-16')) randomLength = 6;
+                        else if (el.classList.contains('w-20')) randomLength = 8;
+                        else if (el.classList.contains('w-24')) randomLength = 12;
+                        else randomLength = Math.floor(Math.random() * 10) + 8; 
+                        el.textContent = generateRandomString(randomLength);
+                    }
                 });
             }, 80); 
         });
