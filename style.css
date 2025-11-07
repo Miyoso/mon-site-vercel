@@ -904,3 +904,37 @@ h1 {
     color: #eaeaea; /* AJOUT : Force le texte en blanc/gris */
     border: 1px solid #333; /* AJOUT : Ajoute une bordure visible */
 }
+
+
+.logs-grid-header, .logs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1.5fr 2fr;
+    gap: 10px;
+    padding: 0 1rem;
+    font-size: 0.9rem;
+}
+
+.logs-grid-header {
+    color: #00ff00;
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.logs-grid span {
+    padding: 0.2rem 0;
+    word-break: break-all;
+}
+
+.log-success {
+    color: #00e600;
+    font-weight: bold;
+}
+.log-failure {
+    color: #ff6666;
+    font-weight: bold;
+}
+.log-timestamp {
+    color: #888;
+}

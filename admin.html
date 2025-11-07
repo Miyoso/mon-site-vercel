@@ -36,15 +36,15 @@
             const adminName = localStorage.getItem('sas_user') || 'ADMIN';
             document.getElementById('admin-name-display').textContent = adminName;
 
-            // --- FONCTION: Construit le HTML pour la liste ---
+       
             function buildAgentListHTML(agents) {
                 let html = '';
                 agents.forEach(agent => {
                     
-                    // --- FILTRE MODIFIÉ : N'affiche que les niveaux 1, 2, 3 ---
+                   
                     if (agent.level >= 4) return;
                     
-                    const isDisabled = false; // Plus besoin, on filtre
+                    const isDisabled = false; 
                     
                     html += `
                         <div class="admin-agent-row" id="row-agent-${agent.id}">
@@ -66,7 +66,7 @@
                 return html;
             }
 
-            // --- CHARGEMENT INITIAL (ET DU LOGIC) ---
+
             try {
                 const response = await fetch('/api/get-agents');
                 const data = await response.json();
@@ -80,10 +80,10 @@
                 container.innerHTML = `<p style="color: #ff4141;">[ERREUR CRITIQUE DE CONNEXION]</p>`;
             }
 
-            // --- GESTION DES ÉVÉNEMENTS (Submit et Click) ---
+            
             container.addEventListener('click', async (e) => {
                 
-                // --- Logique de SUPPRESSION (Click) ---
+                
                 if (e.target.classList.contains('delete-agent-btn')) {
                     const button = e.target;
                     const agentId = button.getAttribute('data-agent-id');
