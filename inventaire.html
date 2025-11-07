@@ -112,7 +112,7 @@
             // --- FONCTION 1 : AFFICHER L'INVENTAIRE ---
             async function fetchAndDisplayInventory() {
                 try {
-                    const response = await fetch('/api/get-inventory');
+                    const response = await fetch('/api/read?resource=inventory');
                     const data = await response.json();
                     if (!data.items) throw new Error('Données d\'inventaire non reçues');
 
@@ -153,10 +153,10 @@
                 }
             }
 
-            // --- FONCTION 2 : REMPLIR LA LISTE DES AGENTS ---
+            -
             async function fetchAgentsForForm() {
                 try {
-                    const response = await fetch('/api/get-agents');
+                    const response = await fetch('/api/read?resource=agents');
                     const data = await response.json();
                     if (!data.agents) throw new Error('Agents non reçus');
 
@@ -173,7 +173,7 @@
                 }
             }
 
-            // --- FONCTION 3 : GÉRER LE FORMULAIRE "ADD ITEM" ---
+          
             const addForm = document.getElementById('add-item-form');
             const addMessageEl = document.getElementById('add-form-message');
             

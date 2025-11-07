@@ -92,7 +92,7 @@
                 const warningListEl = document.getElementById('warning-notes-list');
 
                 try {
-                    const response = await fetch(`../api/get-agent-details?username=${user}`);
+                    const response = await fetch(\`../api/read?resource=agent-details&username=${user}`);
                     const data = await response.json();
 
                     if (!response.ok) throw new Error(data.error);

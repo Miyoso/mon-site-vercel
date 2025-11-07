@@ -66,8 +66,8 @@
 
             try {
                 const [agentsResponse, notesResponse] = await Promise.all([
-                    fetch('/api/get-agents'),
-                    fetch('/api/get-notes')
+                    fetch('/api/read?resource=agents'),
+                    fetch('/api/read?resource=notes')
                 ]);
                 
                 const agentsData = await agentsResponse.json();

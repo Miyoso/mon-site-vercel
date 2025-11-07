@@ -68,7 +68,7 @@
             const jiBox = document.getElementById('agent-box-ji');
 
             try {
-                const response = await fetch('/api/get-agents');
+                const response = await fetch('/api/read?resource=agents');
                 const data = await response.json();
 
                 if (data.agents && data.agents.length > 0) {

@@ -36,7 +36,7 @@
             document.getElementById('log-access-display').textContent = adminName;
 
             try {
-                const response = await fetch('/api/get-logs');
+                const response = await fetch('/api/read?resource=logs');
                 const data = await response.json();
 
                 if (!data.logs) throw new Error('Données de logs non reçues.');
