@@ -17,8 +17,23 @@
 <body>
 
     <div class="security-container">
+
         <div class="prompt-header">
             ┌──(<span id="prompt-user" class="username">[LOADING]</span><span class="host">㉿sas-mainframe</span>)-[<span class="path">~/profil</span>]
+        </div>
+
+        <p class="status" id="agent-status-display">AGENT: [CHARGEMENT...]</p>
+
+        <div class="warning-notes-container">
+            <h1>
+                <span class="prompt-end">└─<span class="blink">#</span></span>
+                dossier_avertissement
+            </h1>
+            <p class="status" id="warning-level-display">NIVEAU D'AVERTISSEMENT: [CHARGEMENT...]</p>
+            
+            <ul class="warning-notes-list" id="warning-notes-list">
+                <li class="warning-note-empty">[CHARGEMENT DES NOTES...]</li>
+            </ul>
         </div>
 
         <h1>
@@ -26,22 +41,39 @@
             change_passphrase
         </h1>
 
-        <p class="status" id="agent-status-display">AGENT: [CHARGEMENT...]</p>
-        
-        <div class="warning-notes-container">
-            <h1>
-                <span class="prompt-end">└─<span class="blink">#</span></span>
-                dossier_avertissement
-            </h1>
-            <p class="status" id="warning-level-display">NIVEAU D'AVERTISSEMENT: [CHARGEMENT...]</p>
-            <ul class="warning-notes-list" id="warning-notes-list">
-                <li class="warning-note-empty">[CHARGEMENT DES NOTES...]</li>
-            </ul>
+        <div class="alert-box">
+            <span class="quote">"Attention, mettez un mot de passe différent de vos mots de passe habituels."</span>
+            <span class="signature">-- Je vois vos mots de passe -- Ada :)</span>
         </div>
-        
+
+        <form id="change-password-form">
+            <div class="form-group">
+                <label for="new-password">
+                    <span class="prompt-end" style="color: #888;">&gt;</span>
+                    NOUVEAU MOT DE PASSE:
+                </label>
+                <input type="password" id="new-password" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">
+                    <span class="prompt-end" style="color: #888;">&gt;</span>
+                    CONFIRMER LE MOT DE PASSE:
+                </label>
+                <input type="password" id="confirm-password" class="form-input" required>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                &gt;&gt; Exécuter
+            </button>
+            
+            <p id="form-message" class="form-message"></p>
+        </form>
+
         <footer class="footer-link">
             <a href="../index.html">&lt;&lt; RETURN_TO_MAINFRAME</a>
         </footer>
+        
     </div> 
     
     <script>
@@ -51,23 +83,108 @@
             const level = localStorage.getItem('sas_level') || '0';
             
             document.getElementById('prompt-user').textContent = user.toLowerCase();
+            document.getElementById('agent-status-display').innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
             
             async function loadAgentDetails() {
                 const warningLevelEl = document.getElementById('warning-level-display');
                 const warningListEl = document.getElementById('warning-notes-list');
-                const agentStatusDisplay = document.getElementById('agent-status-display');
-                
+
                 try {
-                    // CORRECTION : Utilisation du chemin ABSOLU FIABLE
-                    const response = await fetch(`/api/read?resource=agent-details&username=${user}`);
+                   
+                    const response = await fetch(\`../api/read?resource=agent-details&username=${user}\`);
                     const data = await response.json();
 
-                    if (!response.ok) throw new Error(data.error || 'Erreur inconnue de l\'API');
+                    if (!response.ok) throw new Error(data.error);
 
-                    // Mettre à jour l'affichage STATUS (qui était en CHARGEMENT...)
-                    agentStatusDisplay.innerHTML = `AGENT: <span class="status-secure">${user}</span> :: ACCREDITATION: <span class="status-level">${level}</span>`;
+                    warningLevelEl.textContent = `NIVEAU D'AVERTISSEMENT: ${data.warningLevel}`;
 
+                    if (data.warningNotes.length > 0) {
+                        let notesHTML = '';
+                        data.warningNotes.forEach(note => {
+                            notesHTML += `
+                                <li class="warning-note-item">
+                                    <span class="warning-note-meta">
+                                        De: <span class="author">${note.author_name}</span> (Le ${new Date(note.created_at).toLocaleDateString()})
+                                    </span>
+                                    <p class="warning-note-text">${note.note_text}</p>
+                                </li>
+                            `;
+                        });
+                        warningListEl.innerHTML = notesHTML;
+                    } else {
+                        warningListEl.innerHTML = '<li class="warning-note-empty">Aucune note d\'avertissement dans votre dossier.</li>';
+                    }
+
+                } catch (error) {
+                    warningLevelEl.textContent = "NIVEAU D'AVERTISSEMENT: [ERREUR]";
+                    warningListEl.innerHTML = `<li class="warning-note-empty" style="color: #ff6666;">${error.message}</li>`;
+                }
+            }
+            
+            const passwordForm = document.getElementById('change-password-form');
+            const newPasswordEl = document.getElementById('new-password');
+            const confirmPasswordEl = document.getElementById('confirm-password');
+            const messageEl = document.getElementById('form-message');
+
+            function validatePassword(password) {
+                if (password.length < 5) {
+                    return "Erreur: Mot de passe trop court (5 min).";
+                }
+                const specialCharRegex = /[^A-Za-z0-9]/;
+                if (!specialCharRegex.test(password)) {
+                    return "Erreur: Doit contenir au moins 1 caractère spécial (!, @, #, $, etc.)";
+                }
+                return null;
+            }
+
+            passwordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                messageEl.textContent = 'MISE A JOUR EN COURS...';
+                messageEl.className = 'form-message';
+
+                const newPassword = newPasswordEl.value;
+                const confirmPassword = confirmPasswordEl.value;
+
+                if (newPassword !== confirmPassword) {
+                    messageEl.textContent = 'ERREUR: NON-CONCORDANCE';
+                    messageEl.className = 'form-message error';
+                    return;
+                }
+                
+                const validationError = validatePassword(newPassword);
+                if (validationError) {
+                    messageEl.textContent = validationError.toUpperCase();
+                    messageEl.className = 'form-message error';
+                    return;
+                }
+
+                try {
                     
+                    const response = await fetch('../api/change-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            username: user, 
+                            newPassword: newPassword 
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+                    
+                    messageEl.textContent = 'SUCCES! MOT DE PASSE MIS A JOUR.';
+                    messageEl.className = 'form-message success';
+                    newPasswordEl.value = '';
+                    confirmPasswordEl.value = '';
+
+                } catch (error) {
+                    messageEl.textContent = `ERREUR: ${error.message}`;
+                    messageEl.className = 'form-message error';
+                }
+            });
+
+            loadAgentDetails();
+        });
     </script>
 </body>
 </html>
