@@ -294,12 +294,23 @@
         }
 
         async function submitScoreToDB(pseudo, score) {
-            await fetch('/api/submit-score', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pseudo, score })
-            });
-        }
+    console.log(">> TENTATIVE D'ENVOI DU SCORE...", { pseudo, score });
+
+    const res = await fetch('/api/submit-score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pseudo, score })
+    });
+
+    
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Erreur serveur (${res.status}): ${errorText}`);
+    }
+
+    const responseData = await res.json();
+    console.log(">> RÉPONSE SERVEUR:", responseData);
+}
 
         function renderLeaderboard(data) {
             if (data.length === 0) {
