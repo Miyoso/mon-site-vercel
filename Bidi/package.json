@@ -1,0 +1,10 @@
+{
+  "name": "elite-aim-trainer",
+  "version": "1.0.0",
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "@vercel/postgres": "^0.7.2"
+  }
+}
