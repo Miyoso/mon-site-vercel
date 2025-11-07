@@ -11,15 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <style>
-        /* Styles spécifiques pour les liens secrets */
-        .link-secret {
-            cursor: pointer;
-            position: relative;
-        }
-        .link-secret:hover::after {
-            content: " [LOCKED]";
-            color: #ef4444; /* Rouge */
-        }
+        .link-secret { cursor: pointer; position: relative; }
+        .link-secret:hover::after { content: " [LOCKED]"; color: #ef4444; }
+        /* Animation simple pour le curseur */
+        .cursor-blink::after { content: '_'; animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body class="text-green-400 min-h-screen p-4 md:p-8 scanline bg-black">
@@ -31,7 +27,6 @@
         </header>
 
         <div class="p-6 md:p-8 space-y-8">
-            
             <div>
                 <span class="text-green-300">$</span> <span class="text-white">load --dossier=AGENT_BLACKWOOD_NYX</span>
                 <p class="text-cyan-400">... Chargement du dossier ...</p>
@@ -73,7 +68,7 @@
                     <div>
                         <h3 class="text-xl text-green-400 font-tech mb-2">// QUALITÉS (ASSETS)</h3>
                         <ul class="list-none space-y-1">
-                            <li>Loyale</li><li>Perspicace</li><li>Disciplinée</li><li>Analytique</li>
+                            <li>Loyale</li><li>Disciplinée</li>
                         </ul>
                     </div>
                     <div>
@@ -109,12 +104,10 @@
                 <h2 class="font-tech text-2xl text-yellow-400 mb-4">[SECTION 04 : COMPÉTENCES & OPÉRATIONS - NIVEAU 7 REQUIS]</h2>
                 <div class="bg-black/30 p-4 rounded">
                     <p class="text-yellow-400 mb-2">[ACCÈS VERROUILLÉ - CLÉ DE DÉCHIFFREMENT MANQUANTE]</p>
-                    
                     <p class="encrypted text-sm select-none font-mono text-yellow-700/50">
                         [FICHIER: operations_datahaven.log]...
                         2f 2f 20 43 6f 6d 70 65 74 65 6e 63 65 73 20...
-                        <span id="trigger-secret" >[FICHIER: analyse_psy_cortex.dat]</span>...
-                        ...<span class="data-glitched-random"></span>...
+                        <span id="trigger-secret">[FICHIER: analyse_psy_cortex.dat]</span>...
                         ...<span class="data-glitched-random"></span>...
                         [FICHIER: contacts_actifs.db] (Verrouillé)...
                         01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -125,83 +118,96 @@
              <div>
                 <span class="text-green-300">$</span> <span class="text-white">exit</span>
                 <p class="text-red-500">... Déconnexion ...</p>
-                
                 <div class="mt-8 text-center border-t border-green-700/50 pt-4">
                     <a href="../database.html" class="font-tech text-green-400 hover:text-white hover:bg-green-700 p-2 transition-all inline-block">
                         &lt;&lt; RETURN_TO_DATABASE
                     </a>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <div id="custom-alert-overlay" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+        <div class="border-2 border-red-600 bg-black p-6 max-w-md w-full font-mono shadow-[0_0_30px_rgba(220,38,38,0.3)]">
+            <div class="text-red-500 text-xl mb-4 font-bold flex items-center">
+                <span class="animate-pulse mr-2">⚠️</span> [ALERTE SÉCURITÉ]
+            </div>
+            <p id="custom-alert-message" class="text-red-400 mb-8 text-lg leading-relaxed">
+                </p>
+            <div class="text-right">
+                <button id="custom-alert-ok" class="bg-red-950 hover:bg-red-900 text-red-400 border border-red-600 px-6 py-2 transition-all duration-150 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)] active:scale-95">
+                    > CONFIRMER_
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- EFFETS GLITCH (inchangé) ---
+           
             const glitchElements = document.querySelectorAll('.data-glitched-random');
             const chars = 'ABCDEF0123456789<>!@#$%^&*()_+[]{}|;:,./?';
-
             setInterval(() => {
                 glitchElements.forEach(el => {
                     el.textContent = Array.from({length: Math.floor(Math.random() * 10) + 8}, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
                 });
             }, 150);
 
-            // --- GESTION DU CLIC SUR LE LIEN SECRET ---
+            // --- FONCTION ALERT PERSONNALISÉE ---
+            const overlay = document.getElementById('custom-alert-overlay');
+            const messageEl = document.getElementById('custom-alert-message');
+            const okBtn = document.getElementById('custom-alert-ok');
+
+            function showCustomAlert(msg) {
+                messageEl.textContent = msg;
+                overlay.classList.remove('hidden');
+                return new Promise(resolve => {
+                    okBtn.onclick = () => {
+                        overlay.classList.add('hidden');
+                        resolve();
+                    };
+                });
+            }
+
+           
             const trigger = document.getElementById('trigger-secret');
-            
             if (trigger) {
                 trigger.addEventListener('click', async (e) => {
-                    e.preventDefault(); 
-
-                    const password = prompt(">> ACCÈS RESTREINT NIVEAU 7 <<\nVEUILLEZ ENTRER LE CODE DE DÉCHIFFREMENT :");
+                    e.preventDefault();
+                    
+                    
+                    const password = prompt(">> ENTRÉE SÉCURISÉE NIVEAU 7 <<\nVEUILLEZ SAISIR LE CODE D'ACCÈS :");
                     
                     if (password) {
-                        // Feedback visuel style terminal pendant le chargement
                         document.body.innerHTML = `
-                            <div style="color:#0f0; font-family:'Share Tech Mono', monospace; padding:20px; background:#000; height:100vh; font-size:1.2rem;">
-                                > INITIALISATION DU PROTOCOLE DE SÉCURITÉ...<br>
-                                > ENVOI DU HASH D'AUTHENTIFICATION...<br>
-                                <span class="animate-pulse">_</span>
+                            <div style="color:#0f0; font-family:'Roboto Mono', monospace; padding:20px; background:#000; height:100vh; font-size:1.2rem;">
+                                > CONNEXION AU TERMINAL CENTRAL...<br>
+                                > VÉRIFICATION DU HASH...<br>
+                                <span class="cursor-blink"></span>
                             </div>`;
 
                         try {
-                            // APPEL À L'API UNIFIÉE
-                            // On spécifie mode: 'file_access' pour que le serveur sache quoi faire
                             const response = await fetch('/api/login', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ 
-                                    mode: 'file_access', 
-                                    password: password 
-                                })
+                                body: JSON.stringify({ mode: 'file_access', password: password })
                             });
-
                             const data = await response.json();
 
                             if (response.ok && data.success && data.redirect) {
-                                // SUCCÈS : Le serveur a validé le mot de passe
                                 document.body.innerHTML = `
-                                    <div style="color:#0f0; font-family:'Share Tech Mono', monospace; padding:20px; background:#000; height:100vh; font-size:1.2rem;">
-                                        > AUTHENTIFICATION RÉUSSIE.<br>
-                                        > DÉVERROUILLAGE DU FICHIER [analyse_psy_cortex.dat]...<br>
-                                        > REDIRECTION EN COURS...
+                                    <div style="color:#0f0; font-family:'Roboto Mono', monospace; padding:20px; background:#000; height:100vh; font-size:1.2rem;">
+                                        > ACCÈS AUTORISÉ.<br>
+                                        > CHARGEMENT DU FICHIER...
                                     </div>`;
-                                
-                                setTimeout(() => {
-                                    window.location.href = data.redirect;
-                                }, 1500);
-
+                                setTimeout(() => window.location.href = data.redirect, 1500);
                             } else {
-                                // ÉCHEC : Mot de passe incorrect
-                                alert("!!! ACCÈS REFUSÉ !!!\nTERMINAL RÉPOND : " + (data.message || "CODE INVALIDE"));
-                                window.location.reload(); // Recharge la page pour revenir à l'état normal
+                                await showCustomAlert("ERREUR : " + (data.message || "CODE INVALIDE"));
+                                window.location.reload();
                             }
-
                         } catch (error) {
-                            console.error('Erreur critique:', error);
-                            alert("ERREUR CRITIQUE : IMPOSSIBLE DE JOINDRE LE SERVEUR CENTRAL.");
+                            console.error(error);
+                            await showCustomAlert("ERREUR CRITIQUE : TERMINAL HORS LIGNE.");
                             window.location.reload();
                         }
                     }
