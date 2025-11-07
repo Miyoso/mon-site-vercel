@@ -7,19 +7,18 @@
     <link rel="stylesheet" href="SecretNyx.css">
 
     <style>
-        /* On met ça ici pour être SÛR que Vercel le prenne en compte */
         .secret-line {
             width: 4px;
             height: 0px;
-            background-color: #0f0; /* Vert fluo bien visible */
+            background-color: #0f0;
             margin-top: 10px;
             opacity: 0;
             transition: height 2s ease-out, opacity 0.5s ease-out;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7); /* Grosse lueur pour bien la voir */
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
         }
 
         .secret-line.active {
-            height: 150px !important; /* !important force l'affichage */
+            height: 150px !important;
             opacity: 1 !important;
         }
     </style>
@@ -63,18 +62,28 @@
                 const isPlaying = audioButton.classList.contains('playing');
 
                 if (isPlaying) {
+                    // --- STOP ---
                     audioPlayer.pause(); 
                     audioButton.classList.remove('playing');
                     icon.textContent = '\u{1F4D5}';
                     teaserText.textContent = '> LECTURE SUSPENDUE_';
                     lineContainer.innerHTML = '';
-                    clearTimeout(lineTimer);
-                    secretLine.classList.remove('active');
+                    
+                    // ON NE CACHE PLUS LA LIGNE ICI
+                    clearTimeout(lineTimer); 
+                    // secretLine.classList.remove('active'); <--- Ligne supprimée
+
                 } else {
+                    // --- PLAY ---
                     audioPlayer.play(); 
                     audioButton.classList.add('playing');
                     icon.textContent = '\u{1F4D6}';
-                    teaserText.textContent = '> ANALYSE DU FLUX AUDIO...';
+                    
+                    // Si la ligne est DÉJÀ là, on garde le texte "Données enregistrées"
+                    if (!secretLine.classList.contains('active')) {
+                         teaserText.textContent = '> ANALYSE DU FLUX AUDIO...';
+                    }
+
                     lineContainer.innerHTML = '';
                     
                     for (let i = 0; i < 30; i++) {
@@ -84,21 +93,27 @@
                         lineContainer.appendChild(bar);
                     }
 
-                    // Timer de 5 secondes
-                    lineTimer = setTimeout(() => {
-                        secretLine.classList.add('active');
-                        teaserText.textContent = '> DONNÉES ENREGISTRÉES_';
-                    }, 5000);
+                    // Si la ligne n'est pas encore là, on lance le timer
+                    if (!secretLine.classList.contains('active')) {
+                        lineTimer = setTimeout(() => {
+                            secretLine.classList.add('active');
+                            teaserText.textContent = '> DONNÉES ENREGISTRÉES_';
+                        }, 5000);
+                    }
                 }
             });
 
             audioPlayer.addEventListener('ended', () => {
                 audioButton.classList.remove('playing');
                 icon.textContent = '\u{1F4D5}';
-                teaserText.textContent = '> FIN DE TRANSMISSION_';
+                // On change le texte seulement si la ligne n'est PAS active
+                 if (!secretLine.classList.contains('active')) {
+                    teaserText.textContent = '> FIN DE TRANSMISSION_';
+                }
                 lineContainer.innerHTML = '';
                 clearTimeout(lineTimer);
-                secretLine.classList.remove('active');
+                // ON NE CACHE PLUS LA LIGNE ICI NON PLUS
+                // secretLine.classList.remove('active'); <--- Ligne supprimée
             });
         });
     </script>
