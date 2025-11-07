@@ -36,24 +36,16 @@
             const adminName = localStorage.getItem('sas_user') || 'ADMIN';
             document.getElementById('admin-name-display').textContent = adminName;
 
-            let agentsList = [];
-
-            
+            // --- FONCTION: Construit le HTML pour la liste ---
             function buildAgentListHTML(agents) {
                 let html = '';
                 agents.forEach(agent => {
-                    const isDisabled = agent.level >= 4;
-                    let deleteButtonHTML = '';
                     
-                    // On ne peut pas supprimer l'admin (Niv 4)
-                    if (!isDisabled) {
-                        deleteButtonHTML = `
-                            <button type="button" class="form-button delete-agent-btn" data-agent-id="${agent.id}" title="Supprimer cet agent">
-                                X
-                            </button>
-                        `;
-                    }
-
+                    // --- FILTRE MODIFIÉ : N'affiche que les niveaux 1, 2, 3 ---
+                    if (agent.level >= 4) return;
+                    
+                    const isDisabled = false; // Plus besoin, on filtre
+                    
                     html += `
                         <div class="admin-agent-row" id="row-agent-${agent.id}">
                             <span class="agent-name">${agent.name} (ID: ${agent.id})</span>
@@ -62,24 +54,25 @@
                                     <option value="1" ${agent.level === 1 ? 'selected' : ''}>Niveau 1</option>
                                     <option value="2" ${agent.level === 2 ? 'selected' : ''}>Niveau 2</option>
                                     <option value="3" ${agent.level === 3 ? 'selected' : ''}>Niveau 3</option>
-                                    ${isDisabled ? '<option value="4" selected>Niveau 4 (Admin)</option>' : ''}
                                 </select>
                                 <button type="submit" class="form-button" ${isDisabled ? 'disabled' : ''}>&gt;</button>
-                                ${deleteButtonHTML}
                             </form>
+                            <button type="button" class="form-button delete-agent-btn" data-agent-id="${agent.id}" title="Supprimer cet agent">
+                                X
+                            </button>
                         </div>
                     `;
                 });
                 return html;
             }
 
-            
+            // --- CHARGEMENT INITIAL (ET DU LOGIC) ---
             try {
                 const response = await fetch('/api/get-agents');
                 const data = await response.json();
                 if (!data.agents) throw new Error('Données non reçues');
 
-                agentsList = data.agents.sort((a, b) => a.id - b.id);
+                const agentsList = data.agents.sort((a, b) => a.id - b.id);
                 container.innerHTML = buildAgentListHTML(agentsList);
 
             } catch (error) {
@@ -87,10 +80,10 @@
                 container.innerHTML = `<p style="color: #ff4141;">[ERREUR CRITIQUE DE CONNEXION]</p>`;
             }
 
-            
+            // --- GESTION DES ÉVÉNEMENTS (Submit et Click) ---
             container.addEventListener('click', async (e) => {
                 
-                
+                // --- Logique de SUPPRESSION (Click) ---
                 if (e.target.classList.contains('delete-agent-btn')) {
                     const button = e.target;
                     const agentId = button.getAttribute('data-agent-id');
@@ -126,7 +119,7 @@
             });
 
             container.addEventListener('submit', async (e) => {
-                
+                // --- Logique de MISE À JOUR (Submit) ---
                 if (e.target.classList.contains('set-level-form')) {
                     e.preventDefault();
                     
