@@ -9,7 +9,7 @@ const ADA_LEVEL = 7;
 
 const SECRET_FILE_HASH = '$2a$12$jsXynEEHrEKgaPBD1t6TPuE2h3pSE.2GN2xQtw1L42zgcJJ8H6iG2';
 
-const SECRET_FILE_URL = '../SecretNyx/NyxConf.html';
+const SECRET_FILE_URL = '../AgentDatabase/SecretNyx/NyxConf.html';
 
 
 
