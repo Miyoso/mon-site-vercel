@@ -6,8 +6,10 @@
     <title>SAS - Carte Tactique</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <style>
         #intel-controls {
             background: #0a0a0a;
@@ -19,76 +21,37 @@
             gap: 1rem;
             align-items: flex-end;
         }
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            flex-grow: 1;
-        }
-        .control-group label {
-            color: #00ff00;
-            font-size: 0.9rem;
-        }
+        .control-group { display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
+        .control-group label { color: #00ff00; font-size: 0.9rem; }
         .intel-input, .intel-select {
             font-family: 'Share Tech Mono', monospace;
-            background: #111;
-            color: #eaeaea;
-            border: 1px solid #333;
-            padding: 0.5rem;
-            font-size: 1rem;
+            background: #111; color: #eaeaea; border: 1px solid #333; padding: 0.5rem; font-size: 1rem;
         }
-        .intel-input:focus, .intel-select:focus {
-            outline: none;
-            border-color: #00ff00;
-        }
-        #add-mode-indicator {
-            color: #555;
-            font-style: italic;
-            margin-top: 0.5rem;
-        }
-        #add-mode-indicator.active {
-            color: #00ff00;
-            animation: blink 1s infinite;
-        }
+        .intel-input:focus, .intel-select:focus { outline: none; border-color: #00ff00; }
+        #add-mode-indicator { color: #555; font-style: italic; margin-top: 0.5rem; }
+        #add-mode-indicator.active { color: #00ff00; animation: blink 1s infinite; }
         .custom-marker {
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #000;
-            font-weight: bold;
-            font-size: 10px;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            color: #000; font-weight: bold; font-size: 10px;
         }
         .imp-1 { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
         .imp-2 { background: #ffff00; box-shadow: 0 0 10px #ffff00; }
         .imp-3 { background: #ff9900; box-shadow: 0 0 10px #ff9900; }
         .imp-4 { background: #ff0000; box-shadow: 0 0 15px #ff0000; animation: pulse-red 2s infinite; }
-        
-      
-        .current-agent-info {
-            color: #00ff00;
-            font-size: 0.9rem;
-            border: 1px solid #00ff00;
-            padding: 0.5rem;
-            align-self: center;
-        }
+        .current-agent-info { color: #00ff00; font-size: 0.9rem; border: 1px solid #00ff00; padding: 0.5rem; align-self: center; }
+        .leaflet-draw-toolbar a { background-color: #111 !important; border-color: #333 !important; color: #00ff00 !important; }
+        .leaflet-draw-actions { background-color: #111 !important; }
+        .leaflet-draw-actions a { background-color: #333 !important; color: #eaeaea !important; }
     </style>
 </head>
 <body>
-
     <div class="terminal" style="max-width: 95vw;">
         <h1 class="map-title">RENSEIGNEMENT TACTIQUE</h1>
-        <div class="status">
-            [CRYPTAGE: <span class="secure">ACTIF</span>]
-        </div>
-
+        <div class="status">[CRYPTAGE: <span class="secure">ACTIF</span>]</div>
         <div id="intel-controls">
-            <div class="current-agent-info" id="current-agent-display">
-                [IDENTIFICATION EN COURS...]
-            </div>
-
+            <div class="current-agent-info" id="current-agent-display">[IDENTIFICATION EN COURS...]</div>
             <div class="control-group" style="flex-grow: 2;">
-                <label>DESCRIPTION DU RENSEIGNEMENT</label>
+                <label>DESCRIPTION DU RENSEIGNEMENT (POUR POINT)</label>
                 <input type="text" id="point-desc" class="intel-input" placeholder="Ex: Cache d'armes suspecte...">
             </div>
             <div class="control-group" style="max-width: 150px;">
@@ -101,20 +64,15 @@
                 </select>
             </div>
         </div>
-        <div id="add-mode-indicator">EN ATTENTE DE DESCRIPTION...</div>
-
+        <div id="add-mode-indicator">EN ATTENTE... UTILISEZ LES OUTILS À GAUCHE POUR DESSINER.</div>
         <div id="map-container"></div>
-
         <div class="portal-footer">
             <a href="index.html" class="back-link">[ REVENIR AU DASHBOARD ]</a>
-            <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V2.1</span>
+            <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V3.0 (DRAW)</span>
         </div>
     </div>
-
     <script>
-        // Configuration de la carte
         const mapExtent = [0, 0, 8192, 8192];
-        const mapMinZoom = 2;
         const mapMaxZoom = 5;
         const crs = L.CRS.Simple;
         crs.transformation = new L.Transformation(1, 0, 1, 0);
@@ -122,12 +80,8 @@
         crs.zoom = (scale) => Math.log(scale * (Math.pow(2, mapMaxZoom) * 1.0)) / Math.LN2;
 
         const map = L.map('map-container', {
-            maxZoom: mapMaxZoom,
-            minZoom: mapMinZoom,
-            crs: crs,
-            attributionControl: false,
-            zoomControl: false,
-            doubleClickZoom: false
+            maxZoom: mapMaxZoom, minZoom: 2, crs: crs,
+            attributionControl: false, zoomControl: false, doubleClickZoom: false
         });
 
         L.control.zoom({ position: 'topright' }).addTo(map);
@@ -135,39 +89,38 @@
         map.fitBounds([[0, 0], [8192, 8192]]);
 
         let pointsLayer = L.layerGroup().addTo(map);
-        
-       
+        let drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
         let currentAgent = null;
 
+        const drawControl = new L.Control.Draw({
+            draw: {
+                polyline: { shapeOptions: { color: '#00ff00', weight: 3 } },
+                polygon: { shapeOptions: { color: '#00ff00' }, allowIntersection: false, showArea: true },
+                rectangle: { shapeOptions: { color: '#ffff00', weight: 2 } },
+                circle: false, marker: false, circlemarker: false
+            },
+            edit: false
+        });
+        map.addControl(drawControl);
+
         async function init() {
-           
             const username = localStorage.getItem('sas_user');
-            if (!username) {
-                window.location.href = 'login.html'; 
-                return;
-            }
-
+            if (!username) { window.location.href = 'login.html'; return; }
             try {
-                
-                const response = await fetch('/api/get-agents'); 
+                const response = await fetch('/api/get-agents');
                 const data = await response.json();
-                
-                
                 currentAgent = data.agents.find(a => a.name === username);
-
                 if (currentAgent) {
                     document.getElementById('current-agent-display').textContent = `[AGENT: ${currentAgent.name.toUpperCase()}]`;
                 } else {
                      document.getElementById('current-agent-display').textContent = `[ERREUR IDENTIFICATION]`;
-                     document.getElementById('current-agent-display').style.borderColor = '#ff0000';
                      document.getElementById('current-agent-display').style.color = '#ff0000';
                 }
-                
                 loadPoints();
-
-            } catch (error) {
-                console.error("Erreur d'initialisation:", error);
-            }
+                loadDrawings();
+            } catch (error) { console.error("Erreur init:", error); }
         }
 
         async function loadPoints() {
@@ -175,96 +128,90 @@
                 const response = await fetch('/api/get-points');
                 const data = await response.json();
                 pointsLayer.clearLayers();
-
                 data.points.forEach(point => {
                     const y = 8192 - point.map_y;
                     const x = point.map_x;
                     const imp = point.importance_level || 1;
-                    
-                    const icon = L.divIcon({
-                        className: `custom-marker imp-${imp}`,
-                        html: imp,
-                        iconSize: [20 + (imp * 2), 20 + (imp * 2)],
-                        iconAnchor: [10 + imp, 10 + imp]
-                    });
-
-                    const marker = L.marker([y, x], {icon: icon}).addTo(pointsLayer);
-                    marker.bindPopup(`
-                        <div style="min-width: 200px">
-                            <h4 style="color: #eaeaea; border-bottom: 1px solid #333; margin-bottom: 5px;">
-                                INTEL #${point.id}
-                            </h4>
-                            <p><b>SIGNALÉ PAR:</b> <span style="color:#00ff00">${point.creator_name || 'Inconnu'}</span></p>
-                            <p><b>NIVEAU:</b> <span class="imp-${imp}" style="color:#000; padding: 2px 5px; border-radius: 3px;">${imp}</span></p>
-                            <div style="background:#111; padding: 5px; margin-top: 5px; border-left: 2px solid #00ff00; color: #ccc;">
-                                ${point.description}
-                            </div>
-                            <div style="text-align:right; font-size:0.8em; color:#666; margin-top:5px;">
-                                ${new Date(point.created_at).toLocaleString()}
-                            </div>
-                        </div>
-                    `);
+                    const icon = L.divIcon({ className: `custom-marker imp-${imp}`, html: imp, iconSize: [20+(imp*2), 20+(imp*2)], iconAnchor: [10+imp, 10+imp] });
+                    L.marker([y, x], {icon: icon}).addTo(pointsLayer)
+                        .bindPopup(`<h4 style="color:#eaeaea">INTEL #${point.id}</h4><p>${point.description}</p><p style="font-size:0.8em;color:#666">Par: ${point.creator_name}</p>`);
                 });
-            } catch (e) { console.error("Erreur chargement points:", e); }
+            } catch (e) { console.error("Erreur points:", e); }
         }
 
-       
-        document.getElementById('point-desc').addEventListener('input', updateMode);
+        async function loadDrawings() {
+            try {
+                const response = await fetch('/api/get-drawings');
+                const data = await response.json();
+                drawnItems.clearLayers();
+                data.drawings.forEach(drawing => {
+                    L.geoJSON(drawing.geojson, {
+                        style: function (feature) {
+                            return {color: drawing.type === 'rectangle' ? '#ffff00' : '#00ff00'};
+                        }
+                    }).eachLayer(function (layer) {
+                        drawnItems.addLayer(layer);
+                    });
+                });
+            } catch (e) { console.error("Erreur drawings:", e); }
+        }
 
+        map.on(L.Draw.Event.CREATED, async function (e) {
+            if (!currentAgent) { alert("Erreur identification agent."); return; }
+            const type = e.layerType;
+            const layer = e.layer;
+            drawnItems.addLayer(layer);
+            const geojson = layer.toGeoJSON();
+            try {
+                await fetch('/api/execute-action', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'add_drawing',
+                        drawing_creator_id: currentAgent.id,
+                        type: type,
+                        geojson: geojson
+                    })
+                });
+            } catch (error) { console.error("Erreur sauvegarde dessin:", error); }
+        });
+
+        document.getElementById('point-desc').addEventListener('input', updateMode);
         function updateMode() {
             const desc = document.getElementById('point-desc').value;
             const indicator = document.getElementById('add-mode-indicator');
-            
-       
             if (desc && currentAgent) {
-                indicator.textContent = ">> MODE AJOUT ACTIF : CLIQUEZ SUR LA CARTE <<";
+                indicator.textContent = ">> MODE AJOUT POINT ACTIF : CLIQUEZ SUR LA CARTE <<";
                 indicator.classList.add('active');
             } else {
-                indicator.textContent = "EN ATTENTE DE DESCRIPTION...";
+                indicator.textContent = "EN ATTENTE... UTILISEZ LES OUTILS À GAUCHE POUR DESSINER.";
                 indicator.classList.remove('active');
             }
         }
 
         map.on('click', async function(e) {
             const description = document.getElementById('point-desc').value;
+            if (!description || !currentAgent) return;
             const importance_level = document.getElementById('point-importance').value;
-
-            // Si pas de description ou si l'agent n'est pas identifié, on ne fait rien
-            if (!description || !currentAgent) {
-                if (!currentAgent) alert("Erreur: Vous n'êtes pas identifié. Reconexion requise.");
-                return;
-            }
-
             const x = e.latlng.lng;
             const y = 8192 - e.latlng.lat;
-
             try {
-                // Utilisation de la nouvelle API unifiée
                 const response = await fetch('/api/execute-action', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        action: 'add_point',
-                        creator_id: currentAgent.id, 
-                        map_x: x, 
-                        map_y: y, 
-                        description, 
-                        importance_level 
-                    })
+                    body: JSON.stringify({ action: 'add_point', creator_id: currentAgent.id, map_x: x, map_y: y, description, importance_level })
                 });
-
                 if (response.ok) {
                     document.getElementById('point-desc').value = '';
                     updateMode();
                     loadPoints();
-                } else {
-                    console.error("Erreur serveur lors de l'ajout du point");
                 }
-            } catch (error) { console.error("Erreur réseau ajout point:", error); }
+            } catch (error) { console.error("Erreur ajout point:", error); }
         });
 
         init();
-        setInterval(loadPoints, 15000);
+        setInterval(loadPoints, 10000);
+        setInterval(loadDrawings, 5000);
     </script>
 </body>
 </html>

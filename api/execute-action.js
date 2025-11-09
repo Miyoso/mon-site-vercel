@@ -26,7 +26,6 @@ export default async function handler(request, response) {
 
   try {
     switch (action) {
-      // --- DOSSIERS INTERNES ---
       case 'add_note':
         const { agent_id, author_name, note_text, addWarning } = data;
         if (!agent_id || !author_name || !note_text) {
@@ -47,7 +46,6 @@ export default async function handler(request, response) {
         } catch (e) { await client.query('ROLLBACK'); throw e; }
         finally { client.release(); }
 
-      // --- CARTE TACTIQUE ---
       case 'add_point':
         const { creator_id, map_x, map_y, description, importance_level } = data;
         if (!creator_id || !map_x || !map_y || !description) {
@@ -56,7 +54,14 @@ export default async function handler(request, response) {
         await sql`INSERT INTO intel_points (creator_id, map_x, map_y, description, importance_level) VALUES (${creator_id}, ${map_x}, ${map_y}, ${description}, ${importance_level})`;
         return response.status(200).json({ success: true });
 
-      // --- INVENTAIRE ---
+      case 'add_drawing':
+        const { drawing_creator_id, type, geojson } = data;
+        if (!drawing_creator_id || !geojson) {
+            return response.status(400).json({ error: 'Données de dessin manquantes' });
+        }
+        await sql`INSERT INTO map_drawings (creator_id, type, geojson) VALUES (${drawing_creator_id}, ${type}, ${JSON.stringify(geojson)})`;
+        return response.status(200).json({ success: true });
+
       case 'add_item':
         const { category, item_name, serial_number, status } = data;
         if (!category || !item_name || !status) return response.status(400).json({ error: 'Champs manquants' });
