@@ -1,20 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Carte des Agents GTA V</title>
+    <title>Agent Database - Carte Interactive (GTA V)</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/SJPMeX/KwGzIDdd8"
         crossorigin=""/>
+    
     <style>
-        
+       
         #map-container {
-            height: 800px; 
+            height: 90vh; 
             width: 100%;
+            border: 1px solid #333;
         }
     </style>
 </head>
 <body>
 
+    <h1 style="text-align: center;">Localisation des Agents - San Andreas (GTA V)</h1>
     <div id="map-container"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -23,6 +29,88 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', initializeMap);
+
+        function initializeMap() {
+           
+            const IMAGE_WIDTH_PIXELS = 4096;
+            const IMAGE_HEIGHT_PIXELS = 4096;
+
+            const GAME_X_MIN = -4000;
+            const GAME_X_MAX = 4000;
+            const GAME_Y_MIN = -4000;
+            const GAME_Y_MAX = 4000;
+
+            const X_RANGE = GAME_X_MAX - GAME_X_MIN;
+            const Y_RANGE = GAME_Y_MAX - GAME_Y_MIN;
+            
+           
+            const gtaV_CRS = L.extend({}, L.CRS.Simple, {
+                transformation: new L.Transformation(
+                   
+                    IMAGE_WIDTH_PIXELS / X_RANGE, 
+                  
+                    -IMAGE_WIDTH_PIXELS * GAME_X_MIN / X_RANGE,
+                  
+                    -IMAGE_HEIGHT_PIXELS / Y_RANGE, 
+                
+                    IMAGE_HEIGHT_PIXELS * GAME_Y_MAX / Y_RANGE
+                )
+            });
+
+            const map = L.map('map-container', {
+                crs: gtaV_CRS, 
+                minZoom: -2,
+                maxZoom: 3,
+                center: [0, 0], 
+                zoom: -1, 
+                maxBoundsViscosity: 1.0, 
+            });
+
+            
+            const bounds = [[GAME_Y_MIN, GAME_X_MIN], [GAME_Y_MAX, GAME_X_MAX]];
+            
+            L.imageOverlay('carte-satellite-gta-5.jpg', bounds).addTo(map);
+
+            // Ajuster le zoom pour que toute la carte soit visible au démarrage
+            map.fitBounds(bounds);
+
+
+           
+
+            fetch('/api/get-agents.js')
+                .then(res => res.json())
+                .then(data => {
+                    const agents = data.agents || [];
+                    
+                    if (agents.length === 0) {
+                        console.log("Aucun agent trouvé avec des coordonnées X/Y valides.");
+                        return;
+                    }
+
+                    agents.forEach(agent => {
+                     
+                        const markerPosition = [agent.map_y, agent.map_x];
+
+                   
+                        const popupContent = `
+                            <h4>${agent.name} (Niv. ${agent.level})</h4>
+                            <p>Statut: <b>${agent.status_text}</b></p>
+                            <p>Niveau d'Alerte: ${agent.warning_level}</p>
+                            <a href="${agent.profile_url}" target="_blank">Voir Profil</a>
+                        `;
+
+                  
+                        L.marker(markerPosition, {
+                         
+                        }).addTo(map)
+                          .bindPopup(popupContent);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des agents:', error);
+                    alert('Erreur: Impossible de charger les données des agents depuis l\'API.');
+                });
+        }
     </script>
 </body>
 </html>
