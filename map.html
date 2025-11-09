@@ -6,23 +6,59 @@
     <title>SAS - Carte Tactique</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        #admin-controls {
+            background: #0a0a0a;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        #agent-select {
+            font-family: 'Share Tech Mono', monospace;
+            background: #111;
+            color: #eaeaea;
+            border: 1px solid #333;
+            padding: 0.5rem;
+            font-size: 1rem;
+            flex-grow: 1;
+        }
+        #agent-select:focus {
+            outline: none;
+            border-color: #00ff00;
+        }
+        .admin-label {
+            color: #00ff00;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="terminal" style="max-width: 95vw;"> 
+    <div class="terminal" style="max-width: 95vw;">
         <h1 class="map-title">CARTE TACTIQUE // OPÉRATION LS</h1>
         <div class="status">
             [CONNEXION SATELLITE: <span class="secure">ÉTABLIE</span>]
             <span class="blinker">_</span>
         </div>
 
+        <div id="admin-controls">
+            <span class="admin-label">[ MODE ADMIN : DÉFINIR POSITION ]</span>
+            <select id="agent-select">
+                <option value="">-- SÉLECTIONNER UN AGENT --</option>
+            </select>
+        </div>
+
         <div id="map-container"></div>
 
         <div class="portal-footer">
             <a href="index.html" class="back-link">[ REVENIR AU DASHBOARD ]</a>
-            <span style="color: #555; font-size: 0.8rem;">SAS-GEO-V1.2</span>
+            <span style="color: #555; font-size: 0.8rem;">SAS-GEO-V1.3</span>
         </div>
     </div>
 
@@ -49,13 +85,10 @@
             zoomControl: false
         });
 
-        L.control.zoom({
-            position: 'topright'
-        }).addTo(map);
+        L.control.zoom({ position: 'topright' }).addTo(map);
 
         const imageUrl = 'carte-satellite-gta-5.jpg';
         const imageBounds = [[0, 0], [8192, 8192]];
-
         L.imageOverlay(imageUrl, imageBounds).addTo(map);
         map.fitBounds(imageBounds);
 
@@ -66,35 +99,82 @@
             iconAnchor: [6, 6]
         });
 
-        async function loadAgentsOnMap() {
+        let agentMarkers = {};
+
+        async function loadAgents() {
             try {
                 const response = await fetch('/api/get-agents');
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const data = await response.json();
-                const agents = data.agents;
+                const select = document.getElementById('agent-select');
+                
+                // Garder la sélection actuelle si possible
+                const currentSelection = select.value;
+                select.innerHTML = '<option value="">-- SÉLECTIONNER UN AGENT --</option>';
 
-                agents.forEach(agent => {
+                // Nettoyer les anciens marqueurs
+                for (let id in agentMarkers) {
+                    map.removeLayer(agentMarkers[id]);
+                }
+                agentMarkers = {};
+
+                data.agents.forEach(agent => {
+                    // Remplir le select
+                    const option = document.createElement('option');
+                    option.value = agent.id;
+                    option.textContent = `[Niv.${agent.level}] ${agent.name}`;
+                    select.appendChild(option);
+
+                    // Placer le marqueur si coords existent
                     if (agent.map_x != null && agent.map_y != null) {
                         const y = 8192 - agent.map_y;
                         const x = agent.map_x;
-
                         const marker = L.marker([y, x], {icon: agentIcon}).addTo(map);
-                        
                         marker.bindPopup(`
                             <h4>AGENT: ${agent.name}</h4>
                             <p><b>Niveau:</b> ${agent.level}</p>
                             <p><b>Statut:</b> ${agent.status_text || 'N/A'}</p>
                             <p><a href="dossiers-internes.html?agent=${agent.id}">[ VOIR DOSSIER ]</a></p>
                         `);
+                        agentMarkers[agent.id] = marker;
                     }
                 });
+
+                if (currentSelection) {
+                    select.value = currentSelection;
+                }
 
             } catch (error) {
                 console.error("Erreur chargement agents:", error);
             }
         }
 
-        loadAgentsOnMap();
+        map.on('click', async function(e) {
+            const selectedAgentId = document.getElementById('agent-select').value;
+            if (!selectedAgentId) return;
+
+            const x = e.latlng.lng;
+            const y = 8192 - e.latlng.lat;
+
+            try {
+                const response = await fetch('/api/update-agent-position', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: selectedAgentId, map_x: x, map_y: y })
+                });
+
+                if (response.ok) {
+                    loadAgents();
+                } else {
+                    alert("Erreur lors de la mise à jour de la position.");
+                }
+            } catch (error) {
+                console.error("Erreur réseau:", error);
+            }
+        });
+
+        loadAgents();
+        // Rafraîchir toutes les 30 secondes pour voir les mouvements des autres
+        setInterval(loadAgents, 30000);
     </script>
 </body>
 </html>

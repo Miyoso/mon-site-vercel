@@ -14,9 +14,19 @@ export default async function handler(request, response) {
     return;
   }
 
+  if (request.method !== 'POST') {
+    return response.status(405).json({ error: 'Method Not Allowed' });
+  }
+
+  const { id, map_x, map_y } = request.body;
+
+  if (!id || map_x === undefined || map_y === undefined) {
+    return response.status(400).json({ error: 'Missing required fields' });
+  }
+
   try {
-    const { rows } = await sql`SELECT id, name, level, status_text, map_x, map_y FROM agents ORDER BY id ASC;`;
-    return response.status(200).json({ agents: rows });
+    await sql`UPDATE agents SET map_x = ${map_x}, map_y = ${map_y} WHERE id = ${id};`;
+    return response.status(200).json({ success: true });
   } catch (error) {
     return response.status(500).json({ error: error.message });
   }
