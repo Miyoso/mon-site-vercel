@@ -1,7 +1,6 @@
 import { sql } from '@vercel/postgres';
 
 export default async function handler(request, response) {
-  // En-têtes CORS standards
   response.setHeader('Access-Control-Allow-Credentials', true);
   response.setHeader('Access-Control-Allow-Origin', '*');
   response.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -10,7 +9,13 @@ export default async function handler(request, response) {
   if (request.method === 'OPTIONS') return response.status(200).end();
 
   try {
-    const { rows } = await sql`SELECT * FROM map_drawings ORDER BY created_at ASC;`;
+    // JOIN pour récupérer le nom de l'agent qui a dessiné
+    const { rows } = await sql`
+      SELECT d.*, a.name as creator_name 
+      FROM map_drawings d
+      LEFT JOIN agents a ON d.creator_id = a.id
+      ORDER BY d.created_at ASC;
+    `;
     return response.status(200).json({ drawings: rows });
   } catch (error) {
     return response.status(500).json({ error: error.message });
