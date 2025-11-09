@@ -73,7 +73,7 @@
         <div id="map-container"></div>
         <div class="portal-footer">
             <a href="index.html" class="back-link">[ REVENIR AU DASHBOARD ]</a>
-            <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V3.3 (FULL DETAILS)</span>
+            <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V3.4 (NO-BANDS)</span>
         </div>
     </div>
     <script>
@@ -84,14 +84,22 @@
         crs.scale = (zoom) => Math.pow(2, zoom) / (Math.pow(2, mapMaxZoom) * 1.0);
         crs.zoom = (scale) => Math.log(scale * (Math.pow(2, mapMaxZoom) * 1.0)) / Math.LN2;
 
+        const imageBounds = [[0, 0], [8192, 8192]];
+
         const map = L.map('map-container', {
-            maxZoom: mapMaxZoom, minZoom: 2, crs: crs,
-            attributionControl: false, zoomControl: false, doubleClickZoom: false
+            maxZoom: mapMaxZoom, 
+            minZoom: 2, 
+            crs: crs,
+            attributionControl: false, 
+            zoomControl: false, 
+            doubleClickZoom: false,
+            maxBounds: imageBounds,
+            maxBoundsViscosity: 1.0
         });
 
         L.control.zoom({ position: 'topright' }).addTo(map);
-        L.imageOverlay('carte-satellite-gta-5.jpg', [[0, 0], [8192, 8192]]).addTo(map);
-        map.fitBounds([[0, 0], [8192, 8192]]);
+        L.imageOverlay('carte-satellite-gta-5.jpg', imageBounds).addTo(map);
+        map.fitBounds(imageBounds);
 
         let pointsLayer = L.layerGroup().addTo(map);
         let drawnItems = new L.FeatureGroup();
@@ -164,7 +172,6 @@
                 const data = await response.json();
                 drawnItems.clearLayers();
                 data.drawings.forEach(drawing => {
-                  
                     let color = '#00ff00';
                     const imp = drawing.importance_level || 1;
                     if (imp === 2) color = '#ffff00';
@@ -274,7 +281,6 @@
         }
 
         map.on('click', async function(e) {
-       
             if (drawControl._toolbars.draw._activeMode) return;
 
             const description = document.getElementById('point-desc').value;
