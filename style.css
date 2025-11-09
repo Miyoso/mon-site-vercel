@@ -938,3 +938,91 @@ h1 {
 .log-timestamp {
     color: #888;
 }
+
+
+#map-container {
+    height: 90vh; 
+    width: 100%;
+    background-color: #0a0a0a;
+    border: 1px solid #333;
+    box-shadow: 0 0 25px rgba(170, 170, 170, 0.1), inset 0 0 10px rgba(0, 0, 0, 0.5);
+    padding: 1px; 
+    border-radius: 4px;
+    margin-top: 1.5rem;
+}
+
+
+.map-title {
+    color: #eaeaea; 
+    text-align: center;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    animation: flicker 4s linear infinite;
+}
+
+
+.leaflet-popup-content-wrapper, 
+.leaflet-popup-tip {
+    background-color: #0a0a0a; 
+    color: #00ff00;            
+    font-family: 'Share Tech Mono', monospace;
+    border: 1px solid #00ff00; 
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5); 
+}
+
+
+.leaflet-popup-content {
+    padding: 10px 15px;
+    margin: 0;
+}
+
+
+.leaflet-popup-content h4 {
+    color: #eaeaea; 
+    font-size: 1.1rem;
+    margin: 0 0 5px 0;
+}
+
+
+.leaflet-popup-content p {
+    margin: 0 0 5px 0;
+    color: #c5c5c5;
+}
+.leaflet-popup-content b {
+    color: #ffff00; 
+}
+.leaflet-popup-content a {
+    color: #00ff00;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.leaflet-popup-content a:hover {
+    color: #fff;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+
+.leaflet-popup-close-button {
+    color: #ff4141 !important;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px #ff4141;
+}
+
+
+.leaflet-container {
+    background-color: #000 !important;
+}
+
+
+.leaflet-bar a {
+    background-color: #111 !important;
+    color: #00ff00 !important;
+    border-color: #333 !important;
+}
+.leaflet-bar a:hover {
+    background-color: #00ff00 !important;
+    color: #000 !important;
+}
