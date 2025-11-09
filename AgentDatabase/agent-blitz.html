@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dossier Agent :: BLITZ_21</title>
+    <title>Dossier Agent :: Ruy Diaz (Blitz) [ENCRYPTED]</title>
 
     <script>
         const allowedAgents = [
@@ -20,72 +20,128 @@
             window.location.href = '../access-denied.html';
         }
     </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="style-nyx.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
+    <style>
+        .font-tech {
+            font-family: 'Share Tech Mono', monospace;
+        }
+        body {
+            background-color: #000000 !important;
+            background-image: radial-gradient(rgba(0, 150, 0, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes scan {
+            0% { background-position: 0 -100vh; }
+            100% { background-position: 0 100vh; }
+        }
+        .animate-scan {
+            animation: scan 3s linear infinite;
+        }
+        .cursor-blink::after {
+            content: '_';
+            animation: blink 1s step-start infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .agent-photo-frame {
+            position: relative;
+        }
+        .agent-photo-frame img {
+            filter: grayscale(100%) sepia(100%) hue-rotate(70deg) saturate(300%) contrast(1.2);
+            mix-blend-mode: hard-light;
+            opacity: 0.8;
+        }
+        .agent-photo-frame::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+    </style>
 </head>
-<body class="text-green-400 min-h-screen p-4 md:p-8 scanline">
+<body class="text-green-400 min-h-screen p-4 md:p-8 bg-black font-mono">
 
-    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50">
-        <header class="font-tech text-lg md:text-xl p-4 bg-green-900/30 border-b-2 border-green-700/50 flex justify-between items-center">
-            <span>[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3 REQUIS]</span>
-            <span class="text-red-500 animate-pulse">● REC</span>
+    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50 bg-black/90 backdrop-blur">
+        <header class="font-tech text-lg md:text-xl p-4 bg-green-950/50 border-b-2 border-green-700/50 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md">
+             <span class="tracking-widest">[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3]</span>
+            <span class="text-red-500 animate-pulse flex items-center gap-2">
+                <span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> REC
+            </span>
         </header>
 
         <div class="p-6 md:p-8 space-y-8">
             
-            <div>
-                <span class="text-green-300">$</span> <span class="text-white">load --dossier=AGENT_BLITZ_21</span>
-                <p class="text-cyan-400">... Chargement du dossier ...</p>
-                <p class="text-green-400">Authentification réussie. Affichage des données.</p>
-                <span class="text-green-300">$</span> <span class="cursor-blink"></span>
+            <div class="font-mono text-sm md:text-base">
+                <div><span class="text-green-500">$</span> <span class="text-white">load --dossier=AGENT_DIAZ_RUY</span></div>
+                <div class="text-cyan-400 mt-1">... Chargement du dossier ...</div>
+                <div class="text-green-500 mt-1">Authentification réussie. Affichage des données.</div>
+                <div><span class="text-green-500">$</span> <span class="cursor-blink"></span></div>
             </div>
 
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 01 : IDENTIFICATION]</h2>
+            <section class="border border-green-600/30 p-6 rounded bg-black/40 relative overflow-hidden group hover:border-green-500/50 transition-all duration-500">
+                <div class="absolute top-0 right-0 p-2 text-xs text-green-800 font-tech opacity-70">ID_REF: BLITZ-21</div>
+                 <h2 class="font-tech text-2xl text-white mb-6 flex items-center">
+                    <span class="text-green-500 mr-2">></span> [SECTION 01 : IDENTIFICATION]
+                </h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-slate-400">NOM DE L'AGENT :</p>
-                        <p class="text-xl text-white">Ruy Diaz</p>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-grow space-y-4 font-mono">
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">NOM DE L'AGENT:</span>
+                            <span class="text-xl text-white font-bold tracking-wider">RUY DIAZ</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">ALIAS CONNUS:</span>
+                            <span class="text-white">"21", "BLITZ"</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">ÂGE:</span>
+                            <span class="text-white">35 ans</span>
+                        </div>
+                         <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">ORIGINE:</span>
+                            <span class="text-white">Amérique Latine</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">STATUT ACTUEL:</span>
+                            <span class="text-yellow-400 font-bold">[ ACTIF (Renseignement / Action) ]</span>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-slate-400">ALIAS CONNUS :</p>
-                        <p class="text-xl text-white">"21", "Blitz"</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">STATUT ACTUEL :</p>
-                        <p class="text-xl text-yellow-400">ACTIF (Renseignement)</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">ÂGE :</p>
-                        <p class="text-xl text-white">35</p>
+
+                    <div class="flex-shrink-0 flex justify-center md:justify-end">
+                        <div class="border-2 border-green-500/50 p-1 w-40 h-48 bg-green-950/20 relative overflow-hidden agent-photo-frame flex flex-col items-center justify-center text-center p-2">
+                             <span class="text-green-400 font-bold">[PORTRAIT BLITZ-21]</span>
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/10 to-transparent animate-scan h-full w-full pointer-events-none"></div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
-            
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]</h2>
+            <section class="border border-green-600/30 p-6 rounded bg-black/40 relative overflow-hidden hover:border-green-500/50 transition-all duration-500">
+                <h2 class="font-tech text-2xl text-white mb-6 flex items-center">
+                     <span class="text-green-500 mr-2">></span> [SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]
+                </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <h3 class="text-xl text-cyan-400 font-tech mb-2">// PHYSIQUE</h3>
-                        <ul class="list-none space-y-1">
-                            <li><span class="text-slate-400">TAILLE:</span> 1.85m</li>
-                            <li><span class="text-slate-400">POIDS:</span> 83kg</li>
-                            <li><span class="text-slate-400">YEUX:</span> Verts</li>
+                     <div class="bg-cyan-950/10 p-4 rounded border border-cyan-900/30">
+                        <h3 class="text-lg text-cyan-400 font-tech mb-3 border-b border-cyan-900/50 pb-2">// PHYSIQUE</h3>
+                        <ul class="list-none space-y-2 text-sm">
+                            <li class="flex justify-between"><span class="text-slate-500">TAILLE:</span> <span class="text-white">1.85m</span></li>
+                            <li class="flex justify-between"><span class="text-slate-500">POIDS:</span> <span class="text-white">83kg</span></li>
+                            <li class="flex justify-between"><span class="text-slate-500">YEUX:</span> <span class="text-white">Verts</span></li>
                         </ul>
                     </div>
-                    <div>
-                        <h3 class="text-xl text-green-400 font-tech mb-2">// QUALITÉS (ASSETS)</h3>
-                        <ul class="list-none space-y-1">
+                    <div class="bg-green-950/10 p-4 rounded border border-green-900/30">
+                        <h3 class="text-lg text-green-400 font-tech mb-3 border-b border-green-900/50 pb-2">// QUALITÉS (ASSETS)</h3>
+                         <ul class="space-y-1 text-sm list-disc list-inside text-green-300/80">
                             <li>Loyal</li>
                             <li>Discipliné</li>
                             <li>Sang-froid</li>
@@ -94,50 +150,71 @@
                             <li>Instinctif</li>
                         </ul>
                     </div>
-                    <div>
-                        <h3 class="text-xl text-yellow-400 font-tech mb-2">// DÉFAUTS (LIABILITIES)</h3>
-                        <ul class="list-none space-y-1">
-                            <li>Violent</li>
-                            <li>Sanguinaire</li>
-                            <li>Arrogant</li>
-                            <li>Fataliste <li>
+                    <div class="bg-yellow-950/10 p-4 rounded border border-yellow-900/30">
+                        <h3 class="text-lg text-yellow-400 font-tech mb-3 border-b border-yellow-900/50 pb-2">// DÉFAUTS (LIABILITIES)</h3>
+                        <ul class="space-y-1 text-sm list-disc list-inside text-yellow-500/80">
+                           <li>Violent</li>
+                           <li>Sanguinaire</li>
+                           <li>Arrogant</li>
+                           <li>Fataliste</li>
                         </ul>
                     </div>
                 </div>
             </section>
 
-            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
-
-            <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
-                <h2 class="font-tech text-2xl text-red-400 mb-4">[SECTION 03 : HISTORIQUE - NIVEAU 5 REQUIS]</h2>
-                <div class="bg-black/30 p-4 rounded bio-text">
-                    <p>Originaire d'Amérique Latine, Ruy était un haut gradé de la milice de son pays, dans laquelle il a servi auprès de Javier et Graves. Il est notamment connu pour ses faits d’armes lors de différentes tentatives d’invasion de son pays. Il est donc un militaire surentraîné.</p>
-                    <p>Ruy Diaz (anc. Agent 21) se caractérise par sa loyauté, son dévouement mais surtout sa violence; en effet, il ne laisse pas de survivant après son passage. Il fait confiance à son instinct et croit que le destin le guide. Il sait également se mêler aux foules et manipuler ses ennemis pour les frapper de l’intérieur.</p>
+            <section class="border border-red-800/50 p-6 rounded bg-red-950/10 relative overflow-hidden">
+                 <div class="absolute top-0 right-0 bg-red-900/50 text-red-200 text-xs px-3 py-1 font-tech">NIVEAU 5 REQUIS</div>
+                <h2 class="font-tech text-2xl text-red-500 mb-4 flex items-center">
+                    <span class="mr-2 animate-pulse">🔒</span> [SECTION 03 : HISTORIQUE]
+                </h2>
+                <div class="bg-black/50 p-4 rounded border border-red-900/30 font-mono text-sm text-red-400/80 relative min-h-[150px]">
+                    <div class="mb-4">
+                        <p class="text-red-500/70 mb-2">// ORIGINES & MILICE</p>
+                        <p class="opacity-80">Originaire d'Amérique Latine, le sujet est un ancien haut gradé d'une milice locale, ayant opéré conjointement avec les agents "Javier" et "Graves" lors de conflits régionaux majeurs.</p>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-red-900/30">
+                         <p class="text-red-500/70 mb-2">// FAITS D'ARMES</p>
+                         <p class="blur-[1px] select-none opacity-60 text-sm break-words hover:blur-[0.5px] transition-all duration-500">
+                            Son dossier fait état de faits d'armes notables lors de multiples tentatives d'invasion de son territoire d'origine, confirmant un niveau d'entraînement militaire exceptionnel et une résilience hors normes au combat.
+                        </p>
+                    </div>
                 </div>
             </section>
 
-            <section class="border border-yellow-600/30 p-4 rounded-lg bg-yellow-900/10">
-                <h2 class="font-tech text-2xl text-yellow-400 mb-4">[SECTION 04 : OPÉRATIONS SAS - NIVEAU 7 REQUIS]</h2>
-                <div class="bg-black/30 p-4 rounded">
-                    <p class="text-yellow-400">[ACCÈS VERROUILLÉ – CLÉ DE DÉCHIFFREMENT MANQUANTE]</p>
-                    <p class="encrypted text-sm select-none">
-                        [FICHIER: operations_datahaven.log]...
-                        [FICHIER: analyse_psy_cortex.dat]... [DONNÉES CORROMPUES]...
-                        [FICHIER: contacts_actifs.db] (Verrouillé)...
-                        [FICHIER: transactions_crypto.bin] (Verrouillé)...
-                    </p>
-                </div>
-            </section>
-
-             <div>
-                <span class="text-green-300">$</span> <span class="text-white">exit</span>
-                <p class="text-red-500">... Déconnexion ...</p>
+            <section class="border border-yellow-700/50 p-6 rounded bg-yellow-950/10 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-yellow-900/50 text-yellow-200 text-xs px-3 py-1 font-tech">NIVEAU 7 REQUIS</div>
+                <h2 class="font-tech text-2xl text-yellow-500 mb-4 flex items-center">
+                    <span class="mr-2">⚠️</span> [SECTION 04 : ANALYSE OPÉRATIONNELLE]
+                </h2>
                 
-                <div class="mt-8 text-center border-t border-green-700/50 pt-4">
-                    <a href="../database.html" class="font-tech text-green-400 hover:text-white hover:bg-green-700 p-2 transition-all">
-                        &lt;&lt; RETURN_TO_DATABASE
-                    </a>
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none overflow-hidden">
+                         <div class="border-4 border-red-600/40 text-red-600/40 font-black text-3xl md:text-5xl p-4 -rotate-12 tracking-widest opacity-50 font-tech uppercase backdrop-blur-[1px]">
+                             CONFIDENTIEL
+                         </div>
+                    </div>
+
+                    <div class="bg-black/50 p-4 rounded border border-yellow-900/30 font-mono text-sm text-yellow-600/80 transition-all duration-700 relative z-10 blur-[2px] hover:blur-[1px] select-none">
+                         <p class="mb-3 text-yellow-500 opacity-70">// PROFIL À HAUT RISQUE</p>
+                         <p class="mb-4 opacity-80">
+                            Bien que d'une loyauté et d'un dévouement absolus, l'agent démontre une violence extrême sur le terrain, ne laissant aucun survivant lors de ses interventions ("Sanguinaire"). Se fie à un système de croyance fataliste ("Instinct"). Capacité avérée à s'infiltrer en milieu hostile pour déstabiliser l'ennemi de l'intérieur.
+                        </p>
+                        <div class="space-y-2 pt-4 border-t border-yellow-900/30 opacity-90">
+                            <p class="text-yellow-400/60">[NOTE TACTIQUE]: "Un atout majeur pour les opérations sans retour, mais nécessite une surveillance constante pour éviter les dommages collatéraux."</p>
+                        </div>
+                    </div>
                 </div>
+            </section>
+
+             <div class="pt-6 border-t border-green-800/30 flex justify-between items-end">
+                <div class="text-xs text-green-700 font-mono">
+                    SESSION ID: <span class="data-glitched-random w-16"></span><br>
+                    STATUS: ACTIVE_MONITORING
+                </div>
+                <a href="../database.html" class="font-tech text-sm bg-green-950 hover:bg-green-900 text-green-400 px-4 py-2 border border-green-700 rounded transition-all duration-300 hover:shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+                    << RETURN_TO_DATABASE
+                </a>
             </div>
 
         </div>
@@ -158,10 +235,19 @@
 
             setInterval(() => {
                 glitchElements.forEach(el => {
-                    const randomLength = Math.floor(Math.random() * 20) + 8;
-                    el.textContent = generateRandomString(randomLength);
+                    if (Math.random() > 0.9) { 
+                        let randomLength;
+                        if (el.classList.contains('w-16')) randomLength = 6;
+                        else randomLength = Math.floor(Math.random() * 10) + 8; 
+                        el.textContent = generateRandomString(randomLength);
+                    }
+                    if (el.textContent === '') {
+                         let randomLength = Math.floor(Math.random() * 10) + 8;
+                         if (el.classList.contains('w-16')) randomLength = 6;
+                         el.textContent = generateRandomString(randomLength);
+                    }
                 });
-            }, 100);
+            }, 100); 
         });
     </script>
 
