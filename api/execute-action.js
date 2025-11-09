@@ -82,8 +82,13 @@ export default async function handler(request, response) {
       case 'delete_drawing':
         if (!data.drawing_id) return response.status(400).json({ error: 'ID du dessin manquant' });
         await sql`DELETE FROM map_drawings WHERE id = ${data.drawing_id}`;
-        return response.status(200).json({ success: true });  
+        return response.status(200).json({ success: true });
         
+      case 'delete_point':
+        if (!data.point_id) return response.status(400).json({ error: 'ID du point manquant' });
+        await sql`DELETE FROM intel_points WHERE id = ${data.point_id}`;
+        return response.status(200).json({ success: true });    
+
 
       default:
         return response.status(400).json({ error: `Action inconnue: ${action}` });
