@@ -82,7 +82,8 @@
             minZoom: mapMinZoom,
             crs: crs,
             attributionControl: false,
-            zoomControl: false
+            zoomControl: false,
+            doubleClickZoom: false
         });
 
         L.control.zoom({ position: 'topright' }).addTo(map);
@@ -107,24 +108,20 @@
                 const data = await response.json();
                 const select = document.getElementById('agent-select');
                 
-                // Garder la sélection actuelle si possible
                 const currentSelection = select.value;
                 select.innerHTML = '<option value="">-- SÉLECTIONNER UN AGENT --</option>';
 
-                // Nettoyer les anciens marqueurs
                 for (let id in agentMarkers) {
                     map.removeLayer(agentMarkers[id]);
                 }
                 agentMarkers = {};
 
                 data.agents.forEach(agent => {
-                    // Remplir le select
                     const option = document.createElement('option');
                     option.value = agent.id;
                     option.textContent = `[Niv.${agent.level}] ${agent.name}`;
                     select.appendChild(option);
 
-                    // Placer le marqueur si coords existent
                     if (agent.map_x != null && agent.map_y != null) {
                         const y = 8192 - agent.map_y;
                         const x = agent.map_x;
@@ -173,7 +170,6 @@
         });
 
         loadAgents();
-        // Rafraîchir toutes les 30 secondes pour voir les mouvements des autres
         setInterval(loadAgents, 30000);
     </script>
 </body>
