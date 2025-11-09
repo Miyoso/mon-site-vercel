@@ -11,6 +11,9 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <style>
+        #map-container {
+            background-color: #133a5e; 
+        }
         #intel-controls {
             background: #0a0a0a;
             padding: 1rem;
@@ -73,7 +76,7 @@
         <div id="map-container"></div>
         <div class="portal-footer">
             <a href="index.html" class="back-link">[ REVENIR AU DASHBOARD ]</a>
-            <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V3.4 (NO-BANDS)</span>
+            <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V3.5 (ENDLESS OCEAN)</span>
         </div>
     </div>
     <script>
@@ -88,18 +91,19 @@
 
         const map = L.map('map-container', {
             maxZoom: mapMaxZoom, 
-            minZoom: 2, 
+            minZoom: 1, 
             crs: crs,
             attributionControl: false, 
             zoomControl: false, 
             doubleClickZoom: false,
-            maxBounds: imageBounds,
-            maxBoundsViscosity: 1.0
+            center: [4096, 4096],
+            zoom: 2
         });
 
         L.control.zoom({ position: 'topright' }).addTo(map);
         L.imageOverlay('carte-satellite-gta-5.jpg', imageBounds).addTo(map);
-        map.fitBounds(imageBounds);
+        
+        map.setMaxBounds([[-4096, -4096], [12288, 12288]]); 
 
         let pointsLayer = L.layerGroup().addTo(map);
         let drawnItems = new L.FeatureGroup();
