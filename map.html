@@ -56,8 +56,8 @@
         <div id="intel-controls">
             <div class="current-agent-info" id="current-agent-display">[IDENTIFICATION EN COURS...]</div>
             <div class="control-group" style="flex-grow: 2;">
-                <label>DESCRIPTION DU RENSEIGNEMENT (POUR POINT)</label>
-                <input type="text" id="point-desc" class="intel-input" placeholder="Ex: Cache d'armes suspecte...">
+                <label>DESCRIPTION (POINT OU DESSIN)</label>
+                <input type="text" id="point-desc" class="intel-input" placeholder="Entrez une description avant de dessiner ou cliquer...">
             </div>
             <div class="control-group" style="max-width: 150px;">
                 <label>NIVEAU D'ALERTE</label>
@@ -69,11 +69,11 @@
                 </select>
             </div>
         </div>
-        <div id="add-mode-indicator">EN ATTENTE... UTILISEZ LES OUTILS À GAUCHE POUR DESSINER.</div>
+        <div id="add-mode-indicator">EN ATTENTE... ENTREZ UNE DESCRIPTION POUR ACTIVER LES OUTILS.</div>
         <div id="map-container"></div>
         <div class="portal-footer">
             <a href="index.html" class="back-link">[ REVENIR AU DASHBOARD ]</a>
-            <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V3.2 (FULL CONTROL)</span>
+            <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V3.3 (FULL DETAILS)</span>
         </div>
     </div>
     <script>
@@ -108,7 +108,6 @@
             },
             edit: false
         });
-        map.addControl(drawControl);
 
         async function init() {
             const username = localStorage.getItem('sas_user');
@@ -165,16 +164,27 @@
                 const data = await response.json();
                 drawnItems.clearLayers();
                 data.drawings.forEach(drawing => {
+                  
+                    let color = '#00ff00';
+                    const imp = drawing.importance_level || 1;
+                    if (imp === 2) color = '#ffff00';
+                    if (imp === 3) color = '#ff9900';
+                    if (imp === 4) color = '#ff0000';
+
                     const layer = L.geoJSON(drawing.geojson, {
-                        style: function (feature) {
-                            return {color: drawing.type === 'rectangle' ? '#ffff00' : '#00ff00'};
-                        }
+                        style: function (feature) { return { color: color, weight: 3 }; }
                     });
                     layer.eachLayer(function (l) {
                         l.bindPopup(`
-                            <div style="color: #eaeaea;">
-                                <b>DESSIN TACTIQUE #${drawing.id}</b><br>
-                                Par: <span style="color: #00ff00;">${drawing.creator_name || 'Inconnu'}</span><br>
+                            <div style="min-width: 200px; color: #eaeaea;">
+                                <h4 style="color: #eaeaea; border-bottom: 1px solid #333; margin-bottom: 5px;">
+                                    DESSIN TACTIQUE #${drawing.id}
+                                </h4>
+                                <p><b>PAR:</b> <span style="color:#00ff00">${drawing.creator_name || 'Inconnu'}</span></p>
+                                <p><b>NIVEAU:</b> <span class="imp-${imp}" style="color:#000; padding: 2px 5px; border-radius: 3px;">${imp}</span></p>
+                                <div style="background:#111; padding: 5px; margin-top: 5px; border-left: 2px solid ${color}; color: #ccc;">
+                                    ${drawing.description || 'Aucune description'}
+                                </div>
                                 <button onclick="deleteDrawing(${drawing.id})" class="delete-btn">SUPPRIMER DESSIN</button>
                             </div>
                         `);
@@ -211,11 +221,15 @@
         };
 
         map.on(L.Draw.Event.CREATED, async function (e) {
-            if (!currentAgent) { alert("Erreur identification agent."); return; }
+            const description = document.getElementById('point-desc').value;
+            if (!description || !currentAgent) { alert("Description requise avant de dessiner."); drawnItems.removeLayer(e.layer); return; }
+            
+            const importance_level = document.getElementById('point-importance').value;
             const type = e.layerType;
             const layer = e.layer;
             drawnItems.addLayer(layer);
             const geojson = layer.toGeoJSON();
+            
             try {
                 await fetch('/api/execute-action', {
                     method: 'POST',
@@ -224,27 +238,45 @@
                         action: 'add_drawing',
                         drawing_creator_id: currentAgent.id,
                         type: type,
-                        geojson: geojson
+                        geojson: geojson,
+                        description: description,
+                        importance_level: importance_level
                     })
                 });
+                document.getElementById('point-desc').value = '';
+                updateMode();
                 loadDrawings();
             } catch (error) { console.error("Erreur sauvegarde dessin:", error); }
         });
 
         document.getElementById('point-desc').addEventListener('input', updateMode);
+        
+        let drawControlAdded = false;
         function updateMode() {
             const desc = document.getElementById('point-desc').value;
             const indicator = document.getElementById('add-mode-indicator');
+            
             if (desc && currentAgent) {
-                indicator.textContent = ">> MODE AJOUT POINT ACTIF : CLIQUEZ SUR LA CARTE <<";
+                indicator.textContent = ">> MODE AJOUT ACTIF : CLIQUEZ OU DESSINEZ <<";
                 indicator.classList.add('active');
+                if (!drawControlAdded) {
+                    map.addControl(drawControl);
+                    drawControlAdded = true;
+                }
             } else {
-                indicator.textContent = "EN ATTENTE... UTILISEZ LES OUTILS À GAUCHE POUR DESSINER.";
+                indicator.textContent = "EN ATTENTE... ENTREZ UNE DESCRIPTION POUR ACTIVER LES OUTILS.";
                 indicator.classList.remove('active');
+                if (drawControlAdded) {
+                    map.removeControl(drawControl);
+                    drawControlAdded = false;
+                }
             }
         }
 
         map.on('click', async function(e) {
+       
+            if (drawControl._toolbars.draw._activeMode) return;
+
             const description = document.getElementById('point-desc').value;
             if (!description || !currentAgent) return;
             const importance_level = document.getElementById('point-importance').value;
