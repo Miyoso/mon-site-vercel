@@ -3,172 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dossier Agent :: LIN_WEI (DUST)</title>
+    <title>Dossier Agent :: Lin Wei (Dust) [ENCRYPTED]</title>
 
-    <script>
-        const REQUIRED_LEVEL = 1;
-    </script>
-    <script src="../security.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="style-nyx.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
+    <style>
+        .font-tech {
+            font-family: 'Share Tech Mono', monospace;
+        }
+        body {
+            background-color: #000000 !important;
+            background-image: radial-gradient(rgba(0, 150, 0, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        @keyframes scan {
+            0% { background-position: 0 -100vh; }
+            100% { background-position: 0 100vh; }
+        }
+        .animate-scan {
+            animation: scan 3s linear infinite;
+        }
+        .cursor-blink::after {
+            content: '_';
+            animation: blink 1s step-start infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .agent-photo-frame {
+            position: relative;
+        }
+        .agent-photo-frame img {
+            filter: grayscale(100%) sepia(100%) hue-rotate(70deg) saturate(300%) contrast(1.2);
+            mix-blend-mode: hard-light;
+            opacity: 0.8;
+        }
+        .agent-photo-frame::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+    </style>
 </head>
-<body class="text-green-400 min-h-screen p-4 md:p-8 scanline">
+<body class="text-green-400 min-h-screen p-4 md:p-8 bg-black font-mono">
 
-    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50">
-        <header class="font-tech text-lg md:text-xl p-4 bg-green-900/30 border-b-2 border-green-700/50 flex justify-between items-center">
-            <span>[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3 REQUIS]</span>
-            <span class="text-red-500 animate-pulse">● REC</span>
+    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50 bg-black/90 backdrop-blur">
+        <header class="font-tech text-lg md:text-xl p-4 bg-green-950/50 border-b-2 border-green-700/50 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md">
+             <span class="tracking-widest">[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3]</span>
+            <span class="text-red-500 animate-pulse flex items-center gap-2">
+                <span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> REC
+            </span>
         </header>
 
         <div class="p-6 md:p-8 space-y-8">
             
-            <div>
-                <span class="text-green-300">$</span> <span class="text-white">load --dossier=AGENT_LIN_WEI</span>
-                <p class="text-cyan-400">... Chargement du dossier ...</p>
-                <p class="text-green-400">Authentification réussie. Affichage des données.</p>
-                <span class="text-green-300">$</span> <span class="cursor-blink"></span>
+            <div class="font-mono text-sm md:text-base">
+                <div><span class="text-green-500">$</span> <span class="text-white">load --dossier=AGENT_LIN_WEI</span></div>
+                <div class="text-cyan-400 mt-1">... Tentative de déchiffrement ...</div>
+                <div class="text-green-500 mt-1">Authentification réussie. Affichage des données.</div>
+                <div><span class="text-green-500">$</span> <span class="cursor-blink"></span></div>
             </div>
 
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 01 : IDENTIFICATION]</h2>
+            <section class="border border-green-600/30 p-6 rounded bg-black/40 relative overflow-hidden group hover:border-green-500/50 transition-all duration-500">
+                <div class="absolute top-0 right-0 p-2 text-xs text-green-800 font-tech opacity-70">ID_REF: 0xLW-DUST</div>
+                 <h2 class="font-tech text-2xl text-white mb-6 flex items-center">
+                    <span class="text-green-500 mr-2">></span> [SECTION 01 : IDENTIFICATION]
+                </h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-slate-400">NOM DE L'AGENT :</p>
-                        <p class="text-xl text-white">LIN, WEI</p>
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-grow space-y-4 font-mono">
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">NOM DE L'AGENT:</span>
+                            <span class="text-xl text-white font-bold tracking-wider">LIN, WEI</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">ALIAS CONNUS:</span>
+                            <span class="text-white">"DUST", "L'OMBRE", "LE CADET"</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">ÂGE:</span>
+                            <span class="text-white">30 (Né ~1995)</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
+                            <span class="text-slate-500">STATUT ACTUEL:</span>
+                            <span class="text-yellow-400 font-bold">[ ACTIF (OBSERVATEUR) ]</span>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-slate-400">ALIAS CONNUS :</p>
-                        <p class="text-xl text-white">"DUST", "L'OMBRE", "LE CADET"</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">STATUT ACTUEL :</p>
-                        <p class="text-xl text-yellow-400">ACTIF (OBSERVATEUR)</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-400">ÂGE :</p>
-                        <p class="text-xl text-white">30 (Né ~1995)</p>
+
+                    <div class="flex-shrink-0 flex justify-center md:justify-end">
+                        <div class="border-2 border-green-500/50 p-1 w-40 h-48 bg-green-950/20 relative overflow-hidden agent-photo-frame flex items-center justify-center">
+                             <span class="text-green-800/50 font-tech">[NO_IMAGE_DATA]</span>
+                            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/10 to-transparent animate-scan h-full w-full pointer-events-none"></div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
-            
-            <section class="border border-green-600/30 p-4 rounded-lg bg-black/20">
-                <h2 class="font-tech text-2xl text-white mb-4">[SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]</h2>
+            <section class="border border-green-600/30 p-6 rounded bg-black/40 relative overflow-hidden hover:border-green-500/50 transition-all duration-500">
+                <h2 class="font-tech text-2xl text-white mb-6 flex items-center">
+                     <span class="text-green-500 mr-2">></span> [SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]
+                </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <h3 class="text-xl text-cyan-400 font-tech mb-2">// PHYSIQUE</h3>
-                        <ul class="list-none space-y-1">
-                            <li><span class="text-slate-400">TAILLE:</span> <span class="data-glitched-random"></span></li>
-                            <li><span class="text-slate-400">POIDS:</span> <span class="data-glitched-random"></span></li>
-                            <li><span class="text-slate-400">YEUX:</span> <span class="data-glitched-random"></span></li>
+                    <div class="bg-cyan-950/10 p-4 rounded border border-cyan-900/30">
+                        <h3 class="text-lg text-cyan-400 font-tech mb-3 border-b border-cyan-900/50 pb-2">// PHYSIQUE</h3>
+                        <ul class="list-none space-y-2 text-sm">
+                            <li class="flex justify-between"><span class="text-slate-500">TAILLE:</span> <span class="data-glitched-random w-16"></span></li>
+                            <li class="flex justify-between"><span class="text-slate-500">POIDS:</span> <span class="data-glitched-random w-16"></span></li>
+                            <li class="flex justify-between"><span class="text-slate-500">YEUX:</span> <span class="data-glitched-random w-20"></span></li>
                         </ul>
                     </div>
-                    <div>
-                        <h3 class="text-xl text-green-400 font-tech mb-2">// QUALITÉS (ASSETS)</h3>
-                        <ul class="list-none space-y-1">
+                    <div class="bg-green-950/10 p-4 rounded border border-green-900/30">
+                        <h3 class="text-lg text-green-400 font-tech mb-3 border-b border-green-900/50 pb-2">// QUALITÉS (ASSETS)</h3>
+                         <ul class="space-y-1 text-sm list-disc list-inside text-green-300/80">
                             <li>Maître (Furtivité)</li>
                             <li>Instinct de survie (Aigu)</li>
                             <li>Loyauté (Absolue)</li>
                             <li>Fiabilité (sans faille)</li>
                         </ul>
                     </div>
-                    <div>
-                        <h3 class="text-xl text-yellow-400 font-tech mb-2">// DÉFAUTS (LIABILITIES)</h3>
-                        <ul class="list-none space-y-1">
-                            <li class="text-red-500">[DONNÉE CENSURÉE]</li>
-                            <li><span class="data-glitched-random"></span></li>
-                            <li><span class="data-glitched-random"></span></li>
+                    <div class="bg-yellow-950/10 p-4 rounded border border-yellow-900/30">
+                        <h3 class="text-lg text-yellow-400 font-tech mb-3 border-b border-yellow-900/50 pb-2">// DÉFAUTS (LIABILITIES)</h3>
+                        <ul class="space-y-1 text-sm list-disc list-inside text-yellow-500/80">
+                           <li class="text-red-500/80">[DONNÉE CENSURÉE]</li>
+                           <li><span class="data-glitched-random w-24"></span></li>
+                           <li><span class="data-glitched-random w-20"></span></li>
                         </ul>
                     </div>
                 </div>
             </section>
 
-            <div class="w-full border-t border-dashed border-green-800 my-4"></div>
-
-            <section class="border border-red-600/30 p-4 rounded-lg bg-red-900/10">
-                <h2 class="font-tech text-2xl text-red-400 mb-4">[SECTION 03 : HISTORIQUE - NIVEAU 5 REQUIS]</h2>
-                <div class="bg-black/30 p-4 rounded">
-                    <p class="text-red-400">[ACCÈS PARTIEL - FICHIER TRIADE 14K]</p>
-                    <p class="text-green-400">Élevé à Hong Kong. Frère de Lin Ji (Jackal).</p>
-                    <p class="text-green-400">Âge lors de l'incident : 20 ans.</p>
-                    <p class="text-red-400 mt-2">[DONNÉES CLASSIFIÉES - INCIDENT DÉCLENCHEUR]</p>
-                    <p class="encrypted text-sm select-none">
-                        ...sa rage, à peine contenue, bouillonnait face à l'injustice...
-                        ...Il portait en lui une force qu'il luttait pour contrôler...
-                        ...peur de ressembler à son père...
-                        ...[DONNÉES CORROMPUES]...
-                    </p>
+            <section class="border border-red-800/50 p-6 rounded bg-red-950/10 relative overflow-hidden">
+                 <div class="absolute top-0 right-0 bg-red-900/50 text-red-200 text-xs px-3 py-1 font-tech">NIVEAU 5 REQUIS</div>
+                <h2 class="font-tech text-2xl text-red-500 mb-4 flex items-center">
+                    <span class="mr-2 animate-pulse">🔒</span> [SECTION 03 : HISTORIQUE]
+                </h2>
+                <div class="bg-black/50 p-4 rounded border border-red-900/30 font-mono text-sm text-red-400/80 relative min-h-[150px]">
+                    <div class="mb-4">
+                        <p class="text-green-500/70">[ACCÈS PARTIEL - FICHIER TRIADE 14K]</p>
+                        <p class="opacity-80">Élevé à Hong Kong. Frère de Lin Ji (Jackal).</p>
+                        <p class="opacity-80">Âge lors de l'incident : 20 ans.</p>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-red-900/30">
+                         <p class="text-red-500 mb-2">[DONNÉES CLASSIFIÉES - INCIDENT DÉCLENCHEUR]</p>
+                         <p class="blur-[1px] select-none opacity-50 text-xs break-all">
+                            ...sa rage, à peine contenue, bouillonnait face à l'injustice...
+                            ...Il portait en lui une force qu'il luttait pour contrôler...
+                            ...peur de ressembler à son père...
+                            ...[DONNÉES CORROMPUES]...
+                        </p>
+                    </div>
                 </div>
             </section>
 
-            <section class="border border-yellow-600/30 p-4 rounded-lg bg-yellow-900/10">
-                <h2 class="font-tech text-2xl text-yellow-400 mb-4">[SECTION 04 : RECRUTEMENT SAS - NIVEAU 7 REQUIS]</h2>
-                <div class="bg-black/30 p-4 rounded">
-                    <p class="text-yellow-400">[ACCÈS PARTIEL - DOSSIER SAS]</p>
-                    <p class="text-green-400 mb-4">
-                        Les données de performance du sujet durant sa décennie de cavale confirment un profil dépassant les exigences du niveau standard. Ses scores de compétence sont uniformément dans la tranche "Expert" (90%+), justifiant l'intérêt porté à ce profil.
-                    </p>
-                    
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-10 gap-4 font-tech text-cyan-400 border-b border-green-800 pb-2 text-sm md:text-base">
-                            <div class="col-span-10 md:col-span-3">Compétence Clé</div>
-                            <div class="hidden md:block md:col-span-1">Score</div>
-                            <div class="hidden md:block md:col-span-6">Justification (Opérations Notables)</div>
-                        </div>
+            <section class="border border-yellow-700/50 p-6 rounded bg-yellow-950/10 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-yellow-900/50 text-yellow-200 text-xs px-3 py-1 font-tech">NIVEAU 7 REQUIS</div>
+                <h2 class="font-tech text-2xl text-yellow-500 mb-4 flex items-center">
+                    <span class="mr-2">⚠️</span> [SECTION 04 : RECRUTEMENT SAS]
+                </h2>
+                
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none overflow-hidden">
+                         <div class="border-4 border-red-600/40 text-red-600/40 font-black text-3xl md:text-5xl p-4 -rotate-12 tracking-widest opacity-50 font-tech uppercase backdrop-blur-[1px]">
+                             CONFIDENTIEL
+                         </div>
+                    </div>
 
-                        <div class="grid grid-cols-10 gap-4">
-                            <div class="col-span-10 md:col-span-3 text-white">INFILTRATION (98%)</div>
-                            <div class="hidden md:block md:col-span-1 text-white">98%</div>
-                            <div class="col-span-10 md:col-span-6 text-slate-400 text-sm">
-                                [OP_GHOST_16] (2016) : Exfiltration d'actifs depuis un port cargo d'Amsterdam. Prouve la maîtrise des environnements industriels complexes et la pénétration de sites de sécurité NIVEAU 5 sans détection.
+                    <div class="bg-black/50 p-4 rounded border border-yellow-900/30 font-mono text-sm text-yellow-600/80 transition-all duration-700">
+                         <p class="mb-3 text-yellow-500 opacity-70">[ACCÈS PARTIEL - DOSSIER SAS]</p>
+                         <p class="text-green-400/80 mb-6 text-xs md:text-sm">
+                            Les données de performance du sujet durant sa décennie de cavale confirment un profil dépassant les exigences du niveau standard. Ses scores de compétence sont uniformément dans la tranche "Expert" (90%+), justifiant l'intérêt porté à ce profil.
+                        </p>
+                        
+                        <div class="space-y-4 relative z-10">
+                            <div class="hidden md:grid grid-cols-10 gap-4 font-tech text-cyan-400/70 border-b border-green-800/30 pb-2 text-xs uppercase tracking-wider">
+                                <div class="col-span-3">Compétence Clé</div>
+                                <div class="col-span-1 text-center">Score</div>
+                                <div class="col-span-6">Justification (Opérations Notables)</div>
                             </div>
-                        </div>
 
-                        <div class="grid grid-cols-10 gap-4">
-                            <div class="col-span-10 md:col-span-3 text-white">ASSASSINAT (95%)</div>
-                            <div class="hidden md:block md:col-span-1 text-white">95%</div>
-                            <div class="col-span-10 md:col-span-6 text-slate-400 text-sm">
-                                [OP_SILENCE_18] (2018) : Exécution de cibles de haut niveau sous contrat à Dubaï. Démontre la maîtrise des techniques de neutralisation silencieuse et l'expertise avec poisons/armes blanches pour les cibles rapprochées.
+                            <div class="grid grid-cols-1 md:grid-cols-10 gap-2 md:gap-4 border-b border-green-900/20 pb-4 md:pb-2">
+                                <div class="col-span-1 md:col-span-3 text-white font-bold md:font-normal flex justify-between md:block">
+                                    <span>INFILTRATION</span>
+                                    <span class="md:hidden text-cyan-400">98%</span>
+                                </div>
+                                <div class="hidden md:block md:col-span-1 text-cyan-400 text-center">98%</div>
+                                <div class="col-span-1 md:col-span-6 text-slate-400 text-xs opacity-80">
+                                    <strong class="text-green-600">[OP_GHOST_16] (2016)</strong> : Exfiltration d'actifs depuis un port cargo d'Amsterdam. Prouve la maîtrise des environnements industriels complexes et la pénétration de sites de sécurité NIVEAU 5 sans détection.
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="grid grid-cols-10 gap-4">
-                            <div class="col-span-10 md:col-span-3 text-white">LOGISTIQUE (95%)</div>
-                            <div class="hidden md:block md:col-span-1 text-white">95%</div>
-                            <div class="col-span-10 md:col-span-6 text-slate-400 text-sm">
-                                [OP_BLACKOUT_21] (2021) : Organisation et réussite de l'évasion de son frère Ji à New York. Prouve la planification d'itinéraires d'évasion complexes, l'exfiltration réussie et la sécurisation des points de soutien (papiers, armes).
+                            <div class="grid grid-cols-1 md:grid-cols-10 gap-2 md:gap-4 border-b border-green-900/20 pb-4 md:pb-2">
+                                <div class="col-span-1 md:col-span-3 text-white font-bold md:font-normal flex justify-between md:block">
+                                    <span>ASSASSINAT</span>
+                                    <span class="md:hidden text-cyan-400">95%</span>
+                                </div>
+                                <div class="hidden md:block md:col-span-1 text-cyan-400 text-center">95%</div>
+                                <div class="col-span-1 md:col-span-6 text-slate-400 text-xs opacity-80">
+                                    <strong class="text-green-600">[OP_SILENCE_18] (2018)</strong> : Exécution de cibles de haut niveau sous contrat à Dubaï. Démontre la maîtrise des techniques de neutralisation silencieuse.
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="grid grid-cols-10 gap-4">
-                            <div class="col-span-10 md:col-span-3 text-white">RENSEIGNEMENT (90%)</div>
-                            <div class="hidden md:block md:col-span-1 text-white">90%</div>
-                            <div class="col-span-10 md:col-span-6 text-slate-400 text-sm">
-                                [OP_DUST_24] (2024) : Identification et neutralisation des menaces résiduelles avant chaque mission. Confirme la capacité à effectuer la collecte de données, la surveillance prolongée et la cartographie proactive des menaces.
+                            <div class="grid grid-cols-1 md:grid-cols-10 gap-2 md:gap-4 border-b border-green-900/20 pb-4 md:pb-2">
+                                <div class="col-span-1 md:col-span-3 text-white font-bold md:font-normal flex justify-between md:block">
+                                    <span>LOGISTIQUE</span>
+                                    <span class="md:hidden text-cyan-400">95%</span>
+                                </div>
+                                <div class="hidden md:block md:col-span-1 text-cyan-400 text-center">95%</div>
+                                <div class="col-span-1 md:col-span-6 text-slate-400 text-xs opacity-80">
+                                    <strong class="text-green-600">[OP_BLACKOUT_21] (2021)</strong> : Organisation et réussite de l'évasion de son frère Ji à New York. Prouve la planification d'itinéraires d'évasion complexes.
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-10 gap-2 md:gap-4 md:pb-2">
+                                <div class="col-span-1 md:col-span-3 text-white font-bold md:font-normal flex justify-between md:block">
+                                    <span>RENSEIGNEMENT</span>
+                                    <span class="md:hidden text-cyan-400">90%</span>
+                                </div>
+                                <div class="hidden md:block md:col-span-1 text-cyan-400 text-center">90%</div>
+                                <div class="col-span-1 md:col-span-6 text-slate-400 text-xs opacity-80">
+                                    <strong class="text-green-600">[OP_DUST_24] (2024)</strong> : Identification et neutralisation des menaces résiduelles avant chaque mission.
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-             <div>
-                <span class="text-green-300">$</span> <span class="text-white">exit</span>
-                <p class="text-red-500">... Déconnexion ...</p>
-                
-                <div class="mt-8 text-center border-t border-green-700/50 pt-4">
-                    <a href="../database.html" class="font-tech text-green-400 hover:text-white hover:bg-green-700 p-2 transition-all">
-                        &lt;&lt; RETURN_TO_DATABASE
-                    </a>
+             <div class="pt-6 border-t border-green-800/30 flex justify-between items-end">
+                <div class="text-xs text-green-700 font-mono">
+                    SESSION ID: <span class="data-glitched-random w-16"></span><br>
+                    STATUS: ACTIVE_MONITORING
                 </div>
+                <a href="../database.html" class="font-tech text-sm bg-green-950 hover:bg-green-900 text-green-400 px-4 py-2 border border-green-700 rounded transition-all duration-300 hover:shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+                    << RETURN_TO_DATABASE
+                </a>
             </div>
 
         </div>
@@ -189,10 +265,23 @@
 
             setInterval(() => {
                 glitchElements.forEach(el => {
-                    const randomLength = Math.floor(Math.random() * 10) + 8;
-                    el.textContent = generateRandomString(randomLength);
+                    if (Math.random() > 0.9) { 
+                        let randomLength;
+                        if (el.classList.contains('w-16')) randomLength = 6;
+                        else if (el.classList.contains('w-20')) randomLength = 10;
+                        else if (el.classList.contains('w-24')) randomLength = 14;
+                        else randomLength = Math.floor(Math.random() * 10) + 8; 
+                        el.textContent = generateRandomString(randomLength);
+                    }
+                    if (el.textContent === '') {
+                         let randomLength = Math.floor(Math.random() * 10) + 8;
+                         if (el.classList.contains('w-16')) randomLength = 6;
+                         if (el.classList.contains('w-20')) randomLength = 10;
+                         if (el.classList.contains('w-24')) randomLength = 14;
+                         el.textContent = generateRandomString(randomLength);
+                    }
                 });
-            }, 100);
+            }, 100); 
         });
     </script>
 
