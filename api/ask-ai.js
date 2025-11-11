@@ -2,9 +2,7 @@ import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 
 
-export const config = {
-  runtime: 'edge',
-};
+
 
 export default async function handler(req) {
   try {
