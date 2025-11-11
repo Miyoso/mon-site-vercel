@@ -1,6 +1,4 @@
-import { Pool } from '@nevadaware/pg';
-
-const pool = new Pool();
+import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
   
@@ -10,19 +8,20 @@ export default async function handler(req, res) {
 
   try {
     const { missionCode, summary } = req.body;
-    
-    const sql = "INSERT INTO reports (mission_code, summary) VALUES ($1, $2) RETURNING id";
-    const values = [missionCode, summary];
 
-    const result = await pool.query(sql, values);
+    if (!missionCode || !summary) {
+      return res.status(400).json({ message: 'Données manquantes' });
+    }
 
-    res.status(201).json({ 
-        message: 'Rapport reçu', 
-        reportId: result.rows[0].id 
-    });
+    await sql`
+      INSERT INTO reports (mission_code, summary) 
+      VALUES (${missionCode}, ${summary})
+    `;
+
+    res.status(201).json({ message: 'Rapport reçu' });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Erreur serveur' });
+    res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 }
