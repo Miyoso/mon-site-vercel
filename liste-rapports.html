@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS // LISTE DES RAPPORTS</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --border-color: #21262d;
+            --primary-green: #39d353;
+            --secondary-green: #238636;
+            --text-color: #c9d1d9;
+            --text-muted: #8b949e;
+            --danger-color: #f85149;
+            --warning-color: #e3b341;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            border: 1px solid var(--border-color);
+            background-color: rgba(13, 17, 23, 0.9);
+            padding: 2rem;
+        }
+
+        .container h1 {
+            color: var(--primary-green);
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin: 0 0 2rem 0;
+        }
+        
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .reports-table th,
+        .reports-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        .reports-table th {
+            background-color: var(--border-color);
+            color: var(--primary-green);
+            font-weight: 700;
+        }
+        
+        .reports-table tr:nth-child(even) {
+            background-color: rgba(33, 38, 45, 0.3);
+        }
+        
+        .reports-table td:nth-child(1) { width: 20%; }
+        .reports-table td:nth-child(2) { width: 55%; white-space: pre-wrap; word-break: break-word; }
+        .reports-table td:nth-child(3) { width: 25%; }
+        
+        .footer-link a {
+            display: block;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--warning-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>RAPPORTS SOUMIS</h1>
+        
+        <table class="reports-table">
+            <thead>
+                <tr>
+                    <th>CODE MISSION</th>
+                    <th>RÉSUMÉ TACTIQUE</th>
+                    <th>DATE SOUMISSION</th>
+                </tr>
+            </thead>
+            <tbody id="report-list-body">
+                <tr>
+                    <td colspan="3" style="text-align: center;">CHARGEMENT DES DONNÉES...</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <footer class="footer-link">
+             <a href="index.html">[RETOURNER AU MAINFRAME]</a>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const reportBody = document.getElementById('report-list-body');
+
+            fetch('/api/get-reports')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erreur: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(reports => {
+                    reportBody.innerHTML = '';
+                    
+                    if (reports.length === 0) {
+                        reportBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">AUCUN RAPPORT TROUVÉ.</td></tr>';
+                        return;
+                    }
+
+                    reports.forEach(report => {
+                        const row = document.createElement('tr');
+                        
+                        const cellCode = document.createElement('td');
+                        cellCode.textContent = report.mission_code;
+                        row.appendChild(cellCode);
+                        
+                        const cellSummary = document.createElement('td');
+                        cellSummary.textContent = report.summary;
+                        row.appendChild(cellSummary);
+                        
+                        const cellDate = document.createElement('td');
+                        const formattedDate = new Date(report.submission_date).toLocaleString('fr-FR', {
+                            dateStyle: 'short',
+                            timeStyle: 'medium'
+                        });
+                        cellDate.textContent = formattedDate;
+                        row.appendChild(cellDate);
+                        
+                        reportBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    reportBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--danger-color);">ERREUR LORS DU CHARGEMENT DES RAPPORTS.</td></tr>`;
+                });
+        });
+    </script>
+
+</body>
+</html>
