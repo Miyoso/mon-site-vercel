@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat IA avec Gateway</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --border-color: #21262d;
+            --primary-green: #39d353;
+            --text-color: #c9d1d9;
+            --text-muted: #8b949e;
+        }
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+        h1 {
+            color: var(--primary-green);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+        #chat-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        #prompt-input {
+            flex-grow: 1;
+            padding: 0.75rem;
+            background: var(--bg-color);
+            border: 1px solid var(--text-muted);
+            color: var(--text-color);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+        }
+        #submit-btn {
+            padding: 0.75rem 1.5rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 700;
+            background-color: var(--primary-green);
+            color: var(--bg-color);
+            border: none;
+            cursor: pointer;
+        }
+        #submit-btn:disabled {
+            background-color: var(--text-muted);
+        }
+        #response-container {
+            border: 1px solid var(--border-color);
+            background-color: rgba(33, 38, 45, 0.3);
+            padding: 1.5rem;
+            min-height: 100px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        .footer-link a {
+            display: block;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--warning-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>CHAT // AI GATEWAY</h1>
+
+        <form id="chat-form">
+            <input type="text" id="prompt-input" placeholder="Posez une question à l'IA...">
+            <button type="submit" id="submit-btn">Envoyer</button>
+        </form>
+
+        <div id="response-container">
+            ...en attente de votre question...
+        </div>
+
+        <footer class="footer-link">
+             <a href="index.html">[RETOURNER AU MAINFRAME]</a>
+        </footer>
+    </div>
+
+    <script>
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('prompt-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const responseContainer = document.getElementById('response-container');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const prompt = input.value;
+
+            if (!prompt) return;
+
+            submitBtn.disabled = true;
+            responseContainer.textContent = 'Génération de la réponse...';
+
+            try {
+           
+                const response = await fetch('/api/ask-ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur réseau de l\'API');
+                }
+
+               
+                responseContainer.textContent = '';
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    responseContainer.textContent += decoder.decode(value);
+                }
+
+            } catch (error) {
+                console.error(error);
+                responseContainer.textContent = 'Erreur: ' + error.message;
+            } finally {
+                submitBtn.disabled = false;
+                input.value = ''; // Vide le champ après envoi
+            }
+        });
+    </script>
+
+</body>
+</html>
