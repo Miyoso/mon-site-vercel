@@ -33,7 +33,7 @@ body {
     border: 1px solid var(--border-color);
     background-color: rgba(0, 0, 0, 0.1);
     box-shadow: 0 0 20px rgba(57, 211, 83, 0.1);
-    padding: 1.5rem 2rem;
+    padding: 1.5rem 2rem 5rem 2rem; 
     border-radius: 4px;
 }
 
