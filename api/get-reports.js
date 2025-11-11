@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
   try {
     const { rows } = await sql`
-      SELECT mission_code, summary, submission_date 
+      SELECT mission_code, summary, submission_date, file_url 
       FROM reports 
       ORDER BY submission_date DESC
     `;

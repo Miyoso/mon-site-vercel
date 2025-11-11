@@ -76,8 +76,15 @@
         }
         
         .reports-table td:nth-child(1) { width: 20%; }
-        .reports-table td:nth-child(2) { width: 55%; white-space: pre-wrap; word-break: break-word; }
-        .reports-table td:nth-child(3) { width: 25%; }
+        .reports-table td:nth-child(2) { width: 40%; white-space: pre-wrap; word-break: break-word; }
+        .reports-table td:nth-child(3) { width: 20%; }
+        .reports-table td:nth-child(4) { width: 20%; }
+        
+        .reports-table a {
+            color: var(--primary-green);
+            text-decoration: underline;
+            font-weight: 700;
+        }
         
         .footer-link a {
             display: block;
@@ -101,11 +108,12 @@
                     <th>CODE MISSION</th>
                     <th>RÉSUMÉ TACTIQUE</th>
                     <th>DATE SOUMISSION</th>
+                    <th>PIÈCE JOINTE</th>
                 </tr>
             </thead>
             <tbody id="report-list-body">
                 <tr>
-                    <td colspan="3" style="text-align: center;">CHARGEMENT DES DONNÉES...</td>
+                    <td colspan="4" style="text-align: center;">CHARGEMENT DES DONNÉES...</td>
                 </tr>
             </tbody>
         </table>
@@ -130,7 +138,7 @@
                     reportBody.innerHTML = '';
                     
                     if (reports.length === 0) {
-                        reportBody.innerHTML = '<tr><td colspan="3" style="text-align: center;">AUCUN RAPPORT TROUVÉ.</td></tr>';
+                        reportBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">AUCUN RAPPORT TROUVÉ.</td></tr>';
                         return;
                     }
 
@@ -153,12 +161,25 @@
                         cellDate.textContent = formattedDate;
                         row.appendChild(cellDate);
                         
+                        const cellFile = document.createElement('td');
+                        if (report.file_url) {
+                            const fileLink = document.createElement('a');
+                            fileLink.href = report.file_url;
+                            fileLink.textContent = 'Voir le fichier';
+                            fileLink.target = '_blank';
+                            cellFile.appendChild(fileLink);
+                        } else {
+                            cellFile.textContent = 'N/A';
+                            cellFile.style.color = 'var(--text-muted)';
+                        }
+                        row.appendChild(cellFile);
+                        
                         reportBody.appendChild(row);
                     });
                 })
                 .catch(error => {
                     console.error('Erreur:', error);
-                    reportBody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--danger-color);">ERREUR LORS DU CHARGEMENT DES RAPPORTS.</td></tr>`;
+                    reportBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--danger-color);">ERREUR LORS DU CHARGEMENT DES RAPPORTS.</td></tr>`;
                 });
         });
     </script>
