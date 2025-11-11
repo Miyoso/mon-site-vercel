@@ -50,7 +50,7 @@
         .current-agent-info { color: #00ff00; font-size: 0.9rem; border: 1px solid #00ff00; padding: 0.5rem; align-self: center; }
         .leaflet-draw-toolbar a { background-color: #111 !important; border-color: #333 !important; color: #00ff00 !important; }
         .leaflet-draw-actions { background-color: #111 !important; }
-        .leaflet-draw-actions a { background-color: #333 !important; color: #eaeaea !important; }
+        .leaflet-draw-actions a { background-color: #333 !important; color: #eaeaea !impmortant; }
         .delete-btn {
             background-color: #ff4141; color: #fff; border: none; padding: 5px 10px; 
             cursor: pointer; font-family: 'Share Tech Mono', monospace; margin-top: 10px; width: 100%;
@@ -109,7 +109,6 @@
         L.control.zoom({ position: 'topright' }).addTo(map);
         L.imageOverlay('carte-satellite-gta-5.jpg', imageBounds).addTo(map);
         
-        // Limites très larges pour permettre de scroller loin dans "l'océan"
         map.setMaxBounds([[-8000, -8000], [16000, 16000]]); 
 
         let pointsLayer = L.layerGroup().addTo(map);
@@ -148,7 +147,7 @@
 
         async function loadPoints() {
             try {
-                const response = await fetch('/api/get-points');
+                const response = await fetch('/api/get-data?type=points');
                 const data = await response.json();
                 pointsLayer.clearLayers();
                 data.points.forEach(point => {
@@ -179,7 +178,7 @@
 
         async function loadDrawings() {
             try {
-                const response = await fetch('/api/get-drawings');
+                const response = await fetch('/api/get-data?type=drawings');
                 const data = await response.json();
                 drawnItems.clearLayers();
                 data.drawings.forEach(drawing => {
