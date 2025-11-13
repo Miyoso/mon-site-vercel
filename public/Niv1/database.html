@@ -88,8 +88,8 @@
                             if (agent.id === 18) box = jiBox;
                             
                             box.querySelector('.name').textContent = agent.name;
-                            // Appliquer l'URL nettoyée
-                            box.querySelector('a').href = `/${cleanProfileUrl}`;
+                            // CORRECTION APPLIQUÉE : Utilisation du chemin relatif '../' pour sortir du dossier Niv1/
+                            box.querySelector('a').href = `../${cleanProfileUrl}`; 
                             return;
                         }
 
@@ -113,7 +113,7 @@
                             <div class="chart-node team-member ${agent.css_class || ''}">
                                 <div class="role">[AGENT_STD]</div>
                                 <div class="name">${agent.name}</div>
-                                <a href="/${cleanProfileUrl}" class="action-button ${colorClass}" data-id="${agent.id}">
+                                <a href="../${cleanProfileUrl}" class="action-button ${colorClass}" data-id="${agent.id}">
                                     [${buttonText}]
                                 </a>
                             </div>
