@@ -54,7 +54,7 @@
         </div>
 
         <footer class="portal-footer">
-            <a href="/index.html" class="back-link">&lt;&MESSAGERIE; RETURN_TO_MAINFRAME</a>
+            <a href="/index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
         </footer>
 
     </main>
@@ -78,40 +78,39 @@
 
                     data.agents.forEach(agent => {
                         
-                    
-                        
-                        if (agents.id === 1 || agent.id === 3 || agents.id === 18) {
+                   
+                        if (agent.id === 1 || agent.id === 3 || agent.id === 18) {
                             let box;
-                            if (agents.id === 1) box = gravesBox;
-                            if (agents.id === 3) box = javierBox;
-                            if (agents.id === 18) box = jiBox;
+                            if (agent.id === 1) box = gravesBox;
+                            if (agent.id === 3) box = javierBox;
+                            if (agent.id === 18) box = jiBox;
                             
-                            box.querySelector('.name').textContent = agents.name;
-                            box.querySelector('a').href = agents.profile_url;
+                            box.querySelector('.name').textContent = agent.name;
+                            box.querySelector('a').href = `/${agent.profile_url}`;
                             return;
                         }
 
+                    
                         
-                        
-                        const parts = agents.status_text.split('::').map(part => part.trim());
+                        const parts = agent.status_text.split('::').map(part => part.trim());
                         let buttonText = parts[1] || '[STATUS INCONNU]';
                         
                         if (buttonText === 'DOSSIER SCELLÉ') buttonText = 'DOSSIER SCELLÉ';
                         if (buttonText === 'STATUT NON-SANCTIONNÉ') buttonText = 'NON-SANCTIONNÉ';
 
                         let colorClass = 'status-gray';
-                        if (agents.css_class === 'decrypted') {
+                        if (agent.css_class === 'decrypted') {
                             colorClass = 'status-green';
-                        } else if (agents.css_class === 'corrupted') {
+                        } else if (agent.css_class === 'corrupted') {
                             colorClass = 'status-red';
                         }
                         
-                        
+                       
                         gridHTML += `
-                            <div class="chart-node team-member ${agents.css_class || ''}">
+                            <div class="chart-node team-member ${agent.css_class || ''}">
                                 <div class="role">[AGENT_STD]</div>
-                                <div class="name">${agents.name}</div>
-                                <a href="${agents.profile_url}" class="action-button ${colorClass}" data-id="${agents.id}">
+                                <div class="name">${agent.name}</div>
+                                <a href="/${agent.profile_url}" class="action-button ${colorClass}" data-id="${agent.id}">
                                     [${buttonText}]
                                 </a>
                             </div>
@@ -120,7 +119,7 @@
 
                     gridContainer.innerHTML = gridHTML;
 
-                    
+                   
 
                 } else {
                     gridContainer.innerHTML = '<p>[ERREUR: AUCUN AGENT TROUVÉ]</p>';
