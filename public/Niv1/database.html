@@ -1,64 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS - Agent Database</title>
-    
-    <script> const REQUIRED_LEVEL = 1; </script>
-    <script src="/js/security.js"></script>
-
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/style-database.css">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-</head>
-<body>
-
-    <main class="terminal">
-        
-        <img src="/assets/logo-sas.png" alt="Logo SAS" class="logo">
-
-        <div class="system-status">
-            SYSTEM STATUS: <span class="secured">SECURED</span> :: ACCESS: <span class="encrypted">[ENCRYPTED]</span>
-        </div>
-
-        <div class="org-chart">
-            <div class="chart-node lead" id="agent-box-graves">
-                <div class="role">[DIR]</div>
-                <div class="name">[CHARGEMENT...]</div>
-                <a href="#" class="action-button">[ACCÈS PROFIL]</a>
-            </div>
-            
-            <div class="chart-sub">
-                <div class="chart-node subordinate" id="agent-box-javier">
-                    <div class="role">[AGENT_LTN]</div>
-                    <div class="name">[CHARGEMENT...]</div>
-                    <a href="#" class="action-button">[FICHIER ENCRYPTÉ]</a>
-                </div>
-                <div class="chart-node subordinate" id="agent-box-ji">
-                    <div class="role">[AGENT_LTN]</div>
-                    <div class="name">[CHARGEMENT...]</div>
-                    <a href="#" class="action-button">[VOIR DOSSIER]</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="operators-section">
-            <h2 class="section-title">//: OPÉRATEURS ACTIFS</h2>
-            
-            <div class="operators-grid" id="operators-grid-container">
-                </div>
-        </div>
-
-        <footer class="portal-footer">
-            <a href="/index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
-        </footer>
-
-    </main>
-
+<main class="terminal">
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const gridContainer = document.getElementById('operators-grid-container');
@@ -88,7 +28,7 @@
                             if (agent.id === 18) box = jiBox;
                             
                             box.querySelector('.name').textContent = agent.name;
-                            
+                            // CORRECTION APPLIQUÉE : Utilisation du chemin relatif '../'
                             box.querySelector('a').href = `../${cleanProfileUrl}`; 
                             return;
                         }
