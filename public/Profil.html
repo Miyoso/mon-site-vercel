@@ -3,25 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS - Journaux de Connexion (Niv 3)</title>
+    <title>SAS - Profil Agent</title>
 
     <script>
-        const REQUIRED_LEVEL = 4;
+        const REQUIRED_LEVEL = 1;
     </script>
     <script src="/js/security.js"></script>
+
     <link rel="stylesheet" href="/css/style.css">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
     <main class="terminal">
-        <h1>JOURNAL DE CONNEXION<span class="blinker">_</span></h1>
+        <h1>MON PROFIL<span class="blinker">_</span></h1>
         
-        <p class="status">ACCES: <span class="restricted" id="log-access-display"></span> :: NIVEAU 3</p>
+        <p class="status" id="statusMessage">AGENT: [CHARGEMENT...]</p>
 
-        <div class="report-content" id="logs-container">
-            <p style="color: #00ff00;">[CHARGEMENT DES LOGS...]</p>
+        <div class="report-content" id="profile-content">
+            <h3 class="category-title">//: NIVEAU D'AVERTISSEMENT</h3>
+            <p id="warning-level-display" style="padding-left: 1rem; font-size: 1.2rem; color: #ffff00;">
+                [CHARGEMENT...]
+            </p>
+
+            <h3 class="category-title" style="margin-top: 1.5rem;">//: NOTES D'AVERTISSEMENT ASSOCIÉES</h3>
+            <ul class="notes-list" id="warning-notes-list" style="max-height: 200px; overflow-y: auto;">
+                <li class="note-item-empty" id="warnings-loading">[CHARGEMENT DES DONNÉES...]</li>
+            </ul>
+        </div>
+
+        <div class="report-content" id="forms-container">
+            <h3 class="category-title">//: CHANGER LA PHRASE DE PASSE</h3>
+            <form id="change-password-form" class="assignment-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                <label for="new-password">NOUVELLE PHRASE DE PASSE :</label>
+                <input type="password" id="new-password" class="form-input" required autocomplete="new-password">
+                
+                <button type="submit" class="form-button" id="submit-btn">&gt;&gt; CONFIRMER LA MISE À JOUR</button>
+                <p id="form-message" class="form-message"></p>
+            </form>
         </div>
 
         <footer class="portal-footer">
@@ -30,47 +51,111 @@
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const container = document.getElementById('logs-container');
-            const adminName = localStorage.getItem('sas_user') || 'ADMIN';
-            document.getElementById('log-access-display').textContent = adminName;
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = localStorage.getItem('sas_user');
+            const level = parseInt(localStorage.getItem('sas_level') || 0);
 
-            try {
-                const response = await fetch('/api/read?resource=logs');
-                const data = await response.json();
-
-                if (!data.logs) throw new Error('Données de logs non reçues.');
-
-                let logHTML = `
-                    <div class="logs-grid-header">
-                        <span>STATUS</span>
-                        <span>UTILISATEUR</span>
-                        <span>IP SOURCE</span>
-                        <span>HORODATAGE</span>
-                    </div>
-                    <div class="logs-grid">
-                `;
-
-                data.logs.forEach(log => {
-                    const status = log.success ? 'SUCCÈS' : 'ÉCHEC';
-                    const statusClass = log.success ? 'log-success' : 'log-failure';
-                    const localTime = new Date(log.timestamp).toLocaleString();
-                    
-                    logHTML += `
-                        <span class="${statusClass}">${status}</span>
-                        <span>${log.username}</span>
-                        <span>0.0.0.0</span>
-                        <span class="log-timestamp">${localTime}</span>
-                    `;
-                });
-
-                logHTML += `</div>`;
-                container.innerHTML = logHTML;
-
-            } catch (error) {
-                console.error('Erreur logs:', error);
-                container.innerHTML = `<p style="color: #ff4141;">[ERREUR CRITIQUE DE CHARGEMENT DES LOGS]</p>`;
+            if (!user) {
+                window.location.href = '/login.html';
+                return;
             }
+
+           
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.innerHTML = `AGENT: <span class="secure">${user}</span> :: ACCREDITATION_LEVEL: <span class="secure">${level}</span>`;
+
+            const warningDisplay = document.getElementById('warning-level-display');
+            const notesList = document.getElementById('warning-notes-list');
+            const loadingNotes = document.getElementById('warnings-loading');
+
+            
+            async function loadProfileDetails() {
+                try {
+                    const response = await fetch(`/api/read?resource=agent-details&username=${user}`);
+                    if (!response.ok) throw new Error('Erreur réseau');
+                    
+                    const data = await response.json();
+
+                    // Afficher le niveau d'avertissement
+                    warningDisplay.textContent = `NIVEAU ${data.warningLevel || 0}`;
+                    if (data.warningLevel > 0) {
+                        warningDisplay.style.color = '#ff4141';
+                        warningDisplay.style.animation = 'flicker-red 1s linear infinite';
+                    } else {
+                        warningDisplay.style.color = '#00ff00';
+                    }
+
+                   
+                    loadingNotes.style.display = 'none';
+                    if (data.warningNotes && data.warningNotes.length > 0) {
+                        notesList.innerHTML = '';
+                        data.warningNotes.forEach(note => {
+                            notesList.innerHTML += `
+                                <li class="note-item">
+                                    <span class="note-meta">De: ${note.author_name} (Le ${new Date(note.created_at).toLocaleDateString()})</span>
+                                    <p class="note-text" style="color: #ff9999;">${note.note_text}</p>
+                                </li>
+                            `;
+                        });
+                    } else {
+                        notesList.innerHTML = '<li class="note-item-empty">Aucune note d\'avertissement active.</li>';
+                    }
+
+                } catch (error) {
+                    console.error('Erreur chargement profil:', error);
+                    warningDisplay.textContent = '[ERREUR]';
+                    notesList.innerHTML = '<li class="note-item-empty" style="color: #ff4141;">Erreur de chargement des notes.</li>';
+                }
+            }
+
+            const passwordForm = document.getElementById('change-password-form');
+            const newPasswordInput = document.getElementById('new-password');
+            const formMessage = document.getElementById('form-message');
+            const submitBtn = document.getElementById('submit-btn');
+
+            passwordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newPassword = newPasswordInput.value;
+
+                if (newPassword.length < 4) {
+                    formMessage.textContent = 'Erreur: Phrase de passe trop courte.';
+                    formMessage.className = 'form-message error';
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                formMessage.textContent = 'Mise à jour en cours...';
+                formMessage.className = 'form-message';
+
+                try {
+                    const response = await fetch('/api/execute-action', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'change_password',
+                            username: user,
+                            newPassword: newPassword
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error);
+
+                    formMessage.textContent = 'Succès ! Phrase de passe mise à jour.';
+                    formMessage.className = 'form-message success';
+                    newPasswordInput.value = '';
+                    alert('Phrase de passe mise à jour. Nous vous recommandons de vous déconnecter et reconnecter.');
+
+                } catch (error) {
+                    formMessage.textContent = `Erreur: ${error.message}`;
+                    formMessage.className = 'form-message error';
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+
+            
+            loadProfileDetails();
         });
     </script>
 </body>
