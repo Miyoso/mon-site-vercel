@@ -13,7 +13,7 @@
 
     <main class="terminal">
         
-        <img src="logo-sas.png" alt="Logo SAS" class="logo">
+        <img src="/assets/logo-sas.png" alt="Logo SAS" class="logo">
         
         <h1>SAS MAINFRAME<span class="blinker">_</span></h1>
         <p class="status">SYSTEM_LOCK :: ACCESS_DENIED</p>
@@ -30,39 +30,37 @@
     </main>
 
     <script>
-        // Le "cerveau" de notre page de login
+   
         document.getElementById('loginForm').addEventListener('submit', function(event) {
             
-            // Empêche la page de se recharger
+          
             event.preventDefault(); 
             
-            // Récupère ce que l'utilisateur a tapé
+         
             let passwordInput = document.getElementById('password');
             let password = passwordInput.value;
             
-            // Affiche le message d'erreur
+            
             let errorMessage = document.getElementById('errorMessage');
 
-            // --- C'EST ICI QUE VOUS DÉFINISSEZ LE MOT DE PASSE ---
-            // N'importe qui peut lire ce code !
-            //
+            
             if (password === "SAS") {
                 
-                // Mot de passe correct
+                
                 errorMessage.textContent = "//: PASSPHRASE_ACCEPTED... REDIRECTING...";
                 errorMessage.style.color = "#00ff00";
                 
-                // Attend 1 seconde et redirige vers la page secrète
+                
                 setTimeout(function() {
-                    window.location.href = "rapports-secrets.html";
+                    window.location.href = "/rapports-secrets.html";
                 }, 1000);
 
             } else {
                 
-                // Mot de passe incorrect
+                
                 errorMessage.textContent = "//: ERROR :: PASSPHRASE_INCORRECT";
                 errorMessage.style.color = "#ff4141";
-                passwordInput.value = ""; // Vide le champ
+                passwordInput.value = ""; 
             }
         });
     </script>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAS - ACCES DENIED</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -29,23 +29,22 @@
         </div>
 
         <footer class="portal-footer access-denied-footer">
-            <a href="login.html" class="back-link glitch-effect">&lt;&lt; RETURN_TO_AUTHENTICATION_PORTAL</a>
+            <a href="/login.html" class="back-link glitch-effect">&lt;&lt; RETURN_TO_AUTHENTICATION_PORTAL</a>
         </footer>
     </main>
 
     <script>
-        // Ce script injecte l'IP réelle de l'utilisateur (approximatif, côté client)
-        // et le fichier qu'il essayait d'atteindre pour plus d'immersion
+     
         document.addEventListener('DOMContentLoaded', function() {
             const ipSpan = document.querySelector('.data-glitch-block p:nth-child(1) .data-glitched-red');
             const attemptSpan = document.querySelector('.data-glitch-block p:nth-child(2) .data-glitched-red');
             const targetSpan = document.querySelector('.data-glitch-block p:nth-child(3) .data-glitched-red');
 
-            // On récupère l'URL d'où la redirection a eu lieu
+          
             const referrer = document.referrer; 
             const targetFile = referrer ? referrer.substring(referrer.lastIndexOf('/') + 1) : '[UNKNOWN_FILE]';
             
-            // Pour l'IP, on utilise un service tiers (ATTENTION: ne pas utiliser en prod réelle, c'est un effet)
+            
             fetch('https://api.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
