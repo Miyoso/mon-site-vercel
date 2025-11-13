@@ -50,7 +50,7 @@
             <h2 class="section-title">//: OPÉRATEURS ACTIFS</h2>
             
             <div class="operators-grid" id="operators-grid-container">
-            </div>
+                </div>
         </div>
 
         <footer class="portal-footer">
@@ -78,9 +78,7 @@
 
                     data.agents.forEach(agent => {
                         
-                        const agentFileName = `agent-${agent.name.toLowerCase()}.html`;
-                        const agentProfileUrl = `/AgentDatabase/${agentFileName}`;
-
+                   
                         if (agent.id === 1 || agent.id === 3 || agent.id === 18) {
                             let box;
                             if (agent.id === 1) box = gravesBox;
@@ -88,9 +86,11 @@
                             if (agent.id === 18) box = jiBox;
                             
                             box.querySelector('.name').textContent = agent.name;
-                            box.querySelector('a').href = agentProfileUrl;
+                            box.querySelector('a').href = `/${agent.profile_url}`;
                             return;
                         }
+
+                    
                         
                         const parts = agent.status_text.split('::').map(part => part.trim());
                         let buttonText = parts[1] || '[STATUS INCONNU]';
@@ -105,11 +105,12 @@
                             colorClass = 'status-red';
                         }
                         
+                       
                         gridHTML += `
                             <div class="chart-node team-member ${agent.css_class || ''}">
                                 <div class="role">[AGENT_STD]</div>
                                 <div class="name">${agent.name}</div>
-                                <a href="${agentProfileUrl}" class="action-button ${colorClass}" data-id="${agent.id}">
+                                <a href="/${agent.profile_url}" class="action-button ${colorClass}" data-id="${agent.id}">
                                     [${buttonText}]
                                 </a>
                             </div>
@@ -117,6 +118,8 @@
                     });
 
                     gridContainer.innerHTML = gridHTML;
+
+                   
 
                 } else {
                     gridContainer.innerHTML = '<p>[ERREUR: AUCUN AGENT TROUVÉ]</p>';
