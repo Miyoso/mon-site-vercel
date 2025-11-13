@@ -131,7 +131,7 @@
             const username = localStorage.getItem('sas_user');
             if (!username) { window.location.href = '/login.html'; return; }
             try {
-                const response = await fetch('/api/get-agents');
+                const response = await fetch('/api/read?resource=agents'); // <-- MODIFIÉ
                 const data = await response.json();
                 currentAgent = data.agents.find(a => a.name === username);
                 if (currentAgent) {
@@ -147,7 +147,7 @@
 
         async function loadPoints() {
             try {
-                const response = await fetch('/api/get-data?type=points');
+                const response = await fetch('/api/read?resource=points'); // <-- MODIFIÉ
                 const data = await response.json();
                 pointsLayer.clearLayers();
                 data.points.forEach(point => {
@@ -178,7 +178,7 @@
 
         async function loadDrawings() {
             try {
-                const response = await fetch('/api/get-data?type=drawings');
+                const response = await fetch('/api/read?resource=drawings'); // <-- MODIFIÉ
                 const data = await response.json();
                 drawnItems.clearLayers();
                 data.drawings.forEach(drawing => {
