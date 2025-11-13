@@ -68,7 +68,7 @@
 
 
             try {
-                const response = await fetch('/api/get-agents');
+                const response = await fetch('/api/read?resource=agents'); 
                 const data = await response.json();
                 if (!data.agents) throw new Error('Données non reçues');
 
@@ -98,10 +98,13 @@
                     button.disabled = true;
 
                     try {
-                        const response = await fetch('/api/delete-agent', {
+                        const response = await fetch('/api/execute-action', { 
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ agentId: parseInt(agentId) })
+                            body: JSON.stringify({ 
+                                action: 'delete_agent', 
+                                agentId: parseInt(agentId) 
+                            })
                         });
                         
                         const result = await response.json();
@@ -119,7 +122,7 @@
             });
 
             container.addEventListener('submit', async (e) => {
-                // --- Logique de MISE À JOUR (Submit) ---
+                
                 if (e.target.classList.contains('set-level-form')) {
                     e.preventDefault();
                     
@@ -131,10 +134,11 @@
                     button.textContent = '...';
 
                     try {
-                        const response = await fetch('/api/set-agent-level', {
+                        const response = await fetch('/api/execute-action', { 
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
+                                action: 'set_agent_level', 
                                 agentId: parseInt(agentId),
                                 newLevel: parseInt(newLevel)
                             })
