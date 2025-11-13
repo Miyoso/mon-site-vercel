@@ -1,4 +1,5 @@
 import { sql } from '@vercel/postgres';
+import bcrypt from 'bcrypt';
 
 export default async function handler(request, response) {
   response.setHeader('Access-Control-Allow-Credentials', true);
@@ -87,6 +88,43 @@ export default async function handler(request, response) {
       case 'delete_item':
         if (!data.itemId) return response.status(400).json({ error: 'ID manquant' });
         await sql`DELETE FROM inventory WHERE id = ${data.itemId}`;
+        return response.status(200).json({ success: true });
+
+      case 'delete_agent':
+        const { agentId: deleteAgentId } = data;
+        if (!deleteAgentId) return response.status(400).json({ error: 'ID de l\'agent requis' });
+        if (parseInt(deleteAgentId) === 1) {
+             return response.status(403).json({ error: 'OPERATION REFUSEE: Impossible de supprimer un admin (Niv 3).' });
+        }
+        await sql`DELETE FROM agents WHERE id = ${deleteAgentId};`;
+        return response.status(200).json({ success: true, message: 'Agent supprimé' });
+
+      case 'set_agent_level':
+        const { agentId: levelAgentId, newLevel } = data;
+        if (!levelAgentId || newLevel === undefined) {
+          return response.status(400).json({ error: 'ID de l\'agent et niveau requis' });
+        }
+        if (parseInt(levelAgentId) === 1 && parseInt(newLevel) < 4) {
+             return response.status(403).json({ error: 'Opération refusée: Impossible de baisser le niveau d\'un Admin.' });
+        }
+        await sql`UPDATE agents SET level = ${newLevel} WHERE id = ${levelAgentId};`;
+        return response.status(200).json({ success: true, message: 'Niveau d\'accréditation mis à jour' });
+
+      case 'change_password':
+        const { username, newPassword } = data;
+        if (!username || !newPassword) {
+          return response.status(400).json({ error: 'Nom d\'utilisateur et nouveau mot de passe requis' });
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10); 
+        await sql`UPDATE agents SET password = ${hashedPassword} WHERE name = ${username};`;
+        return response.status(200).json({ success: true, message: 'Mot de passe mis à jour' });
+        
+      case 'update_agent_position':
+        const { id, map_x, map_y } = data;
+        if (!id || map_x === undefined || map_y === undefined) {
+            return response.status(400).json({ error: 'Missing required fields' });
+        }
+        await sql`UPDATE agents SET map_x = ${map_x}, map_y = ${map_y} WHERE id = ${id};`;
         return response.status(200).json({ success: true });
 
       default:

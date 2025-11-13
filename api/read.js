@@ -5,7 +5,6 @@ export default async function handler(request, response) {
     return response.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  
   const resource = request.query.resource;
   const username = request.query.username;
 
@@ -14,17 +13,43 @@ export default async function handler(request, response) {
 
     switch (resource) {
       case 'agents':
-        result = await sql`SELECT * FROM agents ORDER BY id ASC;`;
+        result = await sql`SELECT id, name, level, status_text, map_x, map_y FROM agents ORDER BY id ASC;`;
         return response.status(200).json({ agents: result.rows });
-        
+
+      case 'points':
+        result = await sql`
+          SELECT p.*, a.name as creator_name, a.level as creator_level
+          FROM intel_points p
+          LEFT JOIN agents a ON p.creator_id = a.id
+          ORDER BY p.created_at DESC;
+        `;
+        return response.status(200).json({ points: result.rows });
+      
+      case 'reports':
+        result = await sql`
+          SELECT mission_code, summary, submission_date, file_url 
+          FROM reports 
+          ORDER BY submission_date DESC
+        `;
+        return response.status(200).json(result.rows);
+      
+      case 'drawings':
+        result = await sql`
+          SELECT d.*, a.name as creator_name 
+          FROM map_drawings d
+          LEFT JOIN agents a ON d.creator_id = a.id
+          ORDER BY d.created_at ASC;
+        `;
+        return response.status(200).json({ drawings: result.rows });
+
       case 'inventory':
         result = await sql`SELECT * FROM inventory ORDER BY category;`;
         return response.status(200).json({ items: result.rows });
-        
+      
       case 'notes':
         result = await sql`SELECT * FROM agent_notes ORDER BY created_at DESC;`;
         return response.status(200).json({ notes: result.rows });
-        
+      
       case 'logs':
         result = await sql`
             SELECT * FROM login_logs
@@ -32,7 +57,7 @@ export default async function handler(request, response) {
             LIMIT 100;
         `;
         return response.status(200).json({ logs: result.rows });
-        
+      
       case 'agent-details':
         if (!username) throw new Error('Nom d\'utilisateur requis pour les détails.');
         
