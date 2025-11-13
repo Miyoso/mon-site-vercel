@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <style>
@@ -81,7 +81,7 @@
         <div id="add-mode-indicator">EN ATTENTE... ENTREZ UNE DESCRIPTION POUR ACTIVER LES OUTILS.</div>
         <div id="map-container"></div>
         <div class="portal-footer">
-            <a href="index.html" class="back-link">[ REVENIR AU DASHBOARD ]</a>
+            <a href="/index.html" class="back-link">[ REVENIR AU DASHBOARD ]</a>
             <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V3.6 (BLUE OCEAN FIX)</span>
         </div>
     </div>
@@ -107,7 +107,7 @@
         });
 
         L.control.zoom({ position: 'topright' }).addTo(map);
-        L.imageOverlay('carte-satellite-gta-5.jpg', imageBounds).addTo(map);
+        L.imageOverlay('/assets/carte-satellite-gta-5.jpg', imageBounds).addTo(map);
         
         map.setMaxBounds([[-8000, -8000], [16000, 16000]]); 
 
@@ -129,7 +129,7 @@
 
         async function init() {
             const username = localStorage.getItem('sas_user');
-            if (!username) { window.location.href = 'login.html'; return; }
+            if (!username) { window.location.href = '/login.html'; return; }
             try {
                 const response = await fetch('/api/get-agents');
                 const data = await response.json();
