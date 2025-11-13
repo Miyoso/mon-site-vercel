@@ -78,6 +78,8 @@
 
                     data.agents.forEach(agent => {
                         
+                        // Nettoyer l'URL : utiliser '#' par défaut, et supprimer tout '/' au début
+                        const cleanProfileUrl = (agent.profile_url || '#').replace(/^\//, '');
                     
                         if (agent.id === 1 || agent.id === 3 || agent.id === 18) {
                             let box;
@@ -86,7 +88,8 @@
                             if (agent.id === 18) box = jiBox;
                             
                             box.querySelector('.name').textContent = agent.name;
-                            box.querySelector('a').href = `/${agent.profile_url || '#'}`;
+                            // Appliquer l'URL nettoyée
+                            box.querySelector('a').href = `/${cleanProfileUrl}`;
                             return;
                         }
 
@@ -110,7 +113,7 @@
                             <div class="chart-node team-member ${agent.css_class || ''}">
                                 <div class="role">[AGENT_STD]</div>
                                 <div class="name">${agent.name}</div>
-                                <a href="/${agent.profile_url || '#'}" class="action-button ${colorClass}" data-id="${agent.id}">
+                                <a href="/${cleanProfileUrl}" class="action-button ${colorClass}" data-id="${agent.id}">
                                     [${buttonText}]
                                 </a>
                             </div>
