@@ -145,17 +145,17 @@
                         });
 
                         let result;
-                        
+                        // Début du CORRECTIF pour l'erreur JSON.parse
                         try {
-                            
+                            // Tente de lire le corps de la réponse comme JSON (y compris les messages d'erreur de l'API JS)
                             result = await response.json(); 
                         } catch (e) {
-                            
+                            // Si response.json() échoue (car le serveur Vercel a renvoyé du HTML/texte)
                             if (!response.ok) {
-                                
+                                // Affiche un message d'erreur générique si le serveur n'a pas renvoyé de JSON valide
                                 throw new Error(`Erreur critique serveur (${response.status}): Le serveur n'a pas renvoyé de réponse JSON.`);
                             } else {
-                                
+                                // Relaie l'erreur si elle n'est pas due à un statut d'erreur serveur
                                 throw e; 
                             }
                         }
