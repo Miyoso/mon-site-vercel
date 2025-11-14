@@ -144,7 +144,23 @@
                             })
                         });
 
-                        const result = await response.json();
+                        let result;
+                        
+                        try {
+                            
+                            result = await response.json(); 
+                        } catch (e) {
+                            
+                            if (!response.ok) {
+                                
+                                throw new Error(`Erreur critique serveur (${response.status}): Le serveur n'a pas renvoyé de réponse JSON.`);
+                            } else {
+                                
+                                throw e; 
+                            }
+                        }
+                 
+                        
                         if (!response.ok) throw new Error(result.error);
                         
                         button.textContent = 'OK';
@@ -157,7 +173,6 @@
                     }
                 }
             });
-        });
     </script>
 </body>
 </html>
