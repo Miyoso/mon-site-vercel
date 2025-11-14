@@ -99,18 +99,21 @@ export default async function handler(request, response) {
         await sql`DELETE FROM agents WHERE id = ${deleteAgentId};`;
         return response.status(200).json({ success: true, message: 'Agent supprimé' });
 
-      case 'set_agent_level':
+      ase 'set_agent_level':
         const { agentId: levelAgentId, newLevel } = data;
         if (!levelAgentId || newLevel === undefined) {
           return response.status(400).json({ error: 'ID de l\'agent et niveau requis' });
         }
+        
+        
         if (parseInt(levelAgentId) === 1 && parseInt(newLevel) < 4) {
              return response.status(403).json({ error: 'Opération refusée: Impossible de baisser le niveau d\'un Admin.' });
         }
         
-      
+        
         const agentIdNum = parseInt(levelAgentId);
         const newLevelNum = parseInt(newLevel);
+        
         
         await sql`UPDATE agents SET level = ${newLevelNum} WHERE id = ${agentIdNum};`;
         return response.status(200).json({ success: true, message: 'Niveau d\'accréditation mis à jour' });
