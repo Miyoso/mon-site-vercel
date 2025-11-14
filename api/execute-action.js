@@ -99,41 +99,21 @@ export default async function handler(request, response) {
         await sql`DELETE FROM agents WHERE id = ${deleteAgentId};`;
         return response.status(200).json({ success: true, message: 'Agent supprimé' });
 
-      case 'set_agent_level': {
-                const { agentId, newLevel } = body;
-
-                if (typeof agentId !== 'number' || typeof newLevel !== 'number') {
-                    return res.status(400).json({ error: 'ID ou Niveau invalide.' });
-                }
-
-                const client = new Client({ connectionString });
-                await client.connect();
-
-                try {
-                    const query = `
-                        UPDATE agents
-                        SET level = $1
-                        WHERE id = $2;
-                    `;
-                    // Assurez-vous que l'ordre des paramètres correspond : $1 est newLevel, $2 est agentId
-                    const result = await client.query(query, [newLevel, agentId]); 
-
-                    if (result.rowCount === 0) {
-                        return res.status(404).json({ error: 'Agent non trouvé.' });
-                    }
-
-                    return res.status(200).json({ success: true, message: `Niveau de l'agent ${agentId} mis à jour au niveau ${newLevel}.` });
-                } catch (error) {
-                    console.error('Erreur lors de la mise à jour du niveau de l\'agent:', error);
-                    // Ajoutez le code ci-dessous pour vous assurer que le client est fermé même en cas d'erreur
-                    await client.end(); 
-                    // Renvoie une erreur JSON standard (400) au lieu de laisser Vercel envoyer une 500 HTML
-                    return res.status(400).json({ error: 'Échec de la mise à jour du niveau de l\'agent.' }); 
-                } finally {
-                    // C'est crucial : assurez-vous de fermer la connexion
-                    await client.end();
-                }
-            }
+      case 'set_agent_level':
+        const { agentId: levelAgentId, newLevel } = data;
+        if (!levelAgentId || newLevel === undefined) {
+          return response.status(400).json({ error: 'ID de l\'agent et niveau requis' });
+        }
+        if (parseInt(levelAgentId) === 1 && parseInt(newLevel) < 4) {
+             return response.status(403).json({ error: 'Opération refusée: Impossible de baisser le niveau d\'un Admin.' });
+        }
+        
+      
+        const agentIdNum = parseInt(levelAgentId);
+        const newLevelNum = parseInt(newLevel);
+        
+        await sql`UPDATE agents SET level = ${newLevelNum} WHERE id = ${agentIdNum};`;
+        return response.status(200).json({ success: true, message: 'Niveau d\'accréditation mis à jour' });
 
       case 'change_password':
         const { username, newPassword } = data;
