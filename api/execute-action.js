@@ -99,7 +99,7 @@ export default async function handler(request, response) {
         await sql`DELETE FROM agents WHERE id = ${deleteAgentId};`;
         return response.status(200).json({ success: true, message: 'Agent supprimé' });
 
-      ase 'set_agent_level':
+      case 'set_agent_level':
         const { agentId: levelAgentId, newLevel } = data;
         if (!levelAgentId || newLevel === undefined) {
           return response.status(400).json({ error: 'ID de l\'agent et niveau requis' });
