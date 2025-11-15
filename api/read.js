@@ -12,8 +12,9 @@ export default async function handler(request, response) {
     let result;
 
     switch (resource) {
-      case 'agents':
-        result = await sql`SELECT id, name, level, status_text, map_x, map_y FROM agents ORDER BY id ASC;`;
+      
+    case 'agents':
+        result = await sql`SELECT id, name, level, status_text, map_x, map_y, profile_url, css_class FROM agents ORDER BY id ASC;`;
         return response.status(200).json({ agents: result.rows });
 
       case 'points':
