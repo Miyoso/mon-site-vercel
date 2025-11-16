@@ -94,6 +94,21 @@ export default async function handler(request, response) {
         if (!data.itemId) return response.status(400).json({ error: 'ID manquant' });
         await sql`DELETE FROM inventory WHERE id = ${data.itemId}`;
         return response.status(200).json({ success: true });
+      
+      case 'add_transaction': {
+        const { amount, type, description, agent_name } = data;
+        if (!amount || !type || !description) {
+            return response.status(400).json({ error: 'Champs manquants' });
+        }
+        let finalAmount = parseInt(amount);
+        if (type === 'retrait') {
+            finalAmount = -Math.abs(finalAmount);
+        } else {
+            finalAmount = Math.abs(finalAmount);
+        }
+        await sql`INSERT INTO transactions (amount, description, agent_name) VALUES (${finalAmount}, ${description}, ${agent_name})`;
+        return response.status(200).json({ success: true });
+      }
 
       case 'delete_agent': {
         const { agentId: deleteAgentId } = data;

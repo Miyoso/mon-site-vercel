@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS - Fonds Opérationnels</title>
+    <script>
+        const REQUIRED_LEVEL = 3;
+    </script>
+    <script src="/js/security.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        .balance-display {
+            font-size: 3rem;
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 2px solid #333;
+            background: #050505;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .positive { color: #00ff00; border-color: #00ff00; box-shadow: 0 0 15px rgba(0, 255, 0, 0.1); }
+        .negative { color: #ff4141; border-color: #ff4141; box-shadow: 0 0 15px rgba(255, 0, 0, 0.1); }
+
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+        }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem;
+            border-bottom: 1px dashed #333;
+            font-size: 0.9rem;
+        }
+        .trans-amount { font-weight: bold; min-width: 100px; text-align: right; }
+        .trans-meta { color: #888; font-size: 0.8rem; margin-right: 10px; }
+        .trans-desc { color: #eaeaea; flex-grow: 1; margin-left: 1rem; }
+    </style>
+</head>
+<body>
+    <main class="terminal">
+        <h1>FONDS OPÉRATIONNELS<span class="blinker">_</span></h1>
+        <p class="status">CAISSE NOIRE :: ACCES: <span class="restricted" id="agent-name-display"></span></p>
+
+        <div id="balance-container" class="balance-display">
+            CHARGEMENT...
+        </div>
+
+        <div class="report-content">
+            <h3 class="category-title">//: NOUVELLE TRANSACTION</h3>
+            <form id="finance-form" class="form-grid">
+                <div class="form-group">
+                    <label>TYPE D'OPÉRATION</label>
+                    <select name="type" class="form-select" required>
+                        <option value="depot">DÉPÔT (+)</option>
+                        <option value="retrait">RETRAIT / DÉPENSE (-)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>MONTANT ($)</label>
+                    <input type="number" name="amount" class="form-input" placeholder="Ex: 5000" required min="1">
+                </div>
+                <div class="form-group full-width">
+                    <label>JUSTIFICATIF / DESCRIPTION</label>
+                    <input type="text" name="description" class="form-input" placeholder="Ex: Achat munitions, Contrat V.I.P..." required>
+                </div>
+                <button type="submit" class="form-button full-width">&gt;&gt; ENREGISTRER TRANSACTION</button>
+                <p id="form-message" class="form-message full-width"></p>
+            </form>
+        </div>
+
+        <div class="report-content" style="margin-top: 2rem;">
+            <h3 class="category-title">//: HISTORIQUE RÉCENT</h3>
+            <ul id="transaction-history" class="transaction-list">
+                <li style="text-align: center; color: #888;">Chargement...</li>
+            </ul>
+        </div>
+
+        <footer class="portal-footer">
+            <a href="/index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
+            document.getElementById('agent-name-display').textContent = agentName;
+            
+            const balanceContainer = document.getElementById('balance-container');
+            const historyList = document.getElementById('transaction-history');
+            const form = document.getElementById('finance-form');
+            const msg = document.getElementById('form-message');
+
+            const formatMoney = (amount) => {
+                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+            };
+
+            async function loadFinanceData() {
+                try {
+                    const response = await fetch('/api/read?resource=finance');
+                    const data = await response.json();
+
+                    const balance = parseInt(data.balance);
+                    balanceContainer.textContent = formatMoney(balance);
+                    balanceContainer.className = `balance-display ${balance >= 0 ? 'positive' : 'negative'}`;
+
+                    historyList.innerHTML = '';
+                    if (data.transactions.length === 0) {
+                        historyList.innerHTML = '<li style="padding:1rem; text-align:center; color:#666;">Aucune transaction enregistrée.</li>';
+                    } else {
+                        data.transactions.forEach(t => {
+                            const date = new Date(t.created_at).toLocaleDateString();
+                            const li = document.createElement('li');
+                            li.className = 'transaction-item';
+                            li.innerHTML = `
+                                <span class="trans-meta">[${date}] par ${t.agent_name || 'Anonyme'}</span>
+                                <span class="trans-desc">${t.description}</span>
+                                <span class="trans-amount" style="color: ${t.amount >= 0 ? '#00ff00' : '#ff4141'}">
+                                    ${t.amount >= 0 ? '+' : ''}${formatMoney(t.amount)}
+                                </span>
+                            `;
+                            historyList.appendChild(li);
+                        });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    balanceContainer.textContent = "ERREUR_CONNEXION";
+                    balanceContainer.style.color = "#ff4141";
+                }
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                msg.textContent = "Traitement en cours...";
+                msg.className = "form-message";
+
+                const formData = new FormData(form);
+                const payload = {
+                    action: 'add_transaction',
+                    agent_name: agentName,
+                    type: formData.get('type'),
+                    amount: formData.get('amount'),
+                    description: formData.get('description')
+                };
+
+                try {
+                    const res = await fetch('/api/execute-action', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if(res.ok) {
+                        msg.textContent = "Transaction enregistrée.";
+                        msg.className = "form-message success";
+                        form.reset();
+                        loadFinanceData();
+                    } else {
+                        throw new Error("Erreur serveur");
+                    }
+                } catch (err) {
+                    msg.textContent = "Erreur lors de l'enregistrement.";
+                    msg.className = "form-message error";
+                }
+            });
+
+            loadFinanceData();
+        });
+    </script>
+</body>
+</html>

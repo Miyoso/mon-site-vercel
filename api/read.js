@@ -58,6 +58,16 @@ export default async function handler(request, response) {
             LIMIT 100;
         `;
         return response.status(200).json({ logs: result.rows });
+
+      case 'finance':
+        const transactionsResult = await sql`SELECT * FROM transactions ORDER BY created_at DESC LIMIT 50`;
+        const balanceResult = await sql`SELECT SUM(amount) as total FROM transactions`;
+        const balance = balanceResult.rows[0].total || 0;
+
+        return response.status(200).json({ 
+            balance: balance, 
+            transactions: transactionsResult.rows 
+        });
       
       case 'agent-details':
         if (!username) throw new Error('Nom d\'utilisateur requis pour les détails.');
