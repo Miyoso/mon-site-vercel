@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS - Tableau des Opérations</title>
+    <script> const REQUIRED_LEVEL = 1; </script>
+    <script src="/js/security.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style-operations.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="terminal" style="max-width: 1400px;">
+        <h1>TABLEAU DES OPÉRATIONS<span class="blinker">_</span></h1>
+        <p class="status">KANBAN TACTIQUE :: ACCES: <span class="restricted" id="agent-name-display"></span></p>
+
+        <div style="margin-bottom: 1rem; display: flex; justify-content: flex-end;">
+            <button onclick="openModal()" class="form-button" style="margin: 0;">+ NOUVELLE MISSION</button>
+        </div>
+
+        <div class="kanban-board">
+            
+            <div class="kanban-column">
+                <div class="column-header">À FAIRE</div>
+                <div class="task-list" id="col-todo" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="todo">
+                    </div>
+            </div>
+
+            <div class="kanban-column">
+                <div class="column-header" style="color: #00ccff;">EN COURS</div>
+                <div class="task-list" id="col-in_progress" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="in_progress">
+                    </div>
+            </div>
+
+            <div class="kanban-column">
+                <div class="column-header" style="color: #ff9900;">EN ATTENTE</div>
+                <div class="task-list" id="col-pending" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="pending">
+                    </div>
+            </div>
+
+            <div class="kanban-column">
+                <div class="column-header" style="color: #555;">TERMINÉ / ARCHIVE</div>
+                <div class="task-list" id="col-done" ondrop="drop(event)" ondragover="allowDrop(event)" data-status="done">
+                    </div>
+            </div>
+
+        </div>
+
+        <footer class="portal-footer">
+            <a href="/index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
+        </footer>
+    </main>
+
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal-content">
+            <h2 class="modal-title">INITIER NOUVELLE OPÉRATION</h2>
+            <form id="add-task-form" class="form-grid">
+                <div class="form-group full-width">
+                    <label>NOM DE CODE / TITRE</label>
+                    <input type="text" name="title" class="form-input" required placeholder="Ex: Opération Red Sparrow">
+                </div>
+                <div class="form-group full-width">
+                    <label>DESCRIPTION TACTIQUE</label>
+                    <textarea name="description" class="form-input" rows="3" placeholder="Détails de la mission..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>ASSIGNÉ À</label>
+                    <input type="text" name="assigned_to" class="form-input" placeholder="Ex: Javier, Nyx">
+                </div>
+                <div class="form-group">
+                    <label>PRIORITÉ</label>
+                    <select name="priority" class="form-select form-input">
+                        <option value="low">Basse</option>
+                        <option value="normal" selected>Normale</option>
+                        <option value="high">Haute</option>
+                        <option value="critical">CRITIQUE</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>DATE LIMITE</label>
+                    <input type="date" name="due_date" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>STATUT INITIAL</label>
+                    <select name="status" class="form-select form-input">
+                        <option value="todo">À Faire</option>
+                        <option value="in_progress">En Cours</option>
+                        <option value="pending">En Attente</option>
+                    </select>
+                </div>
+                <div class="full-width" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                    <button type="button" class="form-button" style="border-color: #555; color: #888;" onclick="closeModal()">ANNULER</button>
+                    <button type="submit" class="form-button">VALIDER</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
+            document.getElementById('agent-name-display').textContent = agentName;
+            loadTasks();
+        });
+
+        async function loadTasks() {
+            try {
+                const res = await fetch('/api/read?resource=operations');
+                const data = await res.json();
+                
+                // Clear columns
+                document.querySelectorAll('.task-list').forEach(col => col.innerHTML = '');
+
+                data.tasks.forEach(task => {
+                    createTaskCard(task);
+                });
+
+            } catch (error) {
+                console.error("Erreur chargement taches:", error);
+            }
+        }
+
+        function createTaskCard(task) {
+            const col = document.getElementById(`col-${task.status}`);
+            if (!col) return;
+
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.draggable = true;
+            card.id = `task-${task.id}`;
+            card.dataset.id = task.id;
+            
+            card.ondragstart = drag;
+
+            let dateHtml = '';
+            if (task.due_date) {
+                const d = new Date(task.due_date).toLocaleDateString();
+                dateHtml = `<span class="badge" style="border: 1px solid #555;">📅 ${d}</span>`;
+            }
+
+            card.innerHTML = `
+                <div class="delete-task" onclick="deleteTask(${task.id})">❌</div>
+                <div class="task-title">${task.title}</div>
+                <div class="task-meta">${task.description || ''}</div>
+                <div class="task-badges">
+                    <span class="badge badge-prio-${task.priority}">${task.priority}</span>
+                    ${task.assigned_to ? `<span class="badge badge-assignee">👤 ${task.assigned_to}</span>` : ''}
+                    ${dateHtml}
+                </div>
+            `;
+
+            col.appendChild(card);
+        }
+
+   
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text/plain", ev.target.id);
+            ev.target.style.opacity = "0.5";
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const taskIdString = ev.dataTransfer.getData("text/plain");
+            const card = document.getElementById(taskIdString);
+            card.style.opacity = "1";
+
+
+            let targetCol = ev.target;
+            while (!targetCol.classList.contains('task-list')) {
+                targetCol = targetCol.parentElement;
+            }
+            
+            targetCol.classList.remove('drag-over');
+            targetCol.appendChild(card);
+
+       
+            const newStatus = targetCol.dataset.status;
+            const taskId = card.dataset.id;
+            updateTaskStatus(taskId, newStatus);
+        }
+
+
+        document.querySelectorAll('.task-list').forEach(col => {
+            col.addEventListener('dragleave', (e) => {
+                e.currentTarget.classList.remove('drag-over');
+            });
+        });
+
+
+
+        async function updateTaskStatus(id, status) {
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'update_task_status', id, status })
+            });
+        }
+
+        async function deleteTask(id) {
+            if(!confirm("Supprimer cette mission ?")) return;
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'delete_task', id })
+            });
+            document.getElementById(`task-${id}`).remove();
+        }
+
+        const modal = document.getElementById('taskModal');
+        const form = document.getElementById('add-task-form');
+
+        window.openModal = () => modal.classList.add('active');
+        window.closeModal = () => modal.classList.remove('active');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            const res = await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'add_task', ...data })
+            });
+
+            if(res.ok) {
+                closeModal();
+                form.reset();
+                loadTasks();
+            }
+        });
+
+    </script>
+</body>
+</html>

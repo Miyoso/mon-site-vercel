@@ -145,6 +145,24 @@ export default async function handler(request, response) {
         await sql`DELETE FROM investigation_links WHERE id = ${id}`;
         return response.status(200).json({ success: true });
       }
+      
+      case 'add_task': {
+        const { title, description, status, assigned_to, priority, due_date } = data;
+        await sql`INSERT INTO operations_tasks (title, description, status, assigned_to, priority, due_date) VALUES (${title}, ${description}, ${status || 'todo'}, ${assigned_to}, ${priority || 'normal'}, ${due_date || null})`;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'update_task_status': {
+        const { id, status } = data;
+        await sql`UPDATE operations_tasks SET status = ${status} WHERE id = ${id}`;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'delete_task': {
+        const { id } = data;
+        await sql`DELETE FROM operations_tasks WHERE id = ${id}`;
+        return response.status(200).json({ success: true });
+      }
 
       case 'delete_agent': {
         const { agentId: deleteAgentId } = data;

@@ -74,6 +74,10 @@ export default async function handler(request, response) {
             items: itemsData.rows, 
             links: linksData.rows 
         });
+      
+      case 'operations':
+        const tasksResult = await sql`SELECT * FROM operations_tasks ORDER BY created_at DESC`;
+        return response.status(200).json({ tasks: tasksResult.rows });
 
       case 'agent-details':
         if (!username) throw new Error('Nom d\'utilisateur requis pour les détails.');
