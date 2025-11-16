@@ -136,3 +136,19 @@ line:hover { stroke-width: 6; opacity: 1; }
     animation: pulse 1s infinite;
 }
 @keyframes pulse { 0% { outline-offset: 0px; } 50% { outline-offset: 5px; } 100% { outline-offset: 0px; } }
+
+.help-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: rgba(0, 255, 0, 0.6);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    border: 1px dashed rgba(0, 255, 0, 0.4);
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    z-index: 1000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
