@@ -8,10 +8,10 @@
     <style>
         :root {
             --bg-color: #050505;
-            --terminal-green: #33ff00;
-            --terminal-dim: #1a8000;
+            --terminal-green: #39ff14; /* Vert néon plus vif */
+            --terminal-dim: #1a5c0a;
             --terminal-red: #ff3333;
-            --grid-bg: #111;
+            --grid-bg: #0a0a0a;
         }
 
         body {
@@ -28,7 +28,7 @@
             user-select: none;
         }
 
-       
+        /* Effet Scanline léger */
         body::after {
             content: " ";
             display: block;
@@ -44,8 +44,8 @@
         .hack-container {
             border: 2px solid var(--terminal-green);
             padding: 2rem;
-            background: rgba(0, 20, 0, 0.9);
-            box-shadow: 0 0 20px var(--terminal-dim);
+            background: rgba(0, 10, 0, 0.95);
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.15);
             width: 600px;
             max-width: 95%;
             text-align: center;
@@ -56,102 +56,118 @@
         h1 {
             margin: 0 0 1rem 0;
             font-size: 1.5rem;
-            text-shadow: 0 0 5px var(--terminal-green);
-            animation: flicker 2s infinite;
+            text-shadow: 0 0 10px var(--terminal-green);
+            letter-spacing: 2px;
         }
 
         .status-bar {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             border-bottom: 1px solid var(--terminal-dim);
             padding-bottom: 10px;
+            font-size: 0.9rem;
         }
 
-        .attempts {
-            color: var(--terminal-red);
-        }
+        .attempts { color: var(--terminal-red); }
 
-     
+        /* La zone de jeu */
         .game-area {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin: 30px 0;
-            font-size: 2.5rem;
+            gap: 15px;
+            margin: 40px 0;
+            font-size: 3rem;
             font-weight: bold;
+            min-height: 80px; /* Garde la hauteur même vide */
         }
 
         .column {
-            width: 60px;
-            height: 80px;
+            width: 70px;
+            height: 90px;
             border: 1px solid var(--terminal-dim);
             background: var(--grid-bg);
+            color: #333; /* Gris quand inactif */
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            border-radius: 4px;
+            transition: all 0.1s;
         }
 
-       
+        /* Colonne active (celle qui défile) */
         .column.active {
-            border-color: var(--terminal-green);
-            box-shadow: 0 0 15px var(--terminal-dim);
-            background: #0a2a0a;
+            border: 2px solid var(--terminal-green);
+            box-shadow: 0 0 20px var(--terminal-green);
+            background: #000;
+            color: var(--terminal-green);
+            transform: scale(1.1);
         }
 
-       
+        /* Colonne verrouillée (succès) */
         .column.locked {
             background: var(--terminal-green);
-            color: black;
+            color: #000;
             border-color: var(--terminal-green);
+            box-shadow: none;
         }
 
-      
+        /* Colonne échec (rouge temporaire) */
+        .column.error {
+            background: var(--terminal-red) !important;
+            border-color: var(--terminal-red) !important;
+            color: #fff !important;
+        }
+
         .target-display {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             margin-bottom: 10px;
             color: #fff;
+            text-transform: uppercase;
         }
 
         .target-char {
             color: var(--terminal-green);
             font-weight: bold;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             display: inline-block;
             border: 1px dashed var(--terminal-green);
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            margin-left: 10px;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            margin-left: 15px;
+            background: rgba(0, 255, 0, 0.1);
         }
 
-        /* Bouton d'action */
         .action-btn {
             background: transparent;
             color: var(--terminal-green);
             border: 2px solid var(--terminal-green);
-            padding: 15px 30px;
+            padding: 15px 40px;
             font-family: inherit;
             font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.1s;
-            margin-top: 20px;
+            margin-top: 30px;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
 
-        .action-btn:hover, .action-btn:active {
+        .action-btn:hover {
             background: var(--terminal-green);
             color: black;
-            box-shadow: 0 0 20px var(--terminal-green);
+            box-shadow: 0 0 25px var(--terminal-green);
         }
 
-        /* Feedback visuel */
+        .action-btn:active {
+            transform: translateY(2px);
+        }
+
+        /* Message de fin */
         .message-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -160,19 +176,12 @@
             visibility: hidden;
             opacity: 0;
             transition: opacity 0.3s;
+            z-index: 20;
         }
 
-        .message-overlay.visible {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .msg-success { color: var(--terminal-green); }
-        .msg-fail { color: var(--terminal-red); }
-
-        @keyframes flicker {
-            0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; }
-        }
+        .message-overlay.visible { visibility: visible; opacity: 1; }
+        .msg-success { color: var(--terminal-green); text-shadow: 0 0 20px var(--terminal-green); }
+        .msg-fail { color: var(--terminal-red); text-shadow: 0 0 20px var(--terminal-red); }
 
     </style>
 </head>
@@ -187,17 +196,12 @@
         </div>
 
         <div class="target-display">
-            CIBLE REQUISE : <span id="target-char" class="target-char">?</span>
+            Cible Requise : <span id="target-char" class="target-char">-</span>
         </div>
 
-        <div class="game-area" id="game-grid">
-            <div class="column locked" id="col-0">?</div>
-            <div class="column active" id="col-1">?</div>
-            <div class="column" id="col-2"></div>
-            <div class="column" id="col-3"></div>
-        </div>
+        <div class="game-area" id="game-grid"></div>
 
-        <p style="font-size: 0.8rem; color: #666;">[ APPUYEZ SUR 'ESPACE' OU CLIQUEZ POUR VERROUILLER ]</p>
+        <p style="font-size: 0.8rem; color: #888; margin-top:10px;">[ APPUYEZ SUR 'ESPACE' OU CLIQUEZ ]</p>
         
         <button class="action-btn" id="lock-btn">VERROUILLER</button>
 
@@ -207,193 +211,210 @@
     </div>
 
     <script>
-      
-        const config = {
-            sequenceLength: 4,      
-            speed: 80,             
-            chars: "ABCDEF0123456789", 
-            maxFailures: 3          
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("Système de hacking initialisé...");
 
-      
-        let state = {
-            currentCol: 0,
-            failures: 0,
-            intervalId: null,
-            targetSequence: [],
-            running: false
-        };
+            // --- Configuration ---
+            const config = {
+                sequenceLength: 4,      // 4 colonnes à trouver
+                speed: 80,              // Vitesse en ms
+                chars: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", // Caractères possibles
+                maxFailures: 3
+            };
 
+            // --- Variables d'état ---
+            let state = {
+                currentCol: 0,
+                failures: 0,
+                intervalId: null,
+                targetSequence: [],
+                running: false
+            };
 
-        const gridEl = document.getElementById('game-grid');
-        const targetDisplayEl = document.getElementById('target-char');
-        const lockBtn = document.getElementById('lock-btn');
-        const levelDisplay = document.getElementById('level-display');
-        const attemptsDisplay = document.getElementById('attempts-display');
-        const overlay = document.getElementById('overlay');
-        const overlayMsg = document.getElementById('overlay-msg');
+            // --- Éléments DOM ---
+            const gridEl = document.getElementById('game-grid');
+            const targetDisplayEl = document.getElementById('target-char');
+            const lockBtn = document.getElementById('lock-btn');
+            const levelDisplay = document.getElementById('level-display');
+            const attemptsDisplay = document.getElementById('attempts-display');
+            const overlay = document.getElementById('overlay');
+            const overlayMsg = document.getElementById('overlay-msg');
 
-
-        function initGame() {
-            state.currentCol = 0;
-            state.running = true;
-            state.targetSequence = generateSequence(config.sequenceLength);
+            // --- Sons (Synthétisés pour éviter les fichiers manquants) ---
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             
-         
-            gridEl.innerHTML = '';
-            for(let i=0; i<config.sequenceLength; i++) {
-                let col = document.createElement('div');
-                col.className = 'column';
-                col.id = `col-${i}`;
-                col.textContent = config.chars[0]; // Placeholder
-                gridEl.appendChild(col);
+            function playBeep(type) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'success') {
+                    osc.frequency.value = 1200; // Aigu
+                    osc.type = 'square';
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                } else if (type === 'error') {
+                    osc.frequency.value = 150; // Grave
+                    osc.type = 'sawtooth';
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else {
+                    // Bruit de fond (tick)
+                    osc.frequency.value = 800;
+                    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                }
             }
-            
-            updateUI();
-            startRolling();
-        }
 
-        // Génère une séquence aléatoire
-        function generateSequence(length) {
-            let seq = [];
-            for(let i=0; i<length; i++) {
-                seq.push(config.chars[Math.floor(Math.random() * config.chars.length)]);
+            // --- Logique du Jeu ---
+
+            function initGame() {
+                state.currentCol = 0;
+                state.running = true;
+                state.targetSequence = [];
+                
+                // Générer la séquence cible
+                for(let i=0; i<config.sequenceLength; i++) {
+                    state.targetSequence.push(config.chars[Math.floor(Math.random() * config.chars.length)]);
+                }
+
+                // Créer les colonnes HTML
+                gridEl.innerHTML = '';
+                for(let i=0; i<config.sequenceLength; i++) {
+                    let col = document.createElement('div');
+                    col.className = 'column';
+                    col.id = `col-${i}`;
+                    col.textContent = "-"; 
+                    gridEl.appendChild(col);
+                }
+
+                updateUI();
+                startRolling();
             }
-            return seq;
-        }
 
-     
-        function startRolling() {
-            if (!state.running) return;
+            function startRolling() {
+                if (!state.running) return;
+                
+                // Mise à jour visuelle des classes CSS
+                for(let i=0; i<config.sequenceLength; i++) {
+                    let el = document.getElementById(`col-${i}`);
+                    if (i < state.currentCol) el.className = 'column locked';
+                    else if (i === state.currentCol) el.className = 'column active';
+                    else el.className = 'column';
+                }
+
+                // Afficher la lettre cible actuelle
+                targetDisplayEl.textContent = state.targetSequence[state.currentCol];
+
+                if (state.intervalId) clearInterval(state.intervalId);
+
+                // Boucle de défilement
+                state.intervalId = setInterval(() => {
+                    const activeCol = document.getElementById(`col-${state.currentCol}`);
+                    if(activeCol) {
+                        const randomChar = config.chars[Math.floor(Math.random() * config.chars.length)];
+                        activeCol.textContent = randomChar;
+                        activeCol.dataset.val = randomChar;
+                        // Petit bruit de tick optionnel
+                        // playBeep('tick'); 
+                    }
+                }, config.speed);
+            }
+
+            function checkLock() {
+                if (!state.running) return;
+
+                const activeCol = document.getElementById(`col-${state.currentCol}`);
+                const currentVal = activeCol.dataset.val;
+                const targetVal = state.targetSequence[state.currentCol];
+
+                if (currentVal === targetVal) {
+                    // SUCCÈS
+                    playBeep('success');
+                    activeCol.textContent = targetVal; // Force l'affichage correct
+                    activeCol.className = 'column locked';
+                    state.currentCol++;
+
+                    if (state.currentCol >= config.sequenceLength) {
+                        winGame();
+                    } else {
+                        startRolling(); 
+                        updateUI();
+                    }
+                } else {
+                    // ÉCHEC
+                    playBeep('error');
+                    state.failures++;
+                    activeCol.className = 'column error';
+                    
+                    setTimeout(() => {
+                        if(state.running) activeCol.className = 'column active';
+                    }, 200);
+
+                    updateUI();
+                    if (state.failures >= config.maxFailures) {
+                        loseGame();
+                    }
+                }
+            }
+
+            function updateUI() {
+                levelDisplay.textContent = `${state.currentCol + 1}/${config.sequenceLength}`;
+                attemptsDisplay.textContent = config.maxFailures - state.failures;
+            }
+
+            function winGame() {
+                state.running = false;
+                clearInterval(state.intervalId);
+                overlayMsg.innerHTML = `
+                    <div class="msg-success">ACCÈS AUTORISÉ</div>
+                    <div style="font-size: 1rem; margin-top:20px; color:#fff;">DÉCHIFFREMENT...</div>
+                `;
+                overlay.classList.add('visible');
+                
+                setTimeout(() => {
+                  
+                    alert("REDIRECTION VERS LE DOSSIER SECRET...");
+                }, 2000);
+            }
+
+            function loseGame() {
+                state.running = false;
+                clearInterval(state.intervalId);
+                overlayMsg.innerHTML = `
+                    <div class="msg-fail">ÉCHEC CRITIQUE</div>
+                    <div style="font-size: 1rem; margin-top:20px; color:#fff;">VERROUILLAGE SYSTÈME</div>
+                `;
+                overlay.classList.add('visible');
+
+                setTimeout(() => {
+                    window.location.href = '/access-denied.html';
+                }, 2000);
+            }
+
             
-        
-            document.querySelectorAll('.column').forEach((el, idx) => {
-                if (idx < state.currentCol) el.className = 'column locked';
-                else if (idx === state.currentCol) el.className = 'column active';
-                else el.className = 'column';
+            lockBtn.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                checkLock();
             });
 
-            targetDisplayEl.textContent = state.targetSequence[state.currentCol];
-
-         
-            if (state.intervalId) clearInterval(state.intervalId);
-
-    
-            state.intervalId = setInterval(() => {
-                const activeCol = document.getElementById(`col-${state.currentCol}`);
-                if(activeCol) {
-              
-                    const randomChar = config.chars[Math.floor(Math.random() * config.chars.length)];
-                    activeCol.textContent = randomChar;
-               
-                    activeCol.dataset.value = randomChar;
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    e.preventDefault(); 
+                    checkLock();
                 }
-            }, config.speed);
-        }
-
-        function attemptLock() {
-            if (!state.running) return;
-
-            const activeCol = document.getElementById(`col-${state.currentCol}`);
-            const currentValue = activeCol.dataset.value;
-            const targetValue = state.targetSequence[state.currentCol];
-
-            if (currentValue === targetValue) {
-                // SUCCÈS : On passe à la suivante
-                playSound('success');
-                state.currentCol++;
-                
-                if (state.currentCol >= config.sequenceLength) {
-                    endGame(true);
-                } else {
-                    startRolling();
-                    updateUI();
-                }
-            } else {
-            
-                playSound('error');
-                state.failures++;
-                updateUI();
-                
-               
-                activeCol.style.borderColor = 'red';
-                activeCol.style.color = 'red';
-                setTimeout(() => {
-                    activeCol.style.borderColor = ''; 
-                    activeCol.style.color = '';
-                }, 300);
-
-                if (state.failures >= config.maxFailures) {
-                    endGame(false);
-                }
-            }
-        }
-
-        function updateUI() {
-            levelDisplay.textContent = `${state.currentCol + 1}/${config.sequenceLength}`;
-            attemptsDisplay.textContent = config.maxFailures - state.failures;
-        }
-
-        function endGame(success) {
-            state.running = false;
-            clearInterval(state.intervalId);
-            
-            if (success) {
-                overlayMsg.innerHTML = '<span class="msg-success">ACCÈS AUTORISÉ</span><br><br><span style="font-size:1rem">DÉCHIFFREMENT TERMINÉ...</span>';
-                overlay.classList.add('visible');
-             
-                setTimeout(() => {
-                   
-                    alert("REDIRECTION VERS LE DOSSIER SECRET..."); 
-                    location.reload(); 
-                }, 2000);
-            } else {
-                overlayMsg.innerHTML = '<span class="msg-fail">ÉCHEC CRITIQUE</span><br><br><span style="font-size:1rem">PROTOCOLE DE SÉCURITÉ ACTIVÉ</span>';
-                overlay.classList.add('visible');
-            
-                setTimeout(() => {
-                    window.location.href = '/access-denied.html'; 
-                }, 2000);
-            }
-        }
+            });
 
         
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
-            if (type === 'success') {
-                osc.frequency.value = 800;
-                osc.type = 'square';
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.1);
-            } else {
-                osc.frequency.value = 150;
-                osc.type = 'sawtooth';
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-            }
-        }
-
-        
-        
-        lockBtn.addEventListener('click', attemptLock);
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault(); 
-                attemptLock();
-            }
+            initGame();
         });
-
-        // Démarrage
-        initGame();
-
     </script>
 </body>
 </html>
