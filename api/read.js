@@ -16,6 +16,10 @@ export default async function handler(request, response) {
         result = await sql`SELECT id, name, level, status_text, map_x, map_y, profile_url, css_class FROM agents ORDER BY id ASC;`;
         return response.status(200).json({ agents: result.rows });
 
+        case 'evidence':
+        result = await sql`SELECT * FROM evidence ORDER BY created_at DESC`;
+        return response.status(200).json({ evidence: result.rows });
+
       case 'points':
         result = await sql`
           SELECT p.*, a.name as creator_name, a.level as creator_level

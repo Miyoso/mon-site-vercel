@@ -197,6 +197,12 @@ export default async function handler(request, response) {
         await sql`UPDATE agents SET password = ${hashedPassword} WHERE name = ${username};`;
         return response.status(200).json({ success: true, message: 'Mot de passe mis à jour' });
       }
+
+      case 'delete_evidence': {
+        const { id } = data;
+        await sql`DELETE FROM evidence WHERE id = ${id}`;
+        return response.status(200).json({ success: true });
+      }
         
       case 'update_agent_position': {
         const { id, map_x, map_y } = data;
