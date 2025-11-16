@@ -36,11 +36,21 @@
         const svgLayer = document.getElementById('connections-layer');
 
         async function loadBoard() {
-            const res = await fetch('/api/read?resource=investigation');
-            const data = await res.json();
-            items = data.items;
-            links = data.links;
-            renderBoard();
+            try {
+                const res = await fetch('/api/read?resource=investigation');
+                if (!res.ok) {
+                    throw new Error(`Erreur API: ${res.status}`);
+                }
+                const data = await res.json();
+                if (!data.items || !data.links) {
+                    return;
+                }
+                items = data.items;
+                links = data.links;
+                renderBoard();
+            } catch (error) {
+                alert("ERREUR: Impossible de charger le tableau. Vérifiez que vous avez bien créé les tables SQL dans Vercel.");
+            }
         }
 
         function renderBoard() {
@@ -57,6 +67,11 @@
                 el.id = `item-${item.id}`;
                 el.dataset.id = item.id;
 
+                const currentScale = item.scale || 1.0;
+                const rotation = item.type === 'suspect' ? -2 : 2; 
+                el.style.transform = `scale(${currentScale}) rotate(${rotation}deg)`;
+                el.dataset.scale = currentScale;
+
                 if(item.type === 'suspect') {
                     const imgUrl = item.image_url || '/assets/petit.jpg';
                     el.innerHTML = `<img src="${imgUrl}" draggable="false"><div class="label">${item.label}</div>`;
@@ -72,6 +87,7 @@
 
                 el.onmousedown = startDrag;
                 el.onclick = (e) => handleItemClick(e, item.id);
+                el.onwheel = (e) => handleResize(e, item);
 
                 board.appendChild(el);
             });
@@ -239,6 +255,36 @@
                 toggleLinkMode(linkMode);
                 loadBoard();
             }
+        }
+
+        let resizeTimeout;
+
+        function handleResize(e, item) {
+            e.preventDefault(); 
+            
+            const el = document.getElementById(`item-${item.id}`);
+            let scale = parseFloat(el.dataset.scale);
+            
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            
+            scale += delta;
+            
+            scale = Math.min(Math.max(scale, 0.5), 3.0);
+            
+            const rotation = item.type === 'suspect' ? -2 : 2;
+            el.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            el.dataset.scale = scale;
+
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(async () => {
+                await fetch('/api/execute-action', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ action: 'resize_inv_item', id: item.id, scale: scale })
+                });
+                const it = items.find(i => i.id === item.id);
+                if(it) it.scale = scale;
+            }, 500);
         }
 
         loadBoard();

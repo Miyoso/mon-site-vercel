@@ -121,6 +121,12 @@ export default async function handler(request, response) {
         await sql`UPDATE investigation_items SET x = ${x}, y = ${y} WHERE id = ${id}`;
         return response.status(200).json({ success: true });
       }
+      
+      case 'resize_inv_item': {
+        const { id, scale } = data;
+        await sql`UPDATE investigation_items SET scale = ${scale} WHERE id = ${id}`;
+        return response.status(200).json({ success: true });
+      }
 
       case 'del_inv_item': {
         const { id } = data;
