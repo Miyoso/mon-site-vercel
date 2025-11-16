@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUR D'ENQUÊTE</title>
+    <script> const REQUIRED_LEVEL = 3; </script>
+    <script src="/js/security.js"></script>
+    <link rel="stylesheet" href="/css/style-investigation.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="board-container">
+        <svg id="connections-layer"></svg>
+        <div id="items-layer"></div>
+    </div>
+
+    <div class="toolbar">
+        <button class="tool-btn" onclick="window.location.href='/index.html'">&lt;&lt; RETOUR</button>
+        <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
+        <button class="tool-btn" onclick="addItem('note')">+ NOTE</button>
+        <div style="width: 1px; background: #333; margin: 0 10px;"></div>
+        <button class="tool-btn" id="btn-link-red" onclick="toggleLinkMode('red')">LIEN GUERRE</button>
+        <button class="tool-btn" id="btn-link-green" onclick="toggleLinkMode('green')">LIEN ALLIÉ</button>
+        <button class="tool-btn" id="btn-link-blue" onclick="toggleLinkMode('blue')">LIEN SUB</button>
+    </div>
+
+    <script>
+        let items = [];
+        let links = [];
+        let linkMode = null; 
+        let linkSourceId = null;
+
+        const board = document.getElementById('items-layer');
+        const svgLayer = document.getElementById('connections-layer');
+
+        async function loadBoard() {
+            const res = await fetch('/api/read?resource=investigation');
+            const data = await res.json();
+            items = data.items;
+            links = data.links;
+            renderBoard();
+        }
+
+        function renderBoard() {
+            board.innerHTML = '';
+            svgLayer.innerHTML = '';
+
+            items.forEach(item => {
+                const el = document.createElement('div');
+                el.className = `board-item item-${item.type}`;
+                if(item.type === 'note' && item.color) el.classList.add(item.color);
+                
+                el.style.left = item.x + 'px';
+                el.style.top = item.y + 'px';
+                el.id = `item-${item.id}`;
+                el.dataset.id = item.id;
+
+                if(item.type === 'suspect') {
+                    const imgUrl = item.image_url || '/assets/petit.jpg';
+                    el.innerHTML = `<img src="${imgUrl}" draggable="false"><div class="label">${item.label}</div>`;
+                } else {
+                    el.innerText = item.label;
+                }
+
+                const delBtn = document.createElement('div');
+                delBtn.className = 'delete-btn';
+                delBtn.innerText = 'X';
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteItem(item.id); };
+                el.appendChild(delBtn);
+
+                el.onmousedown = startDrag;
+                el.onclick = (e) => handleItemClick(e, item.id);
+
+                board.appendChild(el);
+            });
+
+            links.forEach(link => {
+                const fromItem = items.find(i => i.id === link.from_id);
+                const toItem = items.find(i => i.id === link.to_id);
+                if(fromItem && toItem) {
+                    drawLine(fromItem, toItem, link.type, link.id);
+                }
+            });
+        }
+
+        function drawLine(item1, item2, type, id) {
+            const w1 = item1.type === 'suspect' ? 180 : 200;
+            const h1 = item1.type === 'suspect' ? 200 : 150;
+            const x1 = item1.x + w1/2;
+            const y1 = item1.y + h1/2;
+
+            const w2 = item2.type === 'suspect' ? 180 : 200;
+            const h2 = item2.type === 'suspect' ? 200 : 150;
+            const x2 = item2.x + w2/2;
+            const y2 = item2.y + h2/2;
+
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1);
+            line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y2", y2);
+            line.setAttribute("class", `link-${type}`);
+            
+            line.onclick = (e) => {
+                if(confirm("Supprimer ce lien ?")) deleteLink(id);
+            };
+
+            svgLayer.appendChild(line);
+        }
+
+        let activeDrag = null;
+        let offsetX, offsetY;
+
+        function startDrag(e) {
+            if(linkMode) return;
+
+            activeDrag = e.currentTarget;
+            const rect = activeDrag.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            
+            document.addEventListener('mousemove', doDrag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function doDrag(e) {
+            if (!activeDrag) return;
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
+            activeDrag.style.left = x + 'px';
+            activeDrag.style.top = y + 'px';
+        }
+
+        async function stopDrag(e) {
+            if (!activeDrag) return;
+            const id = activeDrag.dataset.id;
+            const x = parseInt(activeDrag.style.left);
+            const y = parseInt(activeDrag.style.top);
+
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'move_inv_item', id, x, y })
+            });
+
+            const item = items.find(i => i.id == id);
+            if(item) { item.x = x; item.y = y; }
+            
+            renderBoard();
+            
+            document.removeEventListener('mousemove', doDrag);
+            document.removeEventListener('mouseup', stopDrag);
+            activeDrag = null;
+        }
+
+        async function addItem(type) {
+            let label, image_url, color;
+            
+            if(type === 'suspect') {
+                label = prompt("Nom du Suspect :");
+                if(!label) return;
+                image_url = prompt("URL de la photo (Laisser vide pour défaut) :");
+            } else {
+                label = prompt("Contenu de la note :");
+                if(!label) return;
+                const c = prompt("Couleur ? (yellow, pink, blue)", "yellow");
+                color = (c === 'pink' || c === 'blue') ? c : 'yellow';
+            }
+
+            const x = window.innerWidth/2 - 100 + (Math.random()*50);
+            const y = window.innerHeight/2 - 100 + (Math.random()*50);
+
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    action: 'add_inv_item', 
+                    type, label, image_url, x: parseInt(x), y: parseInt(y), color 
+                })
+            });
+            loadBoard();
+        }
+
+        async function deleteItem(id) {
+            if(!confirm("Supprimer cet élément et ses liens ?")) return;
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'del_inv_item', id })
+            });
+            loadBoard();
+        }
+
+        async function deleteLink(id) {
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'del_inv_link', id })
+            });
+            loadBoard();
+        }
+
+        function toggleLinkMode(color) {
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.board-item').forEach(i => i.classList.remove('linking-source'));
+            linkSourceId = null;
+
+            if(linkMode === color) {
+                linkMode = null;
+            } else {
+                linkMode = color;
+                document.getElementById(`btn-link-${color}`).classList.add('active');
+                alert("MODE LIAISON ACTIVÉ : Cliquez sur le premier élément, puis sur le second.");
+            }
+        }
+
+        async function handleItemClick(e, id) {
+            if(!linkMode) return;
+
+            if(linkSourceId === null) {
+                linkSourceId = id;
+                document.getElementById(`item-${id}`).classList.add('linking-source');
+            } else {
+                if(linkSourceId === id) return;
+
+                await fetch('/api/execute-action', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        action: 'add_inv_link', 
+                        from_id: linkSourceId, 
+                        to_id: id, 
+                        type: linkMode 
+                    })
+                });
+
+                toggleLinkMode(linkMode);
+                loadBoard();
+            }
+        }
+
+        loadBoard();
+    </script>
+</body>
+</html>

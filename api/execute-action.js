@@ -94,7 +94,7 @@ export default async function handler(request, response) {
         if (!data.itemId) return response.status(400).json({ error: 'ID manquant' });
         await sql`DELETE FROM inventory WHERE id = ${data.itemId}`;
         return response.status(200).json({ success: true });
-      
+
       case 'add_transaction': {
         const { amount, type, description, agent_name } = data;
         if (!amount || !type || !description) {
@@ -107,6 +107,36 @@ export default async function handler(request, response) {
             finalAmount = Math.abs(finalAmount);
         }
         await sql`INSERT INTO transactions (amount, description, agent_name) VALUES (${finalAmount}, ${description}, ${agent_name})`;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'add_inv_item': {
+        const { type, label, image_url, x, y, color } = data;
+        await sql`INSERT INTO investigation_items (type, label, image_url, x, y, color) VALUES (${type}, ${label}, ${image_url || null}, ${x}, ${y}, ${color || 'yellow'})`;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'move_inv_item': {
+        const { id, x, y } = data;
+        await sql`UPDATE investigation_items SET x = ${x}, y = ${y} WHERE id = ${id}`;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'del_inv_item': {
+        const { id } = data;
+        await sql`DELETE FROM investigation_items WHERE id = ${id}`;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'add_inv_link': {
+        const { from_id, to_id, type } = data;
+        await sql`INSERT INTO investigation_links (from_id, to_id, type) VALUES (${from_id}, ${to_id}, ${type})`;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'del_inv_link': {
+        const { id } = data;
+        await sql`DELETE FROM investigation_links WHERE id = ${id}`;
         return response.status(200).json({ success: true });
       }
 
@@ -125,14 +155,11 @@ export default async function handler(request, response) {
         if (!levelAgentId || newLevel === undefined) {
           return response.status(400).json({ error: 'ID de l\'agent et niveau requis' });
         }
-        
         if (parseInt(levelAgentId) === 1 && parseInt(newLevel) < 4) {
              return response.status(403).json({ error: 'Opération refusée: Impossible de baisser le niveau d\'un Admin.' });
         }
-        
         const agentIdNum = parseInt(levelAgentId);
         const newLevelNum = parseInt(newLevel);
-        
         await sql`UPDATE agents SET level = ${newLevelNum} WHERE id = ${agentIdNum};`;
         return response.status(200).json({ success: true, message: 'Niveau d\'accréditation mis à jour' });
       }

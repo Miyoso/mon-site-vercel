@@ -12,8 +12,7 @@ export default async function handler(request, response) {
     let result;
 
     switch (resource) {
-      
-    case 'agents':
+      case 'agents':
         result = await sql`SELECT id, name, level, status_text, map_x, map_y, profile_url, css_class FROM agents ORDER BY id ASC;`;
         return response.status(200).json({ agents: result.rows });
 
@@ -25,7 +24,7 @@ export default async function handler(request, response) {
           ORDER BY p.created_at DESC;
         `;
         return response.status(200).json({ points: result.rows });
-      
+
       case 'reports':
         result = await sql`
           SELECT mission_code, summary, submission_date, file_url 
@@ -33,7 +32,7 @@ export default async function handler(request, response) {
           ORDER BY submission_date DESC
         `;
         return response.status(200).json(result.rows);
-      
+
       case 'drawings':
         result = await sql`
           SELECT d.*, a.name as creator_name 
@@ -46,11 +45,11 @@ export default async function handler(request, response) {
       case 'inventory':
         result = await sql`SELECT * FROM inventory ORDER BY category;`;
         return response.status(200).json({ items: result.rows });
-      
+
       case 'notes':
         result = await sql`SELECT * FROM agent_notes ORDER BY created_at DESC;`;
         return response.status(200).json({ notes: result.rows });
-      
+
       case 'logs':
         result = await sql`
             SELECT * FROM login_logs
@@ -63,29 +62,32 @@ export default async function handler(request, response) {
         const transactionsResult = await sql`SELECT * FROM transactions ORDER BY created_at DESC LIMIT 50`;
         const balanceResult = await sql`SELECT SUM(amount) as total FROM transactions`;
         const balance = balanceResult.rows[0].total || 0;
-
         return response.status(200).json({ 
             balance: balance, 
             transactions: transactionsResult.rows 
         });
-      
+
+      case 'investigation':
+        const itemsData = await sql`SELECT * FROM investigation_items`;
+        const linksData = await sql`SELECT * FROM investigation_links`;
+        return response.status(200).json({ 
+            items: itemsData.rows, 
+            links: linksData.rows 
+        });
+
       case 'agent-details':
         if (!username) throw new Error('Nom d\'utilisateur requis pour les détails.');
-        
         const agentResult = await sql`
             SELECT id, warning_level FROM agents WHERE name = ${username};
         `;
         if (agentResult.rows.length === 0) throw new Error('Agent non trouvé');
-        
         const agentId = agentResult.rows[0].id;
         const warningLevel = agentResult.rows[0].warning_level;
-
         const notesResult = await sql`
             SELECT author_name, note_text, created_at FROM agent_notes 
             WHERE agent_id = ${agentId} AND is_warning = true 
             ORDER BY created_at DESC;
         `;
-        
         return response.status(200).json({ warningLevel, warningNotes: notesResult.rows });
 
       default:

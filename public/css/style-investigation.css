@@ -1,0 +1,138 @@
+body {
+    overflow: hidden;
+    background-color: #111;
+    background-image: 
+        radial-gradient(#222 15%, transparent 16%),
+        radial-gradient(#222 15%, transparent 16%);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+}
+
+#board-container {
+    position: absolute;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    overflow: hidden;
+}
+
+#connections-layer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none; 
+}
+
+line {
+    stroke-width: 3;
+    opacity: 0.8;
+    transition: stroke-width 0.2s;
+    pointer-events: stroke; 
+    cursor: crosshair;
+}
+line:hover { stroke-width: 6; opacity: 1; }
+
+.link-red { stroke: #ff4141; }
+.link-green { stroke: #00ff00; }
+.link-blue { stroke: #00ccff; }
+
+.board-item {
+    position: absolute;
+    z-index: 1;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.board-item:active {
+    cursor: grabbing;
+    transform: scale(1.02);
+    box-shadow: 10px 10px 25px rgba(0,0,0,0.7);
+    z-index: 100;
+}
+
+.item-suspect {
+    width: 180px;
+    background: #fff;
+    padding: 10px 10px 30px 10px;
+    text-align: center;
+    transform: rotate(-2deg);
+}
+.item-suspect img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    background: #000;
+    border: 1px solid #ccc;
+}
+.item-suspect .label {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #000;
+    margin-top: 10px;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.item-note {
+    width: 200px;
+    min-height: 150px;
+    background: #ffeb3b;
+    padding: 15px;
+    font-family: 'Indie Flower', cursive, sans-serif;
+    color: #000;
+    font-size: 1.1rem;
+    transform: rotate(2deg);
+    border-bottom-right-radius: 20px 5px;
+}
+.item-note.pink { background: #ff80ab; }
+.item-note.blue { background: #80d8ff; }
+
+.delete-btn {
+    position: absolute;
+    top: -10px; right: -10px;
+    width: 25px; height: 25px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-family: Arial;
+    display: none;
+    border: 2px solid #fff;
+}
+.board-item:hover .delete-btn { display: block; }
+
+.toolbar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    border: 1px solid #00ff00;
+    padding: 10px 20px;
+    display: flex;
+    gap: 15px;
+    z-index: 1000;
+    border-radius: 30px;
+}
+
+.tool-btn {
+    background: transparent;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    text-transform: uppercase;
+    border-radius: 5px;
+}
+.tool-btn:hover { background: #00ff00; color: #000; }
+.tool-btn.active { background: #00ff00; color: #000; box-shadow: 0 0 15px #00ff00; }
+
+.board-item.linking-source {
+    outline: 4px solid #00ff00;
+    animation: pulse 1s infinite;
+}
+@keyframes pulse { 0% { outline-offset: 0px; } 50% { outline-offset: 5px; } 100% { outline-offset: 0px; } }
