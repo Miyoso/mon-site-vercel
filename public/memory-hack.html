@@ -152,7 +152,6 @@
         @keyframes pulse-red {
             0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; }
         }
-
     </style>
 </head>
 <body>
@@ -349,20 +348,36 @@
             }
         }
 
-        function gameWin() {
+        async function gameWin() {
             stopTimer();
             playTone(1200, 'sine', 0.5);
             overlayMsg.innerHTML = `
                 <div class="msg-success">SYSTÈME PIRATÉ</div>
-                <div style="font-size: 1rem; margin-top:20px; color:#fff;">ACCÈS ROOT OBTENU</div>
+                <div style="font-size: 1rem; margin-top:20px; color:#fff;">RÉCUPÉRATION DU CHEMIN D'ACCÈS...</div>
             `;
             overlay.classList.add('visible');
             
-            setTimeout(() => {
-                alert("REDIRECTION VERS LE DOSSIER SECRET...");
-                window.location.href = '/troll.html';
-                
-            }, 2000);
+            try {
+                const response = await fetch('/api/get-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.redirect) {
+                    sessionStorage.setItem('hack_token', data.token);
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 2000);
+                } else {
+                    throw new Error("Erreur serveur");
+                }
+
+            } catch (error) {
+                console.error(error);
+                overlayMsg.innerHTML = `<div class="msg-fail">ERREUR DE LIAISON SERVEUR</div>`;
+            }
         }
 
         function gameOver(isTimeout) {

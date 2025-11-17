@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUPER HACKER !!!</title>
+    <title>SYSTEM CORE LOG</title>
+    <script>
+        if (!sessionStorage.getItem('hack_token')) {
+            window.location.href = '/index.html';
+        }
+        sessionStorage.removeItem('hack_token');
+    </script>
     <style>
         body {
-           
             background-image: url('/assets/oui.png');
-            
-            background-size: cover;     
-            background-position: center; 
+            background-size: cover;
+            background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-
-           
-            background-color: black; 
-
-           
-
-            color: #ffff00; 
-            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; 
+            background-color: black;
+            color: #ffff00;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -32,7 +31,7 @@
         }
 
         .container {
-            background: rgba(0, 0, 255, 0.8); 
+            background: rgba(0, 0, 255, 0.8);
             padding: 30px;
             border: 10px dashed red;
             box-shadow: 10px 10px 0px black;
@@ -74,7 +73,7 @@
         }
         
         button:hover {
-            transform: rotate(180deg); 
+            transform: rotate(180deg);
         }
 
         .marquee-container {
