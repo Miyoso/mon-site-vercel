@@ -276,7 +276,7 @@
             
             state.sequence = [];
             
-          
+            
             const longueurSequence = 5 + Math.floor(state.currentRound / 5);
 
             for (let k = 0; k < longueurSequence; k++) {
@@ -299,7 +299,7 @@
                     state.isPlayerTurn = true;
                     statusText.innerText = "À VOUS !";
                     statusText.style.color = "var(--terminal-green)";
-                    startTimer(); // Démarrage du timer ici
+                    startTimer(); 
                     return;
                 }
                 flashButton(state.sequence[i], speed);
