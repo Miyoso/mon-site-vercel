@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SÉQUENCE MÉMOIRE // HACK</title>
+    <title>SÉQUENCE MÉMOIRE // HACK NIV.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -85,7 +85,7 @@
             justify-content: center;
             font-size: 1.5rem;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: all 0.05s;
             color: var(--terminal-dim);
             box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
         }
@@ -149,15 +149,14 @@
 <body>
 
     <div class="hack-container">
-        <h1>>> BYPASS MÉMOIRE <<</h1>
+        <h1>>> BYPASS MÉMOIRE - HARDCORE <<</h1>
         
         <div class="status-bar">
-            <span>SÉQUENCE: <span id="round-display">0/3</span></span>
-            <span id="status-text">EN ATTENTE...</span>
+            <span>SÉQUENCE: <span id="round-display">0/35</span></span>
+            <span id="status-text">PRÊT...</span>
         </div>
 
-        <div class="grid-pad" id="grid-pad">
-            </div>
+        <div class="grid-pad" id="grid-pad"></div>
 
         <button id="start-btn" onclick="startGame()">LANCER L'INJECTION</button>
 
@@ -168,9 +167,10 @@
 
     <script>
         const config = {
-            roundsToWin: 3,
-            baseSpeed: 800,
-            speedDecrement: 150, 
+            roundsToWin: 35,
+            baseSpeed: 600,
+            speedDecrement: 12,
+            minSpeed: 120,
             gridSize: 9
         };
 
@@ -190,12 +190,10 @@
         const overlay = document.getElementById('overlay');
         const overlayMsg = document.getElementById('overlay-msg');
 
-
         for (let i = 0; i < config.gridSize; i++) {
             let btn = document.createElement('div');
             btn.className = 'pad-btn';
             btn.dataset.index = i;
-            // Hex codes pour le style
             btn.innerText = '0x' + (i + 1 + 9).toString(16).toUpperCase(); 
             btn.addEventListener('mousedown', () => handleInput(i));
             gridPad.appendChild(btn);
@@ -230,18 +228,18 @@
             state.isPlayerTurn = false;
             roundDisplay.innerText = `${state.currentRound}/${config.roundsToWin}`;
             statusText.innerText = "ANALYSE DU MOTIF...";
+            statusText.style.color = "#666";
             
-   
             state.sequence.push(Math.floor(Math.random() * config.gridSize));
 
-   
-            setTimeout(() => playSequence(), 1000);
+            setTimeout(() => playSequence(), 800);
         }
 
         function playSequence() {
             state.isPlayingSequence = true;
             let i = 0;
-            const speed = Math.max(200, config.baseSpeed - (state.currentRound * config.speedDecrement));
+            
+            const speed = Math.max(config.minSpeed, config.baseSpeed - (state.currentRound * config.speedDecrement));
 
             const interval = setInterval(() => {
                 if (i >= state.sequence.length) {
@@ -252,28 +250,33 @@
                     statusText.style.color = "var(--terminal-green)";
                     return;
                 }
-                flashButton(state.sequence[i]);
+                flashButton(state.sequence[i], speed);
                 i++;
             }, speed);
         }
 
-        function flashButton(index) {
+        function flashButton(index, speed) {
             const btn = gridPad.children[index];
             btn.classList.add('active');
-           
-            playTone(300 + (index * 100)); 
+            playTone(300 + (index * 100), 'square', speed / 2000); 
+            
+            const flashDuration = Math.max(50, speed * 0.6); 
+            
             setTimeout(() => {
                 btn.classList.remove('active');
-            }, 300);
+            }, flashDuration);
         }
 
         function handleInput(index) {
             if (!state.isPlayerTurn || state.isPlayingSequence) return;
 
-            flashButton(index); 
+            const btn = gridPad.children[index];
+            btn.classList.add('active');
+            playTone(300 + (index * 100), 'square', 0.1);
+            setTimeout(() => btn.classList.remove('active'), 100);
+
             state.playerInput.push(index);
 
-           
             const currentStep = state.playerInput.length - 1;
             
             if (state.playerInput[currentStep] !== state.sequence[currentStep]) {
@@ -284,11 +287,12 @@
             if (state.playerInput.length === state.sequence.length) {
                 state.isPlayerTurn = false;
                 statusText.innerText = "SÉQUENCE VALIDÉE...";
+                statusText.style.color = "#00ff00";
                 
                 if (state.currentRound >= config.roundsToWin) {
                     setTimeout(gameWin, 800);
                 } else {
-                    setTimeout(nextRound, 1000);
+                    setTimeout(nextRound, 800);
                 }
             }
         }
@@ -297,21 +301,19 @@
             playTone(1200, 'sine', 0.5);
             overlayMsg.innerHTML = `
                 <div class="msg-success">SYSTÈME PIRATÉ</div>
-                <div style="font-size: 1rem; margin-top:20px; color:#fff;">ACCÈS ROOT OBTENU</div>
+                <div style="font-size: 1rem; margin-top:20px; color:#fff;">ACCÈS ROOT OBTENU (GOD MODE)</div>
             `;
             overlay.classList.add('visible');
             
             setTimeout(() => {
-            
                 alert("REDIRECTION VERS LE DOSSIER SECRET...");
             }, 2000);
         }
 
         function gameOver() {
             state.isPlayerTurn = false;
-            playTone(150, 'sawtooth', 0.5);
+            playTone(100, 'sawtooth', 0.8); 
             
-       
             document.querySelectorAll('.pad-btn').forEach(b => b.classList.add('error'));
             
             overlayMsg.innerHTML = `
