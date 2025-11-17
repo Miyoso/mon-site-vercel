@@ -62,6 +62,7 @@
         .status-bar {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
             border-bottom: 1px solid var(--terminal-dim);
             padding-bottom: 10px;
@@ -107,12 +108,6 @@
             border-color: var(--terminal-red);
         }
 
-        .info-text {
-            font-size: 0.8rem;
-            color: #666;
-            margin-top: 20px;
-        }
-
         .message-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -143,17 +138,32 @@
             margin-top: 10px;
         }
         #start-btn:hover { background: var(--terminal-green); color: #000; }
+        
+        #timer-display {
+            font-weight: bold;
+            color: var(--terminal-green);
+            min-width: 60px;
+            text-align: right;
+        }
+        #timer-display.urgent {
+            color: var(--terminal-red);
+            animation: pulse-red 0.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; }
+        }
 
     </style>
 </head>
 <body>
 
     <div class="hack-container">
-        <h1>>> BYPASS MÉMOIRE - HARDCORE <<</h1>
+        <h1>>> BYPASS MÉMOIRE <<</h1>
         
         <div class="status-bar">
             <span>SÉQUENCE: <span id="round-display">0/35</span></span>
             <span id="status-text">PRÊT...</span>
+            <span>TEMPS: <span id="timer-display">10.0</span>s</span>
         </div>
 
         <div class="grid-pad" id="grid-pad"></div>
@@ -169,9 +179,10 @@
         const config = {
             roundsToWin: 35,
             baseSpeed: 800,
-            speedDecrement: 12,
+            speedDecrement: 0,
             minSpeed: 200,
-            gridSize: 9
+            gridSize: 9,
+            timeLimit: 10.0 
         };
 
         let state = {
@@ -179,13 +190,15 @@
             playerInput: [],
             currentRound: 0,
             isPlayerTurn: false,
-            isPlayingSequence: false
+            isPlayingSequence: false,
+            timerInterval: null
         };
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const gridPad = document.getElementById('grid-pad');
         const roundDisplay = document.getElementById('round-display');
         const statusText = document.getElementById('status-text');
+        const timerDisplay = document.getElementById('timer-display');
         const startBtn = document.getElementById('start-btn');
         const overlay = document.getElementById('overlay');
         const overlayMsg = document.getElementById('overlay-msg');
@@ -222,25 +235,53 @@
             nextRound();
         }
 
+        function startTimer() {
+            let timeLeft = config.timeLimit;
+            timerDisplay.textContent = timeLeft.toFixed(1);
+            timerDisplay.classList.remove('urgent');
+
+            if (state.timerInterval) clearInterval(state.timerInterval);
+
+            state.timerInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                
+                if (timeLeft <= 3.0) timerDisplay.classList.add('urgent');
+
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    timerDisplay.textContent = "0.0";
+                    clearInterval(state.timerInterval);
+                    gameOver(true); 
+                } else {
+                    timerDisplay.textContent = timeLeft.toFixed(1);
+                }
+            }, 100);
+        }
+
+        function stopTimer() {
+            if (state.timerInterval) clearInterval(state.timerInterval);
+            timerDisplay.textContent = config.timeLimit.toFixed(1);
+            timerDisplay.classList.remove('urgent');
+        }
+
         function nextRound() {
             state.currentRound++;
             state.playerInput = [];
             state.isPlayerTurn = false;
+            stopTimer();
+            
             roundDisplay.innerText = `${state.currentRound}/${config.roundsToWin}`;
             statusText.innerText = "NOUVEAU MOTIF...";
             statusText.style.color = "#666";
             
-           
+            state.sequence = [];
             
-            
-            state.sequence = []; 
-
-            const longueurSequence = 6; 
+          
+            const longueurSequence = 5 + Math.floor(state.currentRound / 5);
 
             for (let k = 0; k < longueurSequence; k++) {
                 state.sequence.push(Math.floor(Math.random() * config.gridSize));
             }
-
 
             setTimeout(() => playSequence(), 800);
         }
@@ -256,8 +297,9 @@
                     clearInterval(interval);
                     state.isPlayingSequence = false;
                     state.isPlayerTurn = true;
-                    statusText.innerText = "REPRODUISEZ LE MOTIF";
+                    statusText.innerText = "À VOUS !";
                     statusText.style.color = "var(--terminal-green)";
+                    startTimer(); // Démarrage du timer ici
                     return;
                 }
                 flashButton(state.sequence[i], speed);
@@ -290,13 +332,14 @@
             const currentStep = state.playerInput.length - 1;
             
             if (state.playerInput[currentStep] !== state.sequence[currentStep]) {
-                gameOver();
+                gameOver(false);
                 return;
             }
 
             if (state.playerInput.length === state.sequence.length) {
+                stopTimer(); 
                 state.isPlayerTurn = false;
-                statusText.innerText = "SÉQUENCE VALIDÉE...";
+                statusText.innerText = "VALIDE...";
                 statusText.style.color = "#00ff00";
                 
                 if (state.currentRound >= config.roundsToWin) {
@@ -308,10 +351,11 @@
         }
 
         function gameWin() {
+            stopTimer();
             playTone(1200, 'sine', 0.5);
             overlayMsg.innerHTML = `
                 <div class="msg-success">SYSTÈME PIRATÉ</div>
-                <div style="font-size: 1rem; margin-top:20px; color:#fff;">ACCÈS ROOT OBTENU (GOD MODE)</div>
+                <div style="font-size: 1rem; margin-top:20px; color:#fff;">ACCÈS ROOT OBTENU</div>
             `;
             overlay.classList.add('visible');
             
@@ -320,15 +364,18 @@
             }, 2000);
         }
 
-        function gameOver() {
+        function gameOver(isTimeout) {
+            stopTimer();
             state.isPlayerTurn = false;
             playTone(100, 'sawtooth', 0.8); 
             
             document.querySelectorAll('.pad-btn').forEach(b => b.classList.add('error'));
             
+            const reason = isTimeout ? "TEMPS ÉCOULÉ" : "ERREUR SÉQUENCE";
+
             overlayMsg.innerHTML = `
                 <div class="msg-fail">DÉTECTION D'INTRUSION</div>
-                <div style="font-size: 1rem; margin-top:20px; color:#fff;">TERMINAL VERROUILLÉ</div>
+                <div style="font-size: 1rem; margin-top:20px; color:#fff;">${reason}</div>
             `;
             overlay.classList.add('visible');
 
