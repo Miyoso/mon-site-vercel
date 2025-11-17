@@ -168,9 +168,9 @@
     <script>
         const config = {
             roundsToWin: 35,
-            baseSpeed: 600,
+            baseSpeed: 800,
             speedDecrement: 12,
-            minSpeed: 120,
+            minSpeed: 200,
             gridSize: 9
         };
 
@@ -227,10 +227,20 @@
             state.playerInput = [];
             state.isPlayerTurn = false;
             roundDisplay.innerText = `${state.currentRound}/${config.roundsToWin}`;
-            statusText.innerText = "ANALYSE DU MOTIF...";
+            statusText.innerText = "NOUVEAU MOTIF...";
             statusText.style.color = "#666";
             
-            state.sequence.push(Math.floor(Math.random() * config.gridSize));
+           
+            
+            
+            state.sequence = []; 
+
+            const longueurSequence = 6; 
+
+            for (let k = 0; k < longueurSequence; k++) {
+                state.sequence.push(Math.floor(Math.random() * config.gridSize));
+            }
+
 
             setTimeout(() => playSequence(), 800);
         }
