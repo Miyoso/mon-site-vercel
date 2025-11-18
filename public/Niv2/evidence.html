@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/css/style-investigation.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
     <style>
- 
+      
         #btn-stamp.active {
             background: #ff0000; 
             color: white;
@@ -17,7 +17,11 @@
             box-shadow: 0 0 20px #ff0000;
             animation: pulse-red 1s infinite;
         }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 10px #ff0000; } 50% { box-shadow: 0 0 25px #ff0000; } 100% { box-shadow: 0 0 10px #ff0000; } }
+        @keyframes pulse-red { 
+            0% { box-shadow: 0 0 10px #ff0000; } 
+            50% { box-shadow: 0 0 25px #ff0000; } 
+            100% { box-shadow: 0 0 10px #ff0000; } 
+        }
     </style>
 </head>
 <body>
@@ -54,7 +58,7 @@
         let items = [];
         let links = [];
         let linkMode = null; 
-        let stampMode = false; // NOUVELLE VARIABLE D'ÉTAT
+        let stampMode = false; 
         let linkSourceId = null;
         let resizeTimeout;
 
@@ -116,7 +120,6 @@
                 delBtn.onclick = (e) => { e.stopPropagation(); deleteItem(item.id); };
                 el.appendChild(delBtn);
 
-                // GESTION DES ÉVÉNEMENTS MISE À JOUR
                 el.onmousedown = startDrag;
                 el.onclick = (e) => handleItemClick(e, item.id);
                 el.onwheel = (e) => handleResize(e, item);
@@ -173,11 +176,9 @@
             } else {
                 linkMode = color;
                 document.getElementById(`btn-link-${color}`).classList.add('active');
-                
             }
         }
 
-        
         function toggleStampMode() {
             const wasActive = stampMode;
             disableAllModes(); 
@@ -185,7 +186,6 @@
             if(!wasActive) {
                 stampMode = true;
                 document.getElementById('btn-stamp').classList.add('active');
-             
             }
         }
 
@@ -194,13 +194,10 @@
             linkSourceId = null;
             stampMode = false;
             
-         
             document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-          
             document.querySelectorAll('.board-item').forEach(i => i.classList.remove('linking-source'));
         }
 
-       
         async function handleItemClick(e, id) {
             // 1. SI MODE TAMPON
             if (stampMode) {
@@ -208,12 +205,11 @@
                 if (stat) {
                     const finalStat = stat.toUpperCase() === 'NONE' ? '' : stat.toUpperCase();
                     await updateItemData(id, { status: finalStat });
-                    toggleStampMode(); // Désactive le mode après usage (optionnel, plus ergonomique)
+                    toggleStampMode();
                 }
                 return;
             }
 
-            // 2. SI MODE LIEN
             if (linkMode) {
                 if(linkSourceId === null) {
                     linkSourceId = id;
@@ -230,20 +226,17 @@
                             type: linkMode 
                         })
                     });
-                    toggleLinkMode(linkMode); 
+                    toggleLinkMode(linkMode);
                     loadBoard();
                 }
                 return;
             }
-            
-            
         }
 
         let activeDrag = null;
         let offsetX, offsetY;
 
         function startDrag(e) {
-          
             if(linkMode || stampMode) return;
 
             activeDrag = e.currentTarget;
