@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RÉACTEUR // HACK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #080808;
+            --neon-orange: #ff9900;
+            --neon-red: #ff3333;
+            --neon-blue: #00ccff;
+            --dim-color: #442200;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--neon-orange);
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .game-wrapper {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            border: 2px solid var(--neon-orange);
+            padding: 40px;
+            background: rgba(20, 10, 0, 0.9);
+            box-shadow: 0 0 30px rgba(255, 153, 0, 0.15);
+            border-radius: 10px;
+        }
+
+        h1 {
+            margin: 0 0 20px 0;
+            font-size: 2rem;
+            text-shadow: 0 0 10px var(--neon-orange);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            width: 300px;
+            margin: 0 auto 20px auto;
+            font-size: 1.2rem;
+            border-bottom: 1px solid var(--dim-color);
+            padding-bottom: 10px;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background: #000;
+            box-shadow: 0 0 20px var(--dim-color), inset 0 0 20px #000;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .center-info {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px #fff;
+            pointer-events: none;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .overlay-msg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            z-index: 20;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .overlay-msg.visible { visibility: visible; opacity: 1; }
+        
+        .msg-success { color: #00ff00; text-shadow: 0 0 20px #00ff00; }
+        .msg-fail { color: var(--neon-red); text-shadow: 0 0 20px var(--neon-red); }
+
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-wrapper" id="gameBox">
+        <h1>BYPASS THERMIQUE</h1>
+        
+        <div class="stats-row">
+            <span>NIVEAU: <span id="levelDisplay">1/5</span></span>
+            <span>VIE: <span id="livesDisplay" style="color:var(--neon-red)">❤️❤️❤️</span></span>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="gameCanvas"></canvas>
+            <div class="center-info" id="countdown">GO</div>
+        </div>
+
+        <div class="instructions">
+            [ ESPACE ] POUR VALIDER LA ZONE
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay-msg"></div>
+
+    <script>
+        const config = {
+            totalLevels: 7,     // Nombre de succès requis
+            baseSpeed: 0.03,    // Vitesse initiale (radians par frame)
+            speedInc: 0.008,    // Accélération par niveau
+            zoneSize: 0.25,     // Taille de la zone (en PI) ~45 degrés
+            zoneShrink: 0.02    // Rétrécissement par niveau
+        };
+
+        let state = {
+            level: 1,
+            lives: 3,
+            angle: 0,
+            targetStart: 0,
+            targetEnd: 0,
+            speed: 0,
+            running: false,
+            direction: 1, // 1 = Horaire, -1 = Anti-horaire
+            locked: false // Anti-spam
+        };
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const livesDisplay = document.getElementById('livesDisplay');
+        const centerText = document.getElementById('countdown');
+        const gameBox = document.getElementById('gameBox');
+        const overlay = document.getElementById('overlay');
+
+        // Audio (Synth)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'hit') {
+                osc.frequency.value = 880;
+                osc.type = 'sine';
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'miss') {
+                osc.frequency.value = 150;
+                osc.type = 'sawtooth';
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'win') {
+                osc.frequency.value = 1200;
+                osc.type = 'square';
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.5);
+            }
+        }
+
+        // Setup Canvas resolution
+        const size = 300;
+        canvas.width = size;
+        canvas.height = size;
+        const center = size / 2;
+        const radius = size / 2 - 20;
+
+        function initLevel() {
+            state.angle = -Math.PI / 2; // Commence en haut
+            state.locked = false;
+            state.speed = config.baseSpeed + ((state.level - 1) * config.speedInc);
+            
+            // Direction aléatoire
+            state.direction = Math.random() > 0.5 ? 1 : -1;
+
+            // Zone cible aléatoire (mais pas trop proche du départ)
+            const minDist = Math.PI / 2; 
+            const maxDist = Math.PI * 1.5;
+            const randomAngle = Math.random() * (maxDist - minDist) + minDist;
+            
+            // Taille de la zone qui diminue
+            const currentZoneSize = Math.max(0.1, config.zoneSize - ((state.level - 1) * config.zoneShrink));
+            
+            // Positionnement de la zone selon la direction
+            if (state.direction === 1) {
+                state.targetStart = state.angle + randomAngle;
+            } else {
+                state.targetStart = state.angle - randomAngle;
+            }
+            
+            // Normaliser les angles entre 0 et 2PI pour l'affichage
+            state.targetEnd = state.targetStart + (currentZoneSize * state.direction);
+            
+            // Assurer que Start < End pour le calcul mathématique simple
+            if (state.direction === -1) {
+                let temp = state.targetStart;
+                state.targetStart = state.targetEnd;
+                state.targetEnd = temp;
+            }
+
+            levelDisplay.innerText = `${state.level}/${config.totalLevels}`;
+            centerText.innerText = state.level;
+            state.running = true;
+            
+            requestAnimationFrame(loop);
+        }
+
+        function loop() {
+            if (!state.running) return;
+
+            ctx.clearRect(0, 0, size, size);
+
+            // 1. Fond Cercle
+            ctx.beginPath();
+            ctx.arc(center, center, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 15;
+            ctx.stroke();
+
+            // 2. Zone Cible
+            ctx.beginPath();
+            ctx.arc(center, center, radius, state.targetStart, state.targetEnd);
+            ctx.strokeStyle = 'rgba(255, 153, 0, 0.8)';
+            ctx.lineWidth = 15;
+            ctx.lineCap = 'butt';
+            ctx.stroke();
+            
+            // Glow Effect
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#ff9900';
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // 3. Aiguille
+            const needleX = center + Math.cos(state.angle) * (radius - 5);
+            const needleY = center + Math.sin(state.angle) * (radius - 5);
+            
+            ctx.beginPath();
+            ctx.moveTo(center, center);
+            ctx.lineTo(needleX, needleY);
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            // Point central
+            ctx.beginPath();
+            ctx.arc(center, center, 8, 0, Math.PI*2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+
+            // Mise à jour angle
+            state.angle += state.speed * state.direction;
+
+            requestAnimationFrame(loop);
+        }
+
+        function checkHit() {
+            if (!state.running || state.locked) return;
+            state.locked = true;
+
+            // Normaliser les angles pour la comparaison (Modulo 2PI)
+            let normAngle = state.angle % (Math.PI * 2);
+            if (normAngle < 0) normAngle += Math.PI * 2;
+
+            let normStart = state.targetStart % (Math.PI * 2);
+            if (normStart < 0) normStart += Math.PI * 2;
+
+            let normEnd = state.targetEnd % (Math.PI * 2);
+            if (normEnd < 0) normEnd += Math.PI * 2;
+
+            // Gestion du cas où la zone traverse le 0 (ex: 350° à 10°)
+            let isHit = false;
+            if (normStart < normEnd) {
+                isHit = normAngle >= normStart && normAngle <= normEnd;
+            } else {
+                isHit = normAngle >= normStart || normAngle <= normEnd;
+            }
+
+            if (isHit) {
+                playSound('hit');
+                state.level++;
+                if (state.level > config.totalLevels) {
+                    gameWin();
+                } else {
+                    // Petit délai visuel
+                    centerText.innerText = "OK";
+                    centerText.style.color = "#0f0";
+                    state.running = false;
+                    setTimeout(() => {
+                        centerText.style.color = "#fff";
+                        initLevel();
+                    }, 500);
+                }
+            } else {
+                playSound('miss');
+                handleFail();
+            }
+        }
+
+        function handleFail() {
+            state.lives--;
+            let hearts = "";
+            for(let i=0; i<state.lives; i++) hearts += "❤️";
+            livesDisplay.innerText = hearts;
+
+            // Shake effect
+            gameBox.classList.remove('shake');
+            void gameBox.offsetWidth; // Trigger reflow
+            gameBox.classList.add('shake');
+
+            state.running = false;
+            centerText.innerText = "!";
+            centerText.style.color = "red";
+            
+            // Dessiner en rouge pour montrer l'erreur
+            ctx.strokeStyle = 'red';
+            ctx.stroke();
+
+            if (state.lives <= 0) {
+                gameOver();
+            } else {
+                setTimeout(() => {
+                    centerText.style.color = "#fff";
+                    initLevel();
+                }, 800);
+            }
+        }
+
+        async function gameWin() {
+            state.running = false;
+            playSound('win');
+            
+            overlay.innerHTML = `
+                <div class="msg-success">SURCHARGE RÉUSSIE</div>
+                <div style="font-size: 1rem; margin-top:20px; color:#fff;">ACCÈS SYSTÈME...</div>
+            `;
+            overlay.classList.add('visible');
+
+            try {
+                const response = await fetch('/api/get-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+
+                if (data.success && data.redirect) {
+                    sessionStorage.setItem('hack_token', data.token);
+                    setTimeout(() => {
+                        window.location.href = data.redirect;
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error(error);
+                overlay.innerHTML = `<div class="msg-fail">ERREUR RÉSEAU</div>`;
+            }
+        }
+
+        function gameOver() {
+            state.running = false;
+            overlay.innerHTML = `
+                <div class="msg-fail">ÉCHEC CRITIQUE</div>
+                <div style="font-size: 1rem; margin-top:20px; color:#fff;">SYSTÈME VERROUILLÉ</div>
+            `;
+            overlay.classList.add('visible');
+            
+            setTimeout(() => {
+                window.location.href = '/access-denied.html';
+            }, 2000);
+        }
+
+        // Inputs
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                checkHit();
+            }
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            checkHit();
+        });
+
+        // Start
+        initLevel();
+
+    </script>
+</body>
+</html>

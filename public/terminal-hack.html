@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL // HACK</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #001100;
+            --term-green: #00ff33;
+            --term-dim: #004411;
+            --term-highlight: #ccffcc;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--term-green);
+            font-family: 'VT323', monospace;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            font-size: 1.2rem;
+        }
+
+        /* Effet écran bombé CRT */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: radial-gradient(circle, rgba(0,20,0,0) 60%, rgba(0,0,0,0.4) 100%);
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        /* Lignes de balayage */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 9;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        .terminal-container {
+            width: 900px;
+            max-width: 95%;
+            height: 600px;
+            padding: 20px;
+            border: 2px solid var(--term-green);
+            background: rgba(0, 15, 0, 0.95);
+            box-shadow: 0 0 20px var(--term-green);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--term-dim);
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .content-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr; /* Colonne Hex, Colonne Mots, Colonne Log */
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .column-hex {
+            color: var(--term-dim);
+            text-align: right;
+            line-height: 1.5;
+        }
+
+        .column-words {
+            line-height: 1.5;
+            cursor: default;
+            white-space: pre;
+        }
+
+        .word {
+            color: var(--term-green);
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        
+        .word:hover {
+            background-color: var(--term-green);
+            color: #000;
+        }
+
+        .symbol {
+            color: var(--term-green);
+        }
+
+        .column-log {
+            border-left: 1px solid var(--term-dim);
+            padding-left: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+        }
+
+        .log-entry.attempt { color: #aaa; }
+        .log-entry.success { color: var(--term-green); font-weight: bold; }
+        .log-entry.fail { color: #ff3333; }
+
+        .attempts-box {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px dashed var(--term-dim);
+        }
+
+        .block-marker {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            background: var(--term-green);
+            margin-right: 5px;
+        }
+        .block-marker.lost {
+            background: var(--term-dim);
+        }
+
+        .blinking-cursor::after {
+            content: "█";
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+
+        .overlay-msg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            z-index: 20;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+            text-align: center;
+        }
+        .overlay-msg.visible { visibility: visible; opacity: 1; }
+        .msg-success { color: var(--term-green); text-shadow: 0 0 20px var(--term-green); }
+        .msg-fail { color: #ff3333; text-shadow: 0 0 20px #ff3333; }
+
+    </style>
+</head>
+<body>
+
+    <div class="terminal-container">
+        <header>
+            <h1>ROBCO INDUSTRIES (TM) TERMILINK PROTOCOL</h1>
+            <div style="font-size: 0.9rem;">ENTER PASSWORD TO UNLOCK</div>
+        </header>
+
+        <div class="content-area">
+            <div class="column-hex" id="hex-col"></div>
+            
+            <div class="column-words" id="word-col"></div>
+
+            <div class="column-log">
+                <div id="log-container">
+                    <div class="log-entry">> INIT_HACK_SEQUENCE...</div>
+                    <div class="log-entry">> SEARCHING...</div>
+                </div>
+                
+                <div class="attempts-box">
+                    <div>TENTATIVES RESTANTES :</div>
+                    <div id="lives-display" style="margin-top: 5px;">
+                        <span class="block-marker"></span>
+                        <span class="block-marker"></span>
+                        <span class="block-marker"></span>
+                        <span class="block-marker"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 10px; font-size: 0.9rem; color: #555;">
+            [ SOURIS ] SÉLECTIONNER &nbsp;&nbsp; [ CLIC ] VALIDER
+        </div>
+
+        <div id="overlay" class="overlay-msg"></div>
+    </div>
+
+    <script>
+        // Configuration
+        const config = {
+            wordLength: 5,      // Longueur des mots
+            wordCount: 12,      // Nombre de mots à trouver dans la soupe
+            rows: 16,           // Nombre de lignes affichées
+            lives: 4            // Nombre d'essais
+        };
+
+        // Banque de mots (tous de 5 lettres pour cet exemple)
+        const wordBank = [
+            "CODES", "FILES", "HACKS", "LASER", "ROBOT", "GHOST", 
+            "SHELL", "POWER", "LOGIN", "RESET", "ADMIN", "ENTRY",
+            "BYTES", "VIRUS", "MACRO", "LOGIC", "PANEL", "MODEM",
+            "PROXY", "CACHE", "STACK", "QUERY", "FRAME", "BLOCK"
+        ];
+
+        // Symboles de remplissage
+        const garbageChars = "!@#$%^&*()_+-=[]{}|;:,./<>?";
+
+        let state = {
+            password: "",
+            words: [],
+            lives: 4,
+            locked: false
+        };
+
+        // Éléments DOM
+        const hexCol = document.getElementById('hex-col');
+        const wordCol = document.getElementById('word-col');
+        const logContainer = document.getElementById('log-container');
+        const livesDisplay = document.getElementById('lives-display');
+        const overlay = document.getElementById('overlay');
+
+        // Audio
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            if(type === 'hover') {
+                osc.frequency.value = 800;
+                osc.type = 'sine';
+                gain.gain.value = 0.02;
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } else if(type === 'fail') {
+                osc.frequency.value = 150;
+                osc.type = 'sawtooth';
+                gain.gain.value = 0.1;
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if(type === 'success') {
+                osc.frequency.value = 1200;
+                osc.type = 'square';
+                gain.gain.value = 0.1;
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            }
+        }
+
+        // --- Initialisation ---
+        function initGame() {
+            state.lives = config.lives;
+            state.locked = false;
+            
+            // 1. Sélectionner les mots
+            const shuffled = [...wordBank].sort(() => 0.5 - Math.random());
+            state.words = shuffled.slice(0, config.wordCount);
+            state.password = state.words[Math.floor(Math.random() * state.words.length)];
+            
+            console.log("Password is:", state.password); // Triche pour débug ;)
+
+            renderScreen();
+            updateLives();
+        }
+
+        function renderScreen() {
+            hexCol.innerHTML = '';
+            wordCol.innerHTML = '';
+            
+            let fullContent = "";
+            let currentWordIndex = 0;
+            
+            // On génère le contenu ligne par ligne
+            for (let i = 0; i < config.rows; i++) {
+                // Adresse mémoire (décoratif)
+                const address = "0x" + (Math.floor(Math.random() * 60000) + 4096).toString(16).toUpperCase();
+                const hexDiv = document.createElement('div');
+                hexDiv.textContent = address;
+                hexCol.appendChild(hexDiv);
+
+                // Contenu de la ligne (symboles + mots)
+                // On décide aléatoirement si on met un mot sur cette ligne ou non
+                // Il faut placer tous les mots avant la fin
+                let
