@@ -9,20 +9,9 @@
     <link rel="stylesheet" href="/css/style-investigation.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
     <style>
-     
-        #btn-stamp.active {
-            background: #ff0000;
-            color: white;
-            border-color: #ff0000;
-            box-shadow: 0 0 20px #ff0000;
-            animation: pulse-red 1s infinite;
-        }
-        @keyframes pulse-red { 
-            0% { box-shadow: 0 0 10px #ff0000; } 
-            50% { box-shadow: 0 0 25px #ff0000; } 
-            100% { box-shadow: 0 0 10px #ff0000; } 
-        }
+        /* --- CSS INTÉGRÉ POUR LE POPUP TEMPORISÉ --- */
 
+        /* Conteneur du bouton */
         .tool-group {
             position: relative;
             display: flex;
@@ -30,9 +19,10 @@
             justify-content: center;
         }
 
+        /* La Bulle de couleur */
         .color-tooltip {
             position: absolute;
-            bottom: 100%; /* Au-dessus du bouton */
+            bottom: 100%; 
             left: 50%;
             transform: translateX(-50%);
             margin-bottom: 15px;
@@ -43,51 +33,44 @@
             border-radius: 50px;
             display: flex;
             gap: 10px;
-            
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+            z-index: 9999;
+
+            /* --- LA MAGIE DU DÉLAI EST ICI --- */
             opacity: 0;
             visibility: hidden;
-            transition: all 0.2s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            pointer-events: none;
-            z-index: 9999;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
-            white-space: nowrap; /* Empêche le retour à la ligne */
+            /* On met un délai de 5s sur la disparition */
+            transition: all 0.3s ease-in-out;
+            transition-delay: 5s; 
         }
 
-        /* Flèche de la bulle */
+        /* Petite flèche */
         .color-tooltip::after {
             content: '';
             position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -6px;
-            border-width: 6px;
-            border-style: solid;
+            top: 100%; left: 50%; margin-left: -6px;
+            border-width: 6px; border-style: solid;
             border-color: #00ff00 transparent transparent transparent;
         }
 
-        /* Apparition au survol */
+        /* Au survol : Apparition immédiate */
         .tool-group:hover .color-tooltip {
             opacity: 1;
             visibility: visible;
-            pointer-events: auto;
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* Petit effet de montée */
+            /* On annule le délai pour que ça apparaisse tout de suite */
+            transition-delay: 0s; 
         }
 
-        /* Styles des points */
+        /* Les points de couleur */
         .color-dot {
-            width: 22px;
-            height: 22px;
+            width: 22px; height: 22px;
             border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.3);
             cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            color: #000;
-            text-shadow: none;
+            transition: transform 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: bold; color: #000;
         }
         .color-dot:hover {
             transform: scale(1.4);
@@ -95,19 +78,27 @@
             z-index: 2;
         }
 
-        /* Couleurs Notes */
-        .dot-yellow { background: #ffeb3b; box-shadow: 0 0 8px #ffeb3b; }
-        .dot-pink { background: #ff80ab; box-shadow: 0 0 8px #ff80ab; }
-        .dot-blue { background: #80d8ff; box-shadow: 0 0 8px #80d8ff; }
-        .dot-green { background: #69f0ae; box-shadow: 0 0 8px #69f0ae; }
+        /* Couleurs */
+        .dot-white { background: #fff; }
+        .dot-yellow { background: #ffeb3b; }
+        .dot-red { background: #ff4141; }
+        .dot-pink { background: #ff80ab; }
+        .dot-blue { background: #80d8ff; }
+        .dot-green { background: #69f0ae; }
 
         /* Couleurs Tampons */
-        .stamp-dot-wanted { background: #d32f2f; box-shadow: 0 0 8px #d32f2f; color: #fff; } /* WANTED */
-        .stamp-dot-jailed { background: #f57c00; box-shadow: 0 0 8px #f57c00; } /* PRISON */
-        .stamp-dot-dead { background: #000000; border: 1px solid #555; box-shadow: 0 0 8px #fff; color: #fff; } /* MORT */
-        .stamp-dot-clear { background: #388e3c; box-shadow: 0 0 8px #388e3c; color: #fff; } /* CLEAN */
-        .stamp-dot-none { background: #555; color: #fff; } /* GOMME */
+        .stamp-dot-wanted { background: #d32f2f; color: #fff; }
+        .stamp-dot-jailed { background: #f57c00; }
+        .stamp-dot-dead { background: #000; border: 1px solid #555; color: #fff; }
+        .stamp-dot-clear { background: #388e3c; color: #fff; }
+        .stamp-dot-none { background: #555; color: #fff; }
 
+        /* Bouton Actif */
+        #btn-stamp.active {
+            background: #ff0000; color: white; border-color: #ff0000;
+            box-shadow: 0 0 20px #ff0000; animation: pulse-red 1s infinite;
+        }
+        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 10px #ff0000; } 50% { box-shadow: 0 0 25px #ff0000; } }
     </style>
 </head>
 <body>
@@ -126,7 +117,14 @@
         
         <div style="width: 1px; background: #333; margin: 0 5px;"></div>
         
-        <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
+        <div class="tool-group">
+            <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
+            <div class="color-tooltip">
+                <div class="color-dot dot-white" onclick="addItem('suspect', 'white')" title="Blanc"></div>
+                <div class="color-dot dot-yellow" onclick="addItem('suspect', 'yellow')" title="Jaune"></div>
+                <div class="color-dot dot-red" onclick="addItem('suspect', 'red')" title="Rouge"></div>
+            </div>
+        </div>
 
         <div class="tool-group">
             <button class="tool-btn" onclick="addItem('note')">+ NOTE</button>
@@ -147,7 +145,7 @@
         <div style="width: 1px; background: #333; margin: 0 5px;"></div>
 
         <div class="tool-group">
-            <button class="tool-btn" id="btn-stamp" onclick="activateStampMode(null)">TAMPONNER</button>
+            <button class="tool-btn" id="btn-stamp" onclick="toggleStampMode()">TAMPONNER</button>
             <div class="color-tooltip">
                 <div class="color-dot stamp-dot-wanted" onclick="activateStampMode('WANTED')" title="WANTED">W</div>
                 <div class="color-dot stamp-dot-jailed" onclick="activateStampMode('JAILED')" title="PRISON">P</div>
@@ -163,7 +161,7 @@
         let links = [];
         let linkMode = null; 
         let stampMode = false; 
-        let currentStampType = null; 
+        let currentStampType = null;
         let linkSourceId = null;
         let resizeTimeout;
 
@@ -176,13 +174,10 @@
                 if (!res.ok) throw new Error(`Erreur API: ${res.status}`);
                 const data = await res.json();
                 if (!data.items || !data.links) return;
-                
                 items = data.items;
                 links = data.links;
                 renderBoard();
-            } catch (error) {
-                console.error("Erreur chargement:", error);
-            }
+            } catch (error) { console.error("Erreur chargement:", error); }
         }
 
         function renderBoard() {
@@ -221,7 +216,6 @@
                 const delBtn = document.createElement('div');
                 delBtn.className = 'delete-btn';
                 delBtn.innerText = 'X';
-                delBtn.title = "Supprimer";
                 delBtn.onclick = (e) => { e.stopPropagation(); deleteItem(item.id); };
                 el.appendChild(delBtn);
 
@@ -236,9 +230,7 @@
             links.forEach(link => {
                 const fromItem = items.find(i => i.id === link.from_id);
                 const toItem = items.find(i => i.id === link.to_id);
-                if(fromItem && toItem) {
-                    drawLine(fromItem, toItem, link.type, link.id);
-                }
+                if(fromItem && toItem) drawLine(fromItem, toItem, link.type, link.id);
             });
         }
 
@@ -268,39 +260,32 @@
                     else path.style.stroke = "";
                 }, 50);
             };
-
             svgLayer.appendChild(path);
         }
 
         function toggleLinkMode(color) {
             disableAllModes(); 
-            if(linkMode === color) {
-                linkMode = null; 
-            } else {
+            if(linkMode === color) { linkMode = null; } 
+            else {
                 linkMode = color;
                 document.getElementById(`btn-link-${color}`).classList.add('active');
             }
         }
 
+        function toggleStampMode() {
+            const wasActive = stampMode;
+            disableAllModes(); 
+            if(!wasActive) {
+                stampMode = true;
+                document.getElementById('btn-stamp').classList.add('active');
+                currentStampType = null; // Manuel par défaut
+            }
+        }
 
         function activateStampMode(type) {
-            
-            if (type === null) {
-                if (stampMode) { 
-                    disableAllModes(); 
-                } else {
-                    disableAllModes();
-                    stampMode = true;
-                    currentStampType = null; 
-                    document.getElementById('btn-stamp').classList.add('active');
-                }
-                return;
-            }
-
-       
             disableAllModes();
             stampMode = true;
-            currentStampType = type; 
+            currentStampType = type;
             document.getElementById('btn-stamp').classList.add('active');
         }
 
@@ -314,30 +299,20 @@
         }
 
         async function handleItemClick(e, id) {
-       
             if (stampMode) {
                 let statusToApply = "";
-
                 if (currentStampType) {
-             
                     statusToApply = currentStampType === 'NONE' ? '' : currentStampType;
                 } else {
-             
-                    const stat = prompt("TAMPON MANUEL :\nEcrivez le statut (WANTED, DECEASED, NONE...) :");
-                    if (stat) {
-                        statusToApply = stat.toUpperCase() === 'NONE' ? '' : stat.toUpperCase();
-                    } else {
-                        return; // Annulé
-                    }
+                    const stat = prompt("TAMPON MANUEL :\nEcrivez le statut (WANTED, DECEASED...) :");
+                    if (stat) statusToApply = stat.toUpperCase() === 'NONE' ? '' : stat.toUpperCase();
+                    else return;
                 }
-
                 await updateItemData(id, { status: statusToApply });
-                
-       
+                if(currentStampType) activateStampMode(null); // Reset au mode manuel
                 return;
             }
 
-          
             if (linkMode) {
                 if(linkSourceId === null) {
                     linkSourceId = id;
@@ -347,12 +322,7 @@
                     await fetch('/api/execute-action', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ 
-                            action: 'add_inv_link', 
-                            from_id: linkSourceId, 
-                            to_id: id, 
-                            type: linkMode 
-                        })
+                        body: JSON.stringify({ action: 'add_inv_link', from_id: linkSourceId, to_id: id, type: linkMode })
                     });
                     toggleLinkMode(linkMode);
                     loadBoard();
@@ -388,19 +358,13 @@
             const id = activeDrag.dataset.id;
             const x = parseInt(activeDrag.style.left);
             const y = parseInt(activeDrag.style.top);
-            
             activeDrag.style.zIndex = "";
-
             await fetch('/api/execute-action', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ action: 'move_inv_item', id, x, y })
             });
-
-            const item = items.find(i => i.id == id);
-            if(item) { item.x = x; item.y = y; }
-            renderBoard();
-
+            renderBoard(); // Important pour les liens
             document.removeEventListener('mousemove', doDrag);
             document.removeEventListener('mouseup', stopDrag);
             activeDrag = null;
@@ -408,10 +372,7 @@
 
         async function addItem(type, chosenColor) {
             let label, image_url, color;
-            
-            if (!chosenColor) {
-                chosenColor = type === 'suspect' ? 'white' : 'yellow';
-            }
+            if (!chosenColor) chosenColor = type === 'suspect' ? 'white' : 'yellow';
             color = chosenColor;
 
             if(type === 'suspect') {
@@ -436,9 +397,7 @@
 
         async function editItem(e, item) {
             e.stopPropagation();
-        
             const choice = prompt("MODIFIER :\n1. Texte\n2. Image/Couleur");
-
             if (choice === '1') {
                 const newLabel = prompt("Nouveau texte :", item.label);
                 if (newLabel) updateItemData(item.id, { label: newLabel });
@@ -488,9 +447,7 @@
             let scale = parseFloat(el.dataset.scale);
             const delta = e.deltaY > 0 ? -0.1 : 0.1;
             scale = Math.min(Math.max(scale + delta, 0.5), 3.0);
-
-            const rotation = item.type === 'suspect' ? -2 : 2;
-            el.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            el.style.transform = `scale(${scale}) rotate(${item.type === 'suspect' ? -2 : 2}deg)`;
             el.dataset.scale = scale;
 
             clearTimeout(resizeTimeout);
