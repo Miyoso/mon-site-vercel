@@ -9,8 +9,9 @@
         :root {
             --bg-color: #001100;
             --term-green: #00ff33;
-            --term-dim: #004411;
+            --term-dim: #2a6b2a; /* Éclairci pour être plus visible */
             --term-highlight: #ccffcc;
+            --term-red: #ff3333;
         }
 
         body {
@@ -25,7 +26,7 @@
             align-items: center;
             justify-content: center;
             user-select: none;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
         }
 
         /* Effet écran bombé CRT */
@@ -67,9 +68,12 @@
         }
 
         header {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 1px solid var(--term-dim);
             padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
         h1 {
@@ -81,7 +85,7 @@
 
         .content-area {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr; /* Colonne Hex, Colonne Mots, Colonne Log */
+            grid-template-columns: 100px 1fr 200px; /* Hex | Mots | Log */
             gap: 20px;
             overflow: hidden;
         }
@@ -90,18 +94,20 @@
             color: var(--term-dim);
             text-align: right;
             line-height: 1.5;
+            font-family: monospace;
         }
 
         .column-words {
             line-height: 1.5;
             cursor: default;
             white-space: pre;
+            color: var(--term-green);
         }
 
         .word {
-            color: var(--term-green);
             cursor: pointer;
             transition: all 0.1s;
+            font-weight: bold;
         }
         
         .word:hover {
@@ -110,23 +116,21 @@
         }
 
         .symbol {
-            color: var(--term-green);
+            color: var(--term-dim); /* Symboles plus discrets */
         }
 
         .column-log {
             border-left: 1px solid var(--term-dim);
-            padding-left: 20px;
+            padding-left: 15px;
             display: flex;
             flex-direction: column;
+            font-size: 1rem;
         }
 
-        .log-entry {
-            margin-bottom: 5px;
-        }
-
+        .log-entry { margin-bottom: 5px; }
         .log-entry.attempt { color: #aaa; }
         .log-entry.success { color: var(--term-green); font-weight: bold; }
-        .log-entry.fail { color: #ff3333; }
+        .log-entry.fail { color: var(--term-red); }
 
         .attempts-box {
             margin-top: auto;
@@ -136,21 +140,15 @@
 
         .block-marker {
             display: inline-block;
-            width: 15px;
-            height: 15px;
+            width: 20px;
+            height: 20px;
             background: var(--term-green);
             margin-right: 5px;
         }
         .block-marker.lost {
-            background: var(--term-dim);
+            background: transparent;
+            border: 1px solid var(--term-dim);
         }
-
-        .blinking-cursor::after {
-            content: "█";
-            animation: blink 1s step-end infinite;
-        }
-
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
 
         .overlay-msg {
             position: absolute;
@@ -169,7 +167,7 @@
         }
         .overlay-msg.visible { visibility: visible; opacity: 1; }
         .msg-success { color: var(--term-green); text-shadow: 0 0 20px var(--term-green); }
-        .msg-fail { color: #ff3333; text-shadow: 0 0 20px #ff3333; }
+        .msg-fail { color: var(--term-red); text-shadow: 0 0 20px var(--term-red); }
 
     </style>
 </head>
@@ -177,8 +175,11 @@
 
     <div class="terminal-container">
         <header>
-            <h1>ROBCO INDUSTRIES (TM) TERMILINK PROTOCOL</h1>
-            <div style="font-size: 0.9rem;">ENTER PASSWORD TO UNLOCK</div>
+            <div>
+                <h1>ROBCO INDUSTRIES (TM)</h1>
+                <div style="font-size: 0.9rem;">TERMILINK PROTOCOL</div>
+            </div>
+            <div id="locked-status" style="color: var(--term-red); display: none;">! VERROUILLAGE EN COURS !</div>
         </header>
 
         <div class="content-area">
@@ -188,240 +189,264 @@
 
             <div class="column-log">
                 <div id="log-container">
-                    <div class="log-entry">> INIT_HACK_SEQUENCE...</div>
-                    <div class="log-entry">> SEARCHING...</div>
+                    <div class="log-entry">> INIT_SEQ...</div>
                 </div>
                 
                 <div class="attempts-box">
-                    <div>TENTATIVES RESTANTES :</div>
+                    <div>TENTATIVES :</div>
                     <div id="lives-display" style="margin-top: 5px;">
-                        <span class="block-marker"></span>
-                        <span class="block-marker"></span>
-                        <span class="block-marker"></span>
-                        <span class="block-marker"></span>
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
         
-        <div style="margin-top: 10px; font-size: 0.9rem; color: #555;">
-            [ SOURIS ] SÉLECTIONNER &nbsp;&nbsp; [ CLIC ] VALIDER
+        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--term-dim); text-align: center;">
+            SÉLECTIONNEZ LE MOT DE PASSE CORRECT
         </div>
 
         <div id="overlay" class="overlay-msg"></div>
     </div>
 
     <script>
-        // Configuration
-        const config = {
-            wordLength: 5,      // Longueur des mots
-            wordCount: 12,      // Nombre de mots à trouver dans la soupe
-            rows: 16,           // Nombre de lignes affichées
-            lives: 4            // Nombre d'essais
-        };
-
-        // Banque de mots (tous de 5 lettres pour cet exemple)
-        const wordBank = [
-            "CODES", "FILES", "HACKS", "LASER", "ROBOT", "GHOST", 
-            "SHELL", "POWER", "LOGIN", "RESET", "ADMIN", "ENTRY",
-            "BYTES", "VIRUS", "MACRO", "LOGIC", "PANEL", "MODEM",
-            "PROXY", "CACHE", "STACK", "QUERY", "FRAME", "BLOCK"
-        ];
-
-        // Symboles de remplissage
-        const garbageChars = "!@#$%^&*()_+-=[]{}|;:,./<>?";
-
-        let state = {
-            password: "",
-            words: [],
-            lives: 4,
-            locked: false
-        };
-
-        // Éléments DOM
-        const hexCol = document.getElementById('hex-col');
-        const wordCol = document.getElementById('word-col');
-        const logContainer = document.getElementById('log-container');
-        const livesDisplay = document.getElementById('lives-display');
-        const overlay = document.getElementById('overlay');
-
-        // Audio
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+        document.addEventListener('DOMContentLoaded', () => {
             
-            if(type === 'hover') {
-                osc.frequency.value = 800;
-                osc.type = 'sine';
-                gain.gain.value = 0.02;
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.05);
-            } else if(type === 'fail') {
-                osc.frequency.value = 150;
-                osc.type = 'sawtooth';
-                gain.gain.value = 0.1;
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-            } else if(type === 'success') {
-                osc.frequency.value = 1200;
-                osc.type = 'square';
-                gain.gain.value = 0.1;
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
-            }
-        }
+            // --- CONFIGURATION ---
+            const config = {
+                wordLength: 5,
+                wordCount: 12,
+                rows: 17,
+                lives: 4
+            };
 
-        // --- Initialisation ---
-        function initGame() {
-            state.lives = config.lives;
-            state.locked = false;
-            
-            // 1. Sélectionner les mots
-            const shuffled = [...wordBank].sort(() => 0.5 - Math.random());
-            state.words = shuffled.slice(0, config.wordCount);
-            state.password = state.words[Math.floor(Math.random() * state.words.length)];
-            
-            console.log("Password is:", state.password); // Triche pour débug ;)
+            const wordBank = [
+                "CODES", "FILES", "HACKS", "LASER", "ROBOT", "GHOST", 
+                "SHELL", "POWER", "LOGIN", "RESET", "ADMIN", "ENTRY",
+                "BYTES", "VIRUS", "MACRO", "LOGIC", "PANEL", "MODEM",
+                "PROXY", "CACHE", "STACK", "QUERY", "FRAME", "BLOCK",
+                "WATCH", "BREAK", "TRACE", "DEBUG", "WRITE", "MOUNT"
+            ];
 
-            renderScreen();
-            updateLives();
-        }
+            const garbageChars = "!@#$%^&*()_+-=[]{}|;:,./<>?";
 
-        function renderScreen() {
-            hexCol.innerHTML = '';
-            wordCol.innerHTML = '';
-            
-            let fullContent = "";
-            let currentWordIndex = 0;
-            
-            // On génère le contenu ligne par ligne
-            for (let i = 0; i < config.rows; i++) {
-                // Adresse mémoire (décoratif)
-                const address = "0x" + (Math.floor(Math.random() * 60000) + 4096).toString(16).toUpperCase();
-                const hexDiv = document.createElement('div');
-                hexDiv.textContent = address;
-                hexCol.appendChild(hexDiv);
+            let state = {
+                password: "",
+                words: [],
+                lives: 4,
+                locked: false
+            };
 
-                // Contenu de la ligne (symboles + mots)
-                // On décide aléatoirement si on met un mot sur cette ligne ou non
-                // Il faut placer tous les mots avant la fin
-                let lineContentHtml = "";
-                const charsPerLine = 12;
-                let charsUsed = 0;
+            // Éléments DOM
+            const hexCol = document.getElementById('hex-col');
+            const wordCol = document.getElementById('word-col');
+            const logContainer = document.getElementById('log-container');
+            const livesDisplay = document.getElementById('lives-display');
+            const overlay = document.getElementById('overlay');
 
-                while(charsUsed < charsPerLine) {
-                    // Chance de mettre un mot s'il en reste
-                    if (currentWordIndex < state.words.length && Math.random() > 0.7 && (charsPerLine - charsUsed) >= config.wordLength) {
-                        const word = state.words[currentWordIndex];
-                        lineContentHtml += `<span class="word" onclick="checkWord('${word}')" onmouseenter="playSound('hover')">${word}</span>`;
-                        charsUsed += config.wordLength;
-                        currentWordIndex++;
-                    } else {
-                        const char = garbageChars[Math.floor(Math.random() * garbageChars.length)];
-                        lineContentHtml += `<span class="symbol">${char}</span>`;
-                        charsUsed++;
-                    }
+            // --- AUDIO SECURISE ---
+            let audioCtx = null;
+
+            function initAudio() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 }
-                
-                const lineDiv = document.createElement('div');
-                lineDiv.innerHTML = lineContentHtml;
-                wordCol.appendChild(lineDiv);
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
             }
-        }
 
-        function updateLives() {
-            livesDisplay.innerHTML = '';
-            for(let i=0; i<config.lives; i++) {
-                const span = document.createElement('span');
-                span.className = i < state.lives ? 'block-marker' : 'block-marker lost';
-                livesDisplay.appendChild(span);
-            }
-        }
-
-        function addLog(text, type) {
-            const div = document.createElement('div');
-            div.className = `log-entry ${type}`;
-            div.textContent = `> ${text}`;
-            logContainer.appendChild(div);
-            // Scroll auto
-            logContainer.scrollTop = logContainer.scrollHeight;
-        }
-
-        // --- Logique du Jeu ---
-
-        function getLikeness(word1, word2) {
-            let match = 0;
-            for(let i=0; i<word1.length; i++) {
-                if(word1[i] === word2[i]) match++;
-            }
-            return match;
-        }
-
-        window.checkWord = function(clickedWord) {
-            if (state.locked) return;
-
-            addLog(clickedWord, 'attempt');
-
-            if (clickedWord === state.password) {
-                // SUCCÈS
-                playSound('success');
-                addLog("PASSWORD ACCEPTED.", "success");
-                addLog("LOGIN SUCCESSFUL.", "success");
-                state.locked = true;
+            function playSound(type) {
+                if (!audioCtx) return; // Si pas encore init, pas de son (pas grave)
                 
-                setTimeout(() => {
-                    overlay.innerHTML = `
-                        <div class="msg-success">ACCÈS AUTORISÉ</div>
-                        <div style="font-size: 1rem; margin-top:20px; color:#fff;">INITIALISATION DU SYSTÈME...</div>
-                    `;
-                    overlay.classList.add('visible');
-                    
-                    // Appel API pour redirection sécurisée
-                    fetch('/api/get-access', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if(data.success) {
-                            sessionStorage.setItem('hack_token', data.token);
-                            setTimeout(() => window.location.href = data.redirect, 2000);
-                        }
-                    });
-                }, 1000);
-
-            } else {
-                // ÉCHEC
-                playSound('fail');
-                const likeness = getLikeness(clickedWord, state.password);
-                addLog(`ENTRY DENIED.`, "fail");
-                addLog(`LIKENESS: ${likeness}/${config.wordLength}`, "attempt");
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
                 
-                state.lives--;
+                if(type === 'hover') {
+                    osc.frequency.value = 800;
+                    osc.type = 'sine';
+                    gain.gain.value = 0.02;
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.03);
+                } else if(type === 'fail') {
+                    osc.frequency.value = 150;
+                    osc.type = 'sawtooth';
+                    gain.gain.value = 0.1;
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if(type === 'success') {
+                    osc.frequency.value = 1200;
+                    osc.type = 'square';
+                    gain.gain.value = 0.1;
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                }
+            }
+
+            // Active le son au premier clic n'importe où
+            document.body.addEventListener('click', initAudio, { once: true });
+            document.body.addEventListener('keydown', initAudio, { once: true });
+
+            // --- JEU ---
+
+            function initGame() {
+                state.lives = config.lives;
+                state.locked = false;
+                
+                // Mélanger et choisir les mots
+                const shuffled = [...wordBank].sort(() => 0.5 - Math.random());
+                state.words = shuffled.slice(0, config.wordCount);
+                state.password = state.words[Math.floor(Math.random() * state.words.length)];
+                
+                // Triche pour tester (visible dans la console F12)
+                console.log("Password:", state.password);
+
+                renderScreen();
                 updateLives();
+            }
 
-                if (state.lives <= 0) {
+            function renderScreen() {
+                hexCol.innerHTML = '';
+                wordCol.innerHTML = '';
+                
+                let currentWordIndex = 0;
+                
+                for (let i = 0; i < config.rows; i++) {
+                    // Hex Column
+                    const address = "0x" + (Math.floor(Math.random() * 60000) + 4096).toString(16).toUpperCase();
+                    const hexDiv = document.createElement('div');
+                    hexDiv.textContent = address;
+                    hexCol.appendChild(hexDiv);
+
+                    // Word Column
+                    let lineContentHtml = "";
+                    const charsPerLine = 12;
+                    let charsUsed = 0;
+
+                    while(charsUsed < charsPerLine) {
+                        // Est-ce qu'on place un mot ici ?
+                        // Il faut qu'il reste des mots ET de la place sur la ligne
+                        const placeForWord = (charsPerLine - charsUsed) >= config.wordLength;
+                        const wantToPlaceWord = Math.random() > 0.85; // 15% de chance par slot
+                        const mustPlaceWord = (config.rows - i) * 2 <= (state.words.length - currentWordIndex); // Force si on arrive à la fin
+
+                        if (currentWordIndex < state.words.length && placeForWord && (wantToPlaceWord || mustPlaceWord)) {
+                            const word = state.words[currentWordIndex];
+                            lineContentHtml += `<span class="word" data-word="${word}">${word}</span>`;
+                            charsUsed += config.wordLength;
+                            currentWordIndex++;
+                        } else {
+                            const char = garbageChars[Math.floor(Math.random() * garbageChars.length)];
+                            lineContentHtml += `<span class="symbol">${char}</span>`;
+                            charsUsed++;
+                        }
+                    }
+                    
+                    const lineDiv = document.createElement('div');
+                    lineDiv.innerHTML = lineContentHtml;
+                    wordCol.appendChild(lineDiv);
+                }
+
+                // Attacher les événements après création
+                document.querySelectorAll('.word').forEach(el => {
+                    el.addEventListener('click', (e) => checkWord(e.target.dataset.word));
+                    el.addEventListener('mouseenter', () => playSound('hover'));
+                });
+            }
+
+            function updateLives() {
+                livesDisplay.innerHTML = '';
+                for(let i=0; i<config.lives; i++) {
+                    const span = document.createElement('span');
+                    span.className = i < state.lives ? 'block-marker' : 'block-marker lost';
+                    livesDisplay.appendChild(span);
+                }
+            }
+
+            function addLog(text, type) {
+                const div = document.createElement('div');
+                div.className = `log-entry ${type}`;
+                div.textContent = `> ${text}`;
+                logContainer.appendChild(div);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+
+            function getLikeness(word1, word2) {
+                let match = 0;
+                for(let i=0; i<word1.length; i++) {
+                    if(word1[i] === word2[i]) match++;
+                }
+                return match;
+            }
+
+            async function checkWord(clickedWord) {
+                if (state.locked) return;
+
+                // Simuler un délai de traitement
+                state.locked = true;
+                document.body.style.cursor = 'wait';
+                
+                await new Promise(r => setTimeout(r, 200));
+                state.locked = false;
+                document.body.style.cursor = 'default';
+
+                addLog(clickedWord, 'attempt');
+
+                if (clickedWord === state.password) {
+                    // --- VICTOIRE ---
+                    playSound('success');
+                    addLog("PASSWORD ACCEPTED.", "success");
+                    addLog("LOGIN SUCCESSFUL.", "success");
                     state.locked = true;
-                    addLog("TERMINAL LOCKED.", "fail");
+                    
                     setTimeout(() => {
                         overlay.innerHTML = `
-                            <div class="msg-fail">SYSTÈME VERROUILLÉ</div>
-                            <div style="font-size: 1rem; margin-top:20px; color:#fff;">CONTACTEZ L'ADMINISTRATEUR</div>
+                            <div class="msg-success">ACCÈS AUTORISÉ</div>
+                            <div style="font-size: 1rem; margin-top:20px; color:#fff;">REDIRECTION...</div>
                         `;
                         overlay.classList.add('visible');
-                        setTimeout(() => window.location.href = '/access-denied.html', 2000);
+                        
+                        // REDIRECTION VERS LA PAGE SECRÈTE
+                        setTimeout(() => {
+                            alert("REDIRECTION VERS LE DOSSIER SECRET...");
+                            // window.location.href = '../AgentDatabase/SecretNyx/NyxConf.html';
+                        }, 2000);
                     }, 1000);
+
+                } else {
+                    // --- ÉCHEC ---
+                    playSound('fail');
+                    const likeness = getLikeness(clickedWord, state.password);
+                    addLog(`ENTRY DENIED.`, "fail");
+                    addLog(`LIKENESS: ${likeness}/${config.wordLength}`, "attempt");
+                    
+                    state.lives--;
+                    updateLives();
+
+                    if (state.lives <= 0) {
+                        // --- GAME OVER ---
+                        state.locked = true;
+                        document.getElementById('locked-status').style.display = 'block';
+                        addLog("TERMINAL LOCKED.", "fail");
+                        
+                        setTimeout(() => {
+                            overlay.innerHTML = `
+                                <div class="msg-fail">SYSTÈME VERROUILLÉ</div>
+                                <div style="font-size: 1rem; margin-top:20px; color:#fff;">CONTACTEZ L'ADMINISTRATEUR</div>
+                            `;
+                            overlay.classList.add('visible');
+                            
+                            setTimeout(() => {
+                                window.location.href = '/access-denied.html';
+                            }, 2000);
+                        }, 1500);
+                    }
                 }
             }
-        }
 
-        // Démarrage
-        initGame();
-
+            // Lancer le jeu
+            initGame();
+        });
     </script>
 </body>
 </html>
