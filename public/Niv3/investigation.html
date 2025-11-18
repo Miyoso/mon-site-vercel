@@ -9,19 +9,38 @@
     <link rel="stylesheet" href="/css/style-investigation.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
     <style>
-        /* --- CORRECTIF D'AFFICHAGE --- */
+        /* --- STYLES SUPPLÉMENTAIRES --- */
         
-        /* On remonte la barre pour que les pastilles en dessous soient visibles */
+        #btn-stamp.active {
+            background: #ff0000;
+            color: white;
+            border-color: #ff0000;
+            box-shadow: 0 0 20px #ff0000;
+            animation: pulse-red 1s infinite;
+        }
+        @keyframes pulse-red { 
+            0% { box-shadow: 0 0 10px #ff0000; } 
+            50% { box-shadow: 0 0 25px #ff0000; } 
+            100% { box-shadow: 0 0 10px #ff0000; } 
+        }
+
+        /* Styles des tampons génériques (Couleurs) */
+        .stamp-red { color: #d32f2f; border-color: #d32f2f; }
+        .stamp-orange { color: #f57c00; border-color: #f57c00; }
+        .stamp-black { color: #000; border-color: #000; background: rgba(255,255,255,0.5); }
+        .stamp-green { color: #388e3c; border-color: #388e3c; }
+        .stamp-blue { color: #2196f3; border-color: #2196f3; }
+
+        /* Barre d'outils et Pastilles */
         .toolbar {
             bottom: 70px !important; 
             height: 60px !important;
-            overflow: visible !important; /* CRUCIAL : Permet aux pastilles de dépasser */
+            overflow: visible !important;
             z-index: 9000 !important;
             display: flex;
             align-items: center;
         }
 
-        /* Conteneur du bouton + pastilles */
         .tool-group {
             position: relative;
             display: flex;
@@ -31,88 +50,57 @@
             height: 100%;
         }
 
-        /* La barre de pastilles (Toujours visible) */
         .color-selector {
             position: absolute;
-            top: 65px; /* Juste en dessous du bouton */
+            top: 65px;
             left: 50%;
             transform: translateX(-50%);
-            
             background: #000;
             border: 1px solid #00ff00;
             padding: 5px 10px;
             border-radius: 20px;
             display: flex;
             gap: 8px;
-            
-            z-index: 9999; /* Au-dessus de tout */
+            z-index: 9999;
             box-shadow: 0 5px 15px rgba(0,0,0,0.8);
             white-space: nowrap;
         }
 
-        /* Petite flèche de liaison */
         .color-selector::before {
             content: '';
             position: absolute;
-            bottom: 100%;
-            left: 50%;
-            margin-left: -1px;
-            border-width: 5px;
-            border-style: solid;
+            bottom: 100%; left: 50%; margin-left: -1px;
+            border-width: 5px; border-style: solid;
             border-color: transparent transparent #00ff00 transparent;
         }
 
-        /* Les ronds de couleur */
         .color-dot {
-            width: 20px;
-            height: 20px;
+            width: 20px; height: 20px;
             border-radius: 50%;
             border: 1px solid #fff;
             cursor: pointer;
             transition: transform 0.1s;
-            
-            /* Pour centrer le texte (lettres tampons) */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            color: black;
-            text-shadow: none;
         }
-        
-        .color-dot:hover {
-            transform: scale(1.3);
-            z-index: 10;
-        }
+        .color-dot:hover { transform: scale(1.3); z-index: 10; }
 
-        /* Définition des couleurs */
+        /* Couleurs Notes & Tampons */
         .dot-white { background: #fff; }
         .dot-yellow { background: #ffeb3b; }
         .dot-red { background: #ff4141; }
         .dot-pink { background: #ff80ab; }
-        .dot-blue { background: #80d8ff; }
-        .dot-green { background: #69f0ae; }
+        .dot-blue { background: #2196f3; }
+        .dot-green { background: #4caf50; }
+        .dot-orange { background: #ff9800; }
+        .dot-black { background: #000; border-color: #666; }
+        .dot-none { background: #555; position:relative; }
+        .dot-none::after { content:'X'; color:white; font-size:12px; position:absolute; top:1px; left:5px; font-weight:bold; }
 
-        /* Couleurs spéciales Tampons */
-        .stamp-dot-wanted { background: #d32f2f; color: white; border-color: red; }
-        .stamp-dot-jailed { background: #f57c00; color: black; }
-        .stamp-dot-dead { background: #000; color: white; border: 1px solid #555; }
-        .stamp-dot-clear { background: #388e3c; color: white; }
-        .stamp-dot-none { background: #555; color: white; }
-
-        /* Bouton Actif */
-        #btn-stamp.active {
-            background: #ff0000 !important;
-            color: white !important;
-            box-shadow: 0 0 15px #ff0000 !important;
-        }
     </style>
 </head>
 <body>
 
     <div class="help-indicator">
-        [ MOLETTE : ZOOM | DOUBLE-CLIC : ÉDITER ]
+        [ MOLETTE : ZOOM | DOUBLE-CLIC : ÉDITER | ÉCHAP : ANNULER ]
     </div>
 
     <div id="board-container">
@@ -125,9 +113,7 @@
         
         <div style="width: 1px; height: 30px; background: #333; margin: 0 10px;"></div>
         
-        <div class="tool-group">
-            <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
-            </div>
+        <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
 
         <div style="width: 10px;"></div>
 
@@ -152,11 +138,12 @@
         <div class="tool-group">
             <button class="tool-btn" id="btn-stamp" onclick="activateStampMode(null)">TAMPONNER</button>
             <div class="color-selector">
-                <div class="color-dot stamp-dot-wanted" onclick="activateStampMode('WANTED')" title="WANTED">W</div>
-                <div class="color-dot stamp-dot-jailed" onclick="activateStampMode('JAILED')" title="PRISON">P</div>
-                <div class="color-dot stamp-dot-dead" onclick="activateStampMode('DECEASED')" title="MORT">†</div>
-                <div class="color-dot stamp-dot-clear" onclick="activateStampMode('CLEARED')" title="CLEAN">OK</div>
-                <div class="color-dot stamp-dot-none" onclick="activateStampMode('NONE')" title="EFFACER">X</div>
+                <div class="color-dot dot-red" onclick="activateStampMode('red')" title="Rouge"></div>
+                <div class="color-dot dot-orange" onclick="activateStampMode('orange')" title="Orange"></div>
+                <div class="color-dot dot-black" onclick="activateStampMode('black')" title="Noir"></div>
+                <div class="color-dot dot-green" onclick="activateStampMode('green')" title="Vert"></div>
+                <div class="color-dot dot-blue" onclick="activateStampMode('blue')" title="Bleu"></div>
+                <div class="color-dot dot-none" onclick="activateStampMode('NONE')" title="EFFACER"></div>
             </div>
         </div>
     </div>
@@ -166,7 +153,7 @@
         let links = [];
         let linkMode = null; 
         let stampMode = false; 
-        let currentStampType = null;
+        let currentStampColor = 'red'; // Couleur par défaut
         let linkSourceId = null;
         let resizeTimeout;
 
@@ -214,7 +201,9 @@
                 // Affichage du Tampon
                 if (item.status && item.status !== 'NONE') {
                     const stamp = document.createElement('div');
-                    stamp.className = `stamp stamp-${item.status}`;
+                    // On applique la classe de couleur stockée (ex: stamp-red)
+                    const colorClass = item.stamp_color ? `stamp-${item.stamp_color}` : 'stamp-red';
+                    stamp.className = `stamp ${colorClass}`;
                     stamp.innerText = item.status;
                     el.appendChild(stamp);
                 }
@@ -225,7 +214,6 @@
                 delBtn.onclick = (e) => { e.stopPropagation(); deleteItem(item.id); };
                 el.appendChild(delBtn);
 
-                // Événements souris
                 el.onmousedown = startDrag;
                 el.onclick = (e) => handleItemClick(e, item.id);
                 el.onwheel = (e) => handleResize(e, item);
@@ -234,7 +222,6 @@
                 board.appendChild(el);
             });
 
-            // Dessin des liens
             links.forEach(link => {
                 const fromItem = items.find(i => i.id === link.from_id);
                 const toItem = items.find(i => i.id === link.to_id);
@@ -247,7 +234,6 @@
             const h1 = item1.type === 'suspect' ? 200 : 150;
             const x1 = item1.x + (w1 * (item1.scale||1)) / 2;
             const y1 = item1.y + (h1 * (item1.scale||1)) / 2;
-
             const w2 = item2.type === 'suspect' ? 180 : 200;
             const h2 = item2.type === 'suspect' ? 200 : 150;
             const x2 = item2.x + (w2 * (item2.scale||1)) / 2;
@@ -260,20 +246,20 @@
 
             path.setAttribute("d", d);
             path.setAttribute("class", `link-${type}`);
-            
             path.onclick = () => {
                 if(confirm("Couper ce lien ?")) deleteLink(id);
             };
             svgLayer.appendChild(path);
         }
 
-        // --- MODES ET CLICS ---
+        // --- GESTION DES MODES ---
 
         function disableAllModes() {
             linkMode = null;
             linkSourceId = null;
             stampMode = false;
-            currentStampType = null;
+            currentStampColor = 'red';
+            
             document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.board-item').forEach(i => i.classList.remove('linking-source'));
         }
@@ -284,55 +270,41 @@
             document.getElementById(`btn-link-${color}`).classList.add('active');
         }
 
-        window.activateStampMode = function(type) {
+        function activateStampMode(color) {
             disableAllModes();
             stampMode = true;
-            currentStampType = type; 
+            // Si color est null (clic bouton principal), on met rouge par défaut
+            currentStampColor = color || 'red'; 
             document.getElementById('btn-stamp').classList.add('active');
-            console.log("Mode tampon activé :", type);
-        };
+        }
 
-        window.addItem = async function(type, chosenColor) {
-            let label, image_url, color;
-            
-            if (!chosenColor) chosenColor = (type === 'suspect') ? 'white' : 'yellow';
-            color = chosenColor;
-
-            if(type === 'suspect') {
-                label = prompt("Nom du Suspect :");
-                if(!label) return;
-                image_url = prompt("URL photo (facultatif) :");
-            } else {
-                label = prompt("Texte de la note :");
-                if(!label) return;
-            }
-
-            const x = window.innerWidth/2 - 100 + (Math.random()*50);
-            const y = window.innerHeight/2 - 100 + (Math.random()*50);
-
-            await fetch('/api/execute-action', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'add_inv_item', type, label, image_url, x: parseInt(x), y: parseInt(y), color })
-            });
-            loadBoard();
-        };
+        // --- CLIC SUR ITEM ---
 
         async function handleItemClick(e, id) {
+            // 1. MODE TAMPON
             if (stampMode) {
                 let statusToApply = "";
-                if (currentStampType) {
-                    statusToApply = currentStampType === 'NONE' ? '' : currentStampType;
+                let colorToApply = currentStampColor;
+
+                if (currentStampColor === 'NONE') {
+                    // Si on a cliqué sur la gomme, on efface
+                    statusToApply = '';
                 } else {
-                    const stat = prompt("STATUT MANUEL (WANTED, JAILED...) :");
-                    if (stat) statusToApply = stat.toUpperCase();
-                    else return;
+                    // Sinon on demande le texte
+                    const stat = prompt("TEXTE DU TAMPON (ex: WANTED, TRAITRE...) :");
+                    if (stat) {
+                        statusToApply = stat.toUpperCase();
+                    } else {
+                        return; // Annulé
+                    }
                 }
-                await updateItemData(id, { status: statusToApply });
-                // On reste en mode tampon pour enchaîner si besoin
+
+                await updateItemData(id, { status: statusToApply, stamp_color: colorToApply });
+                disableAllModes(); // On quitte le mode après avoir tamponné
                 return;
             }
 
+            // 2. MODE LIEN
             if (linkMode) {
                 if(linkSourceId === null) {
                     linkSourceId = id;
@@ -345,9 +317,10 @@
                             body: JSON.stringify({ action: 'add_inv_link', from_id: linkSourceId, to_id: id, type: linkMode })
                         });
                     }
-                    toggleLinkMode(linkMode); // On coupe après un lien
+                    disableAllModes(); // On quitte le mode après avoir lié
                     loadBoard();
                 }
+                return;
             }
         }
 
@@ -356,7 +329,9 @@
         let offsetX, offsetY;
 
         function startDrag(e) {
+            // IMPORTANT : Si un mode est actif, on interdit le drag
             if(linkMode || stampMode) return;
+
             activeDrag = e.currentTarget;
             activeDrag.style.zIndex = 1000;
             const rect = activeDrag.getBoundingClientRect();
@@ -387,14 +362,68 @@
 
             const item = items.find(i => i.id == id);
             if(item) { item.x = x; item.y = y; }
-            renderBoard(); // Redessiner les lignes
+            renderBoard(); 
 
             document.removeEventListener('mousemove', doDrag);
             document.removeEventListener('mouseup', stopDrag);
             activeDrag = null;
         }
 
+        // --- RACCOURCIS CLAVIER ---
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") {
+                disableAllModes();
+            }
+        });
+        
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            disableAllModes();
+        });
+
         // --- UTILS ---
+        async function addItem(type, chosenColor) {
+            let label, image_url, color;
+            if (!chosenColor) chosenColor = (type === 'suspect') ? 'white' : 'yellow';
+            color = chosenColor;
+
+            if(type === 'suspect') {
+                label = prompt("Nom du Suspect :");
+                if(!label) return;
+                image_url = prompt("URL de la photo (laisser vide pour défaut) :");
+            } else {
+                label = prompt("Contenu de la note :");
+                if(!label) return;
+            }
+
+            const x = window.innerWidth/2 - 100 + (Math.random()*50);
+            const y = window.innerHeight/2 - 100 + (Math.random()*50);
+
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'add_inv_item', type, label, image_url, x: parseInt(x), y: parseInt(y), color })
+            });
+            loadBoard();
+        }
+
+        async function editItem(e, item) {
+            e.stopPropagation();
+            const choice = prompt("MODIFIER :\n1. Texte\n2. Image/Couleur");
+            if (choice === '1') {
+                const val = prompt("Nouveau texte :", item.label);
+                if(val) updateItemData(item.id, { label: val });
+            } else if(choice === '2') {
+                if(item.type === 'suspect') {
+                    const val = prompt("URL Image :", item.image_url);
+                    if(val) updateItemData(item.id, { image_url: val });
+                } else {
+                    const val = prompt("Couleur (yellow, pink, blue, green) :", item.color);
+                    if(val) updateItemData(item.id, { color: val });
+                }
+            }
+        }
+
         async function updateItemData(id, payload) {
             await fetch('/api/execute-action', {
                 method: 'POST',
@@ -423,32 +452,13 @@
             loadBoard();
         }
 
-        async function editItem(e, item) {
-            e.stopPropagation();
-            const choice = prompt("1. Texte\n2. Image/Couleur");
-            if(choice === '1') {
-                const val = prompt("Nouveau texte :", item.label);
-                if(val) updateItemData(item.id, { label: val });
-            } else if(choice === '2') {
-                if(item.type === 'suspect') {
-                    const val = prompt("URL Image :", item.image_url);
-                    if(val) updateItemData(item.id, { image_url: val });
-                } else {
-                    const val = prompt("Couleur (yellow, pink, blue, green) :", item.color);
-                    if(val) updateItemData(item.id, { color: val });
-                }
-            }
-        }
-
         function handleResize(e, item) {
             e.preventDefault();
             const el = document.getElementById(`item-${item.id}`);
             let scale = parseFloat(el.dataset.scale);
             scale += (e.deltaY > 0 ? -0.1 : 0.1);
             scale = Math.min(Math.max(scale, 0.5), 3.0);
-            
-            const rotation = item.type === 'suspect' ? -2 : 2; 
-            el.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            el.style.transform = `scale(${scale}) rotate(${item.type === 'suspect' ? -2 : 2}deg)`;
             el.dataset.scale = scale;
 
             clearTimeout(resizeTimeout);

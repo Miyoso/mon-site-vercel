@@ -46,9 +46,16 @@ export default async function handler(request, response) {
       }
 
       case 'update_inv_item_text': {
-        const { id, label, image_url, color, status } = data;
+        const { id, label, image_url, color, status, stamp_color } = data;
+        
         if (status !== undefined) {
-             await sql`UPDATE investigation_items SET status = ${status} WHERE id = ${id}`;
+             
+             await sql`
+                UPDATE investigation_items 
+                SET status = ${status}, 
+                    stamp_color = ${stamp_color || 'red'} 
+                WHERE id = ${id}
+             `;
         } else if (image_url) {
             await sql`UPDATE investigation_items SET label = ${label}, image_url = ${image_url} WHERE id = ${id}`;
         } else if (color) {
