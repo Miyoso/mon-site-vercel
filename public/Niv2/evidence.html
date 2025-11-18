@@ -3,164 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS - Salle des Preuves</title>
-    <script> const REQUIRED_LEVEL = 2; </script>
+    <title>MUR D'ENQUÊTE</title>
+    <script> const REQUIRED_LEVEL = 3; </script>
     <script src="/js/security.js"></script>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/style-evidence.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style-investigation.css">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+ 
+        #btn-stamp.active {
+            background: #ff0000; 
+            color: white;
+            border-color: #ff0000;
+            box-shadow: 0 0 20px #ff0000;
+            animation: pulse-red 1s infinite;
+        }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 10px #ff0000; } 50% { box-shadow: 0 0 25px #ff0000; } 100% { box-shadow: 0 0 10px #ff0000; } }
+    </style>
 </head>
 <body>
-    <main class="terminal">
-        <h1>SALLE DES PREUVES<span class="blinker">_</span></h1>
-        <p class="status">ACCES: <span class="restricted" id="agent-name-display"></span> :: NIVEAU 2</p>
 
-        <div id="evidence-controls">
-            <h3 class="category-title" style="margin-top: 0;">//: ENREGISTRER NOUVELLE PREUVE</h3>
-            <form id="upload-form" class="form-grid">
-                <div class="form-group">
-                    <label>DOSSIER D'ENQUÊTE</label>
-                    <input type="text" name="dossier" class="form-input" required placeholder="Ex: Affaire Cartel, Enquête Docks...">
-                </div>
-                <div class="form-group">
-                    <label>TAGS (séparés par virgule)</label>
-                    <input type="text" name="tags" class="form-input" placeholder="Ex: #Arme, #Lieu, #Plaque">
-                </div>
-                <div class="form-group full-width">
-                    <label>FICHIER IMAGE (SCREENSHOT)</label>
-                    <input type="file" name="file" class="form-input" required accept="image/png, image/jpeg">
-                </div>
-                <button type="submit" class="form-button full-width" id="submit-btn">&gt;&gt; SCELLER LA PREUVE</button>
-                <p id="form-message" class="form-message full-width"></p>
-            </form>
-        </div>
+    <div class="help-indicator">
+        [ MOLETTE : ZOOM | DOUBLE-CLIC : ÉDITER ]
+    </div>
 
-        <div class="report-content" style="background: transparent; border: none; padding: 0;">
-            <div id="evidence-grid">
-                <p style="color: #00ff00;">[CHARGEMENT DES DONNÉES...]</p>
-            </div>
-        </div>
+    <div id="board-container">
+        <svg id="connections-layer"></svg>
+        <div id="items-layer"></div>
+    </div>
 
-        <footer class="portal-footer">
-            <a href="/index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
-        </footer>
-    </main>
+    <div class="toolbar">
+        <button class="tool-btn" onclick="window.location.href='/index.html'">&lt;&lt; RETOUR</button>
+        
+        <div style="width: 1px; background: #333; margin: 0 5px;"></div>
+        
+        <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
+        <button class="tool-btn" onclick="addItem('note')">+ NOTE</button>
+        
+        <div style="width: 1px; background: #333; margin: 0 5px;"></div>
 
-    <div id="lightbox-overlay" onclick="closeLightbox()">
-        <img src="" id="lightbox-image" alt="Preuve en gros plan">
+        <button class="tool-btn" id="btn-link-red" onclick="toggleLinkMode('red')">LIEN GUERRE</button>
+        <button class="tool-btn" id="btn-link-green" onclick="toggleLinkMode('green')">LIEN ALLIÉ</button>
+        <button class="tool-btn" id="btn-link-blue" onclick="toggleLinkMode('blue')">LIEN SUB</button>
+        
+        <div style="width: 1px; background: #333; margin: 0 5px;"></div>
+
+        <button class="tool-btn" id="btn-stamp" onclick="toggleStampMode()">TAMPONNER</button>
     </div>
 
     <script>
-        const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
-        document.getElementById('agent-name-display').textContent = agentName;
-        const grid = document.getElementById('evidence-grid');
-        const form = document.getElementById('upload-form');
-        const msg = document.getElementById('form-message');
-        const submitBtn = document.getElementById('submit-btn');
+        let items = [];
+        let links = [];
+        let linkMode = null; 
+        let stampMode = false; // NOUVELLE VARIABLE D'ÉTAT
+        let linkSourceId = null;
+        let resizeTimeout;
 
-        const lightbox = document.getElementById('lightbox-overlay');
-        const lightboxImg = document.getElementById('lightbox-image');
+        const board = document.getElementById('items-layer');
+        const svgLayer = document.getElementById('connections-layer');
 
-        function openLightbox(url) {
-            lightboxImg.src = url;
-            lightbox.classList.add('active');
-        }
-        function closeLightbox() {
-            lightbox.classList.remove('active');
-        }
-
-        async function loadEvidence() {
+        async function loadBoard() {
             try {
-                const res = await fetch('/api/read?resource=evidence');
+                const res = await fetch('/api/read?resource=investigation');
+                if (!res.ok) throw new Error(`Erreur API: ${res.status}`);
                 const data = await res.json();
-                grid.innerHTML = '';
-
-                if (data.evidence.length === 0) {
-                    grid.innerHTML = '<p style="color: #888;">[AUCUNE PREUVE ENREGISTRÉE]</p>';
-                    return;
-                }
-
-                data.evidence.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'evidence-card';
-                    card.id = `evidence-${item.id}`;
-                    
-                    const tagsHtml = (item.tags || '')
-                        .split(',')
-                        .filter(tag => tag.trim() !== '')
-                        .map(tag => `<span class="evidence-tag">${tag.trim()}</span>`)
-                        .join('');
-
-                    card.innerHTML = `
-                        <img src="${item.image_url}" alt="Preuve" class="evidence-image" onclick="openLightbox('${item.image_url}')">
-                        <div class="evidence-meta">
-                            <div class="evidence-dossier">${item.dossier.toUpperCase()}</div>
-                            <div class="evidence-tags">${tagsHtml || '<span style="color: #555; font-size: 0.8rem;">Aucun tag</span>'}</div>
-                            <div class="evidence-chain">
-                                Déposé par: ${item.agent_name}<br>
-                                Le: ${new Date(item.created_at).toLocaleString()}
-                            </div>
-                        </div>
-                        <button class="delete-evidence" onclick="deleteEvidence(${item.id})">X</button>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (err) {
-                grid.innerHTML = '<p style="color: #ff4141;">[ERREUR DE CONNEXION AU SERVEUR]</p>';
+                if (!data.items || !data.links) return;
+                
+                items = data.items;
+                links = data.links;
+                renderBoard();
+            } catch (error) {
+                console.error("Erreur chargement:", error);
             }
         }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            msg.textContent = 'Envoi en cours...';
-            msg.className = 'form-message';
-            submitBtn.disabled = true;
+        function renderBoard() {
+            board.innerHTML = '';
+            svgLayer.innerHTML = '';
 
-            const formData = new FormData(form);
-            formData.append('agent_name', agentName);
+            items.forEach(item => {
+                const el = document.createElement('div');
+                el.className = `board-item item-${item.type}`;
+                if(item.type === 'note' && item.color) el.classList.add(item.color);
+                
+                el.style.left = item.x + 'px';
+                el.style.top = item.y + 'px';
+                el.id = `item-${item.id}`;
+                el.dataset.id = item.id;
 
-            try {
-                const res = await fetch('/api/upload-evidence', {
-                    method: 'POST',
-                    body: formData
-                });
+                const currentScale = item.scale || 1.0;
+                const rotation = item.type === 'suspect' ? -2 : 2; 
+                el.style.transform = `scale(${currentScale}) rotate(${rotation}deg)`;
+                el.dataset.scale = currentScale;
 
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.message || 'Erreur inconnue');
+                if(item.type === 'suspect') {
+                    const imgUrl = item.image_url || '/assets/petit.jpg';
+                    el.innerHTML = `<img src="${imgUrl}" draggable="false"><div class="label">${item.label}</div>`;
+                } else {
+                    el.innerText = item.label;
                 }
 
-                msg.textContent = 'Preuve enregistrée !';
-                msg.className = 'form-message success';
-                form.reset();
-                loadEvidence();
+                if (item.status && item.status !== 'NONE') {
+                    const stamp = document.createElement('div');
+                    stamp.className = `stamp stamp-${item.status}`;
+                    stamp.innerText = item.status;
+                    el.appendChild(stamp);
+                }
 
-            } catch (err) {
-                msg.textContent = `Erreur: ${err.message}`;
-                msg.className = 'form-message error';
-            } finally {
-                submitBtn.disabled = false;
-            }
-        });
+                const delBtn = document.createElement('div');
+                delBtn.className = 'delete-btn';
+                delBtn.innerText = 'X';
+                delBtn.title = "Supprimer";
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteItem(item.id); };
+                el.appendChild(delBtn);
 
-        async function deleteEvidence(id) {
-            if (!confirm("Voulez-vous vraiment détruire cette preuve ?")) return;
+                // GESTION DES ÉVÉNEMENTS MISE À JOUR
+                el.onmousedown = startDrag;
+                el.onclick = (e) => handleItemClick(e, item.id);
+                el.onwheel = (e) => handleResize(e, item);
+                el.ondblclick = (e) => editItem(e, item);
+
+                board.appendChild(el);
+            });
+
+            links.forEach(link => {
+                const fromItem = items.find(i => i.id === link.from_id);
+                const toItem = items.find(i => i.id === link.to_id);
+                if(fromItem && toItem) {
+                    drawLine(fromItem, toItem, link.type, link.id);
+                }
+            });
+        }
+
+        function drawLine(item1, item2, type, id) {
+            const w1 = item1.type === 'suspect' ? 180 : 200;
+            const h1 = item1.type === 'suspect' ? 200 : 150;
+            const x1 = item1.x + (w1 * (item1.scale||1)) / 2;
+            const y1 = item1.y + (h1 * (item1.scale||1)) / 2;
+
+            const w2 = item2.type === 'suspect' ? 180 : 200;
+            const h2 = item2.type === 'suspect' ? 200 : 150;
+            const x2 = item2.x + (w2 * (item2.scale||1)) / 2;
+            const y2 = item2.y + (h2 * (item2.scale||1)) / 2;
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            const cx = (x1 + x2) / 2;
+            const cy = (y1 + y2) / 2 + 40;
+            const d = `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
+
+            path.setAttribute("d", d);
+            path.setAttribute("class", `link-${type}`);
             
-            try {
+            path.onclick = (e) => {
+                path.style.stroke = "#fff";
+                setTimeout(() => {
+                    if(confirm("Couper ce lien ?")) deleteLink(id);
+                    else path.style.stroke = "";
+                }, 50);
+            };
+
+            svgLayer.appendChild(path);
+        }
+
+
+        function toggleLinkMode(color) {
+            disableAllModes(); 
+            
+            if(linkMode === color) {
+                linkMode = null; 
+            } else {
+                linkMode = color;
+                document.getElementById(`btn-link-${color}`).classList.add('active');
+                
+            }
+        }
+
+        
+        function toggleStampMode() {
+            const wasActive = stampMode;
+            disableAllModes(); 
+
+            if(!wasActive) {
+                stampMode = true;
+                document.getElementById('btn-stamp').classList.add('active');
+             
+            }
+        }
+
+        function disableAllModes() {
+            linkMode = null;
+            linkSourceId = null;
+            stampMode = false;
+            
+         
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+          
+            document.querySelectorAll('.board-item').forEach(i => i.classList.remove('linking-source'));
+        }
+
+       
+        async function handleItemClick(e, id) {
+            // 1. SI MODE TAMPON
+            if (stampMode) {
+                const stat = prompt("APPLIQUER TAMPON :\n- WANTED\n- JAILED\n- DECEASED\n- CLEARED\n- NONE (Effacer)\n\nEcrivez le statut :");
+                if (stat) {
+                    const finalStat = stat.toUpperCase() === 'NONE' ? '' : stat.toUpperCase();
+                    await updateItemData(id, { status: finalStat });
+                    toggleStampMode(); // Désactive le mode après usage (optionnel, plus ergonomique)
+                }
+                return;
+            }
+
+            // 2. SI MODE LIEN
+            if (linkMode) {
+                if(linkSourceId === null) {
+                    linkSourceId = id;
+                    document.getElementById(`item-${id}`).classList.add('linking-source');
+                } else {
+                    if(linkSourceId === id) return;
+                    await fetch('/api/execute-action', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ 
+                            action: 'add_inv_link', 
+                            from_id: linkSourceId, 
+                            to_id: id, 
+                            type: linkMode 
+                        })
+                    });
+                    toggleLinkMode(linkMode); 
+                    loadBoard();
+                }
+                return;
+            }
+            
+            
+        }
+
+        let activeDrag = null;
+        let offsetX, offsetY;
+
+        function startDrag(e) {
+          
+            if(linkMode || stampMode) return;
+
+            activeDrag = e.currentTarget;
+            activeDrag.style.zIndex = 1000;
+            const rect = activeDrag.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            document.addEventListener('mousemove', doDrag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        function doDrag(e) {
+            if (!activeDrag) return;
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
+            activeDrag.style.left = x + 'px';
+            activeDrag.style.top = y + 'px';
+        }
+
+        async function stopDrag(e) {
+            if (!activeDrag) return;
+            const id = activeDrag.dataset.id;
+            const x = parseInt(activeDrag.style.left);
+            const y = parseInt(activeDrag.style.top);
+            
+            activeDrag.style.zIndex = "";
+
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'move_inv_item', id, x, y })
+            });
+
+            const item = items.find(i => i.id == id);
+            if(item) { item.x = x; item.y = y; }
+            renderBoard();
+
+            document.removeEventListener('mousemove', doDrag);
+            document.removeEventListener('mouseup', stopDrag);
+            activeDrag = null;
+        }
+
+        async function addItem(type) {
+            let label, image_url, color;
+            if(type === 'suspect') {
+                label = prompt("Nom du Suspect :");
+                if(!label) return;
+                image_url = prompt("URL de la photo (laisser vide pour défaut) :");
+            } else {
+                label = prompt("Contenu de la note :");
+                if(!label) return;
+                const c = prompt("Couleur ? (yellow, pink, blue)", "yellow");
+                color = (c === 'pink' || c === 'blue') ? c : 'yellow';
+            }
+
+            const x = window.innerWidth/2 - 100 + (Math.random()*50);
+            const y = window.innerHeight/2 - 100 + (Math.random()*50);
+
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'add_inv_item', type, label, image_url, x: parseInt(x), y: parseInt(y), color })
+            });
+            loadBoard();
+        }
+
+        async function editItem(e, item) {
+            e.stopPropagation();
+            const choice = prompt("MODIFIER :\n1. Texte\n2. Image/Couleur\n\n(Utilisez le bouton TAMPONNER pour le statut)");
+
+            if (choice === '1') {
+                const newLabel = prompt("Nouveau texte :", item.label);
+                if (newLabel) updateItemData(item.id, { label: newLabel });
+            } 
+            else if (choice === '2') {
+                if (item.type === 'suspect') {
+                    const newImg = prompt("Nouvelle URL image :", item.image_url);
+                    if (newImg) updateItemData(item.id, { label: item.label, image_url: newImg });
+                } else {
+                    const newCol = prompt("Nouvelle couleur (yellow, pink, blue) :", item.color);
+                    if (newCol) updateItemData(item.id, { label: item.label, color: newCol });
+                }
+            }
+        }
+
+        async function updateItemData(id, payload) {
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'update_inv_item_text', id: id, ...payload })
+            });
+            loadBoard();
+        }
+
+        async function deleteItem(id) {
+            if(!confirm("Supprimer cet élément ?")) return;
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'del_inv_item', id })
+            });
+            loadBoard();
+        }
+
+        async function deleteLink(id) {
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'del_inv_link', id })
+            });
+            loadBoard();
+        }
+
+        function handleResize(e, item) {
+            e.preventDefault();
+            const el = document.getElementById(`item-${item.id}`);
+            let scale = parseFloat(el.dataset.scale);
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            scale = Math.min(Math.max(scale + delta, 0.5), 3.0);
+
+            const rotation = item.type === 'suspect' ? -2 : 2;
+            el.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
+            el.dataset.scale = scale;
+
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(async () => {
                 await fetch('/api/execute-action', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ action: 'delete_evidence', id })
+                    body: JSON.stringify({ action: 'resize_inv_item', id: item.id, scale: scale })
                 });
-                document.getElementById(`evidence-${id}`).remove();
-            } catch (err) {
-                alert('Erreur lors de la suppression.');
-            }
+                const it = items.find(i => i.id === item.id);
+                if(it) it.scale = scale;
+                renderBoard();
+            }, 500);
         }
 
-        loadEvidence();
+        loadBoard();
     </script>
 </body>
 </html>
