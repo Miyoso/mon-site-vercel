@@ -21,14 +21,15 @@ body {
     pointer-events: none; 
 }
 
-line {
+path {
+    fill: none;
     stroke-width: 3;
     opacity: 0.8;
     transition: stroke-width 0.2s;
-    pointer-events: stroke; 
-    cursor: crosshair;
+    cursor: pointer;
+    stroke-linecap: round;
 }
-line:hover { stroke-width: 6; opacity: 1; }
+path:hover { stroke-width: 6; opacity: 1; }
 
 .link-red { stroke: #ff4141; }
 .link-green { stroke: #00ff00; }
@@ -104,6 +105,31 @@ line:hover { stroke-width: 6; opacity: 1; }
 }
 .board-item:hover .delete-btn { display: block; }
 
+.stamp {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border: 3px solid;
+    border-radius: 5px;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 10;
+    letter-spacing: 2px;
+    mask-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/8399/grunge.png');
+    -webkit-mask-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/8399/grunge.png');
+    mix-blend-mode: multiply;
+}
+
+.stamp-WANTED { color: #d32f2f; border-color: #d32f2f; }
+.stamp-JAILED { color: #f57c00; border-color: #f57c00; }
+.stamp-DECEASED { color: #000; border-color: #000; background: rgba(255,255,255,0.5); }
+.stamp-CLEARED { color: #388e3c; border-color: #388e3c; }
+
 .toolbar {
     position: fixed;
     bottom: 20px;
@@ -131,16 +157,9 @@ line:hover { stroke-width: 6; opacity: 1; }
 .tool-btn:hover { background: #00ff00; color: #000; }
 .tool-btn.active { background: #00ff00; color: #000; box-shadow: 0 0 15px #00ff00; }
 
-.board-item.linking-source {
-    outline: 4px solid #00ff00;
-    animation: pulse 1s infinite;
-}
-@keyframes pulse { 0% { outline-offset: 0px; } 50% { outline-offset: 5px; } 100% { outline-offset: 0px; } }
-
 .help-indicator {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 20px; right: 20px;
     color: rgba(0, 255, 0, 0.6);
     font-family: 'Share Tech Mono', monospace;
     font-size: 0.85rem;
@@ -152,3 +171,9 @@ line:hover { stroke-width: 6; opacity: 1; }
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
+.board-item.linking-source {
+    outline: 4px solid #00ff00;
+    animation: pulse 1s infinite;
+}
+@keyframes pulse { 0% { outline-offset: 0px; } 50% { outline-offset: 5px; } 100% { outline-offset: 0px; } }
