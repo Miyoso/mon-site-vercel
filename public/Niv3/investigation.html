@@ -9,9 +9,8 @@
     <link rel="stylesheet" href="/css/style-investigation.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
     <style>
-      
         #btn-stamp.active {
-            background: #ff0000; 
+            background: #ff0000;
             color: white;
             border-color: #ff0000;
             box-shadow: 0 0 20px #ff0000;
@@ -40,8 +39,24 @@
         
         <div style="width: 1px; background: #333; margin: 0 5px;"></div>
         
-        <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
-        <button class="tool-btn" onclick="addItem('note')">+ NOTE</button>
+        <div class="tool-group">
+            <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
+            <div class="color-tooltip">
+                <div class="color-dot dot-white" onclick="addItem('suspect', 'white')"></div>
+                <div class="color-dot dot-yellow" onclick="addItem('suspect', 'yellow')"></div>
+                <div class="color-dot dot-red" style="background:#ff4141; color:#ff4141;" onclick="addItem('suspect', 'red')"></div>
+            </div>
+        </div>
+
+        <div class="tool-group">
+            <button class="tool-btn" onclick="addItem('note')">+ NOTE</button>
+            <div class="color-tooltip">
+                <div class="color-dot dot-yellow" onclick="addItem('note', 'yellow')"></div>
+                <div class="color-dot dot-pink" onclick="addItem('note', 'pink')"></div>
+                <div class="color-dot dot-blue" onclick="addItem('note', 'blue')"></div>
+                <div class="color-dot dot-green" onclick="addItem('note', 'green')"></div>
+            </div>
+        </div>
         
         <div style="width: 1px; background: #333; margin: 0 5px;"></div>
 
@@ -167,7 +182,6 @@
             svgLayer.appendChild(path);
         }
 
-
         function toggleLinkMode(color) {
             disableAllModes(); 
             
@@ -199,7 +213,6 @@
         }
 
         async function handleItemClick(e, id) {
-            // 1. SI MODE TAMPON
             if (stampMode) {
                 const stat = prompt("APPLIQUER TAMPON :\n- WANTED\n- JAILED\n- DECEASED\n- CLEARED\n- NONE (Effacer)\n\nEcrivez le statut :");
                 if (stat) {
@@ -279,8 +292,14 @@
             activeDrag = null;
         }
 
-        async function addItem(type) {
+        async function addItem(type, chosenColor) {
             let label, image_url, color;
+            
+            if (!chosenColor) {
+                chosenColor = type === 'suspect' ? 'white' : 'yellow';
+            }
+            color = chosenColor;
+
             if(type === 'suspect') {
                 label = prompt("Nom du Suspect :");
                 if(!label) return;
@@ -288,8 +307,6 @@
             } else {
                 label = prompt("Contenu de la note :");
                 if(!label) return;
-                const c = prompt("Couleur ? (yellow, pink, blue)", "yellow");
-                color = (c === 'pink' || c === 'blue') ? c : 'yellow';
             }
 
             const x = window.innerWidth/2 - 100 + (Math.random()*50);
