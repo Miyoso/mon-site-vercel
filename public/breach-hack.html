@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROTOCOLE DE BRÈCHE // HACK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --primary: #ff0055;
+            --secondary: #ff99cc;
+            --dim: #550011;
+            --grid-bg: #1a0a0a;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--primary);
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .hack-container {
+            border: 2px solid var(--primary);
+            padding: 2rem;
+            background: rgba(20, 0, 5, 0.95);
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.15);
+            width: 800px;
+            max-width: 95%;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            grid-column: 1 / -1;
+            margin: 0 0 1rem 0;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px var(--primary);
+            letter-spacing: 2px;
+            text-align: center;
+            border-bottom: 1px solid var(--dim);
+            padding-bottom: 10px;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            background: var(--grid-bg);
+            padding: 10px;
+            border: 1px solid var(--dim);
+        }
+
+        .cell {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.1s;
+            color: #666;
+        }
+
+        .cell.available {
+            color: var(--primary);
+            background: rgba(255, 0, 85, 0.1);
+            box-shadow: 0 0 5px var(--primary);
+        }
+
+        .cell.available:hover {
+            background: var(--primary);
+            color: #000;
+        }
+
+        .cell.selected {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        .cell.active-row-col {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-box {
+            border: 1px solid var(--dim);
+            padding: 15px;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .target-seq {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-top: 5px;
+            letter-spacing: 3px;
+        }
+
+        .buffer-seq {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-top: 5px;
+            letter-spacing: 3px;
+            min-height: 30px;
+        }
+
+        .timer-box {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: right;
+        }
+        .timer-box.urgent {
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        .message-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 20;
+        }
+
+        .message-overlay.visible { visibility: visible; opacity: 1; }
+        .msg-success { color: #00ff00; text-shadow: 0 0 20px #00ff00; }
+        .msg-fail { color: var(--primary); text-shadow: 0 0 20px var(--primary); }
+
+    </style>
+</head>
+<body>
+
+    <div class="hack-container">
+        <h1>>> PROTOCOLE DE BRÈCHE V.2 <<</h1>
+
+        <div class="left-panel">
+            <div class="matrix-grid" id="grid"></div>
+        </div>
+
+        <div class="right-panel">
+            <div class="timer-box" id="timer">45.00</div>
+            
+            <div class="info-box">
+                <div style="color:#888; font-size:0.8rem">SÉQUENCE REQUISE</div>
+                <div class="target-seq" id="target">-- -- --</div>
+            </div>
+
+            <div class="info-box">
+                <div style="color:#888; font-size:0.8rem">MÉMOIRE TAMPON</div>
+                <div class="buffer-seq" id="buffer"></div>
+            </div>
+
+            <div style="font-size: 0.8rem; color: #666; line-height: 1.4;">
+                // RÈGLES D'ENGAGEMENT :<br>
+                1. SÉLECTIONNEZ UN CODE<br>
+                2. ALTERNEZ LIGNE / COLONNE<br>
+                3. REPRODUISEZ LA SÉQUENCE
+            </div>
+        </div>
+
+        <div id="overlay" class="message-overlay">
+            <div id="overlay-msg"></div>
+        </div>
+    </div>
+
+    <script>
+        const config = {
+            gridSize: 6,
+            hexChars: ["1C", "55", "BD", "E9", "7A", "FF"],
+            seqLength: 4, 
+            bufferSize: 6, 
+            timeLimit: 45.0
+        };
+
+        let state = {
+            grid: [],
+            target: [],
+            buffer: [],
+            axis: 'row', 
+            activeIndex: 0, 
+            timer: null,
+            timeLeft: 0,
+            gameOver: false
+        };
+
+        const gridEl = document.getElementById('grid');
+        const targetEl = document.getElementById('target');
+        const bufferEl = document.getElementById('buffer');
+        const timerEl = document.getElementById('timer');
+        const overlay = document.getElementById('overlay');
+        const overlayMsg = document.getElementById('overlay-msg');
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type='square', duration=0.1) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function initGame() {
+            state.grid = [];
+            state.buffer = [];
+            state.axis = 'row'; 
+            state.activeIndex = 0; 
+            state.timeLeft = config.timeLimit;
+            state.gameOver = false;
+            
+            generateSolvableLevel();
+            renderGrid();
+            renderUI();
+            startTimer();
+        }
+
+        function generateSolvableLevel() {
+            state.grid = [];
+            
+            for (let i = 0; i < config.gridSize * config.gridSize; i++) {
+                state.grid.push({
+                    value: config.hexChars[Math.floor(Math.random() * config.hexChars.length)],
+                    used: false,
+                    row: Math.floor(i / config.gridSize),
+                    col: i % config.gridSize
+                });
+            }
+
+            let path = [];
+            let currentR = 0; 
+            let currentC = Math.floor(Math.random() * config.gridSize); 
+            let axis = 'row'; 
+            
+            let tempIndex = (currentR * config.gridSize) + currentC;
+            path.push(state.grid[tempIndex].value);
+            
+            for(let i=0; i<config.seqLength; i++) {
+                let possibleMoves = [];
+                
+                if(axis === 'row') {
+                    for(let c=0; c<config.gridSize; c++) {
+                        if(c !== currentC) possibleMoves.push({r: currentR, c: c});
+                    }
+                    axis = 'col';
+                } else {
+                    for(let r=0; r<config.gridSize; r++) {
+                        if(r !== currentR) possibleMoves.push({r: r, c: currentC});
+                    }
+                    axis = 'row';
+                }
+                
+                if(possibleMoves.length > 0) {
+                    const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+                    currentR = move.r;
+                    currentC = move.c;
+                    const idx = (currentR * config.gridSize) + currentC;
+                    path.push(state.grid[idx].value);
+                }
+            }
+
+            state.target = path.slice(1, config.seqLength + 1);
+        }
+
+        function renderGrid() {
+            gridEl.innerHTML = '';
+            
+            state.grid.forEach((cell, index) => {
+                const el = document.createElement('div');
+                el.className = 'cell';
+                el.textContent = cell.value;
+                
+                if (cell.used) {
+                    el.textContent = '[ ]';
+                    el.style.color = '#333';
+                    el.style.borderColor = 'transparent';
+                } else {
+                    let isAvailable = false;
+                    if (state.axis === 'row' && cell.row === state.activeIndex) isAvailable = true;
+                    if (state.axis === 'col' && cell.col === state.activeIndex) isAvailable = true;
+
+                    if (isAvailable) {
+                        el.classList.add('available');
+                        el.addEventListener('click', () => handleMove(index));
+                    } else if ((state.axis === 'row' && cell.row === state.activeIndex) || (state.axis === 'col' && cell.col === state.activeIndex)) {
+                        el.classList.add('active-row-col');
+                    }
+                }
+
+                gridEl.appendChild(el);
+            });
+        }
+
+        function renderUI() {
+            targetEl.innerHTML = state.target.map(h => `<span style="border:1px solid #555; padding:2px 5px; margin:0 2px;">${h}</span>`).join('');
+            
+            bufferEl.innerHTML = state.buffer.map(h => `<span style="color:#fff;">${h}</span>`).join(' ');
+        }
+
+        function handleMove(index) {
+            if (state.gameOver) return;
+
+            const cell = state.grid[index];
+            cell.used = true;
+            state.buffer.push(cell.value);
+            
+            playTone(800, 'square', 0.05);
+
+            if (state.axis === 'row') {
+                state.axis = 'col';
+                state.activeIndex = cell.col;
+            } else {
+                state.axis = 'row';
+                state.activeIndex = cell.row;
+            }
+
+            checkWinCondition();
+            renderGrid();
+            renderUI();
+        }
+
+        function checkWinCondition() {
+            const bufferStr = state.buffer.join(',');
+            const targetStr = state.target.join(',');
+
+            if (bufferStr.includes(targetStr)) {
+                endGame(true);
+                return;
+            }
+
+            if (state.buffer.length >= config.bufferSize) {
+                endGame(false);
+            }
+        }
+
+        function startTimer() {
+            state.timer = setInterval(() => {
+                state.timeLeft -= 0.05;
+                timerEl.textContent = state.timeLeft.toFixed(2);
+                
+                if(state.timeLeft <= 10.0) timerEl.classList.add('urgent');
+
+                if (state.timeLeft <= 0) {
+                    state.timeLeft = 0;
+                    endGame(false);
+                }
+            }, 50);
+        }
+
+        async function endGame(win) {
+            state.gameOver = true;
+            clearInterval(state.timer);
+
+            if (win) {
+                playTone(1200, 'sine', 0.5);
+                overlayMsg.innerHTML = `
+                    <div class="msg-success">PROTOCOLE ACCEPTÉ</div>
+                    <div style="font-size: 1rem; margin-top:20px; color:#fff;">INJECTION DE DAEMON...</div>
+                `;
+                overlay.classList.add('visible');
+                
+                try {
+                    const response = await fetch('/api/get-access', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    const data = await response.json();
+                    if (data.success && data.redirect) {
+                        sessionStorage.setItem('hack_token', data.token);
+                        setTimeout(() => window.location.href = data.redirect, 2000);
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+
+            } else {
+                playTone(100, 'sawtooth', 0.8);
+                overlayMsg.innerHTML = `
+                    <div class="msg-fail">ÉCHEC DU PROTOCOLE</div>
+                    <div style="font-size: 1rem; margin-top:20px; color:#fff;">SYSTÈME VERROUILLÉ</div>
+                `;
+                overlay.classList.add('visible');
+                setTimeout(() => window.location.href = '/access-denied.html', 2000);
+            }
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
