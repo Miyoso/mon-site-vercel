@@ -8,6 +8,21 @@
     <script src="/js/security.js"></script>
     <link rel="stylesheet" href="/css/style-investigation.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+      
+        #btn-stamp.active {
+            background: #ff0000; 
+            color: white;
+            border-color: #ff0000;
+            box-shadow: 0 0 20px #ff0000;
+            animation: pulse-red 1s infinite;
+        }
+        @keyframes pulse-red { 
+            0% { box-shadow: 0 0 10px #ff0000; } 
+            50% { box-shadow: 0 0 25px #ff0000; } 
+            100% { box-shadow: 0 0 10px #ff0000; } 
+        }
+    </style>
 </head>
 <body>
 
@@ -22,18 +37,28 @@
 
     <div class="toolbar">
         <button class="tool-btn" onclick="window.location.href='/index.html'">&lt;&lt; RETOUR</button>
+        
+        <div style="width: 1px; background: #333; margin: 0 5px;"></div>
+        
         <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
         <button class="tool-btn" onclick="addItem('note')">+ NOTE</button>
-        <div style="width: 1px; background: #333; margin: 0 10px;"></div>
+        
+        <div style="width: 1px; background: #333; margin: 0 5px;"></div>
+
         <button class="tool-btn" id="btn-link-red" onclick="toggleLinkMode('red')">LIEN GUERRE</button>
         <button class="tool-btn" id="btn-link-green" onclick="toggleLinkMode('green')">LIEN ALLIÉ</button>
         <button class="tool-btn" id="btn-link-blue" onclick="toggleLinkMode('blue')">LIEN SUB</button>
+        
+        <div style="width: 1px; background: #333; margin: 0 5px;"></div>
+
+        <button class="tool-btn" id="btn-stamp" onclick="toggleStampMode()">TAMPONNER</button>
     </div>
 
     <script>
         let items = [];
         let links = [];
         let linkMode = null; 
+        let stampMode = false; 
         let linkSourceId = null;
         let resizeTimeout;
 
@@ -124,10 +149,8 @@
             const y2 = item2.y + (h2 * (item2.scale||1)) / 2;
 
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            
             const cx = (x1 + x2) / 2;
             const cy = (y1 + y2) / 2 + 40;
-
             const d = `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
 
             path.setAttribute("d", d);
@@ -144,11 +167,78 @@
             svgLayer.appendChild(path);
         }
 
+
+        function toggleLinkMode(color) {
+            disableAllModes(); 
+            
+            if(linkMode === color) {
+                linkMode = null; 
+            } else {
+                linkMode = color;
+                document.getElementById(`btn-link-${color}`).classList.add('active');
+            }
+        }
+
+        function toggleStampMode() {
+            const wasActive = stampMode;
+            disableAllModes(); 
+
+            if(!wasActive) {
+                stampMode = true;
+                document.getElementById('btn-stamp').classList.add('active');
+            }
+        }
+
+        function disableAllModes() {
+            linkMode = null;
+            linkSourceId = null;
+            stampMode = false;
+            
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.board-item').forEach(i => i.classList.remove('linking-source'));
+        }
+
+        async function handleItemClick(e, id) {
+            // 1. SI MODE TAMPON
+            if (stampMode) {
+                const stat = prompt("APPLIQUER TAMPON :\n- WANTED\n- JAILED\n- DECEASED\n- CLEARED\n- NONE (Effacer)\n\nEcrivez le statut :");
+                if (stat) {
+                    const finalStat = stat.toUpperCase() === 'NONE' ? '' : stat.toUpperCase();
+                    await updateItemData(id, { status: finalStat });
+                    toggleStampMode();
+                }
+                return;
+            }
+
+            if (linkMode) {
+                if(linkSourceId === null) {
+                    linkSourceId = id;
+                    document.getElementById(`item-${id}`).classList.add('linking-source');
+                } else {
+                    if(linkSourceId === id) return;
+                    await fetch('/api/execute-action', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ 
+                            action: 'add_inv_link', 
+                            from_id: linkSourceId, 
+                            to_id: id, 
+                            type: linkMode 
+                        })
+                    });
+                    toggleLinkMode(linkMode);
+                    loadBoard();
+                }
+                return;
+            }
+        }
+
         let activeDrag = null;
         let offsetX, offsetY;
 
         function startDrag(e) {
-            if(linkMode) return;
+            if(linkMode || stampMode) return;
+
             activeDrag = e.currentTarget;
             activeDrag.style.zIndex = 1000;
             const rect = activeDrag.getBoundingClientRect();
@@ -215,8 +305,7 @@
 
         async function editItem(e, item) {
             e.stopPropagation();
-            
-            const choice = prompt("MODIFICATION :\n1. Changer Texte\n2. Changer Image/Couleur\n3. Changer STATUT (Tampon)\n\nEntrez 1, 2 ou 3 :");
+            const choice = prompt("MODIFIER :\n1. Texte\n2. Image/Couleur\n\n(Utilisez le bouton TAMPONNER pour le statut)");
 
             if (choice === '1') {
                 const newLabel = prompt("Nouveau texte :", item.label);
@@ -230,10 +319,6 @@
                     const newCol = prompt("Nouvelle couleur (yellow, pink, blue) :", item.color);
                     if (newCol) updateItemData(item.id, { label: item.label, color: newCol });
                 }
-            } 
-            else if (choice === '3') {
-                const stat = prompt("STATUT :\n- WANTED\n- JAILED\n- DECEASED\n- CLEARED\n- NONE (Effacer)\n\nEcrivez le statut en MAJUSCULES :");
-                if (stat) updateItemData(item.id, { status: stat === 'NONE' ? '' : stat });
             }
         }
 
@@ -263,37 +348,6 @@
                 body: JSON.stringify({ action: 'del_inv_link', id })
             });
             loadBoard();
-        }
-
-        function toggleLinkMode(color) {
-            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.board-item').forEach(i => i.classList.remove('linking-source'));
-            linkSourceId = null;
-
-            if(linkMode === color) {
-                linkMode = null;
-            } else {
-                linkMode = color;
-                document.getElementById(`btn-link-${color}`).classList.add('active');
-            }
-        }
-
-        async function handleItemClick(e, id) {
-            if(!linkMode) return;
-
-            if(linkSourceId === null) {
-                linkSourceId = id;
-                document.getElementById(`item-${id}`).classList.add('linking-source');
-            } else {
-                if(linkSourceId === id) return;
-                await fetch('/api/execute-action', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ action: 'add_inv_link', from_id: linkSourceId, to_id: id, type: linkMode })
-                });
-                toggleLinkMode(linkMode);
-                loadBoard();
-            }
         }
 
         function handleResize(e, item) {
