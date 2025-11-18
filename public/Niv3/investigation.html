@@ -9,76 +9,84 @@
     <link rel="stylesheet" href="/css/style-investigation.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS INTÉGRÉ POUR LE POPUP TEMPORISÉ --- */
+        /* --- CORRECTIF D'AFFICHAGE --- */
+        
+        /* On remonte la barre pour que les pastilles en dessous soient visibles */
+        .toolbar {
+            bottom: 70px !important; 
+            height: 60px !important;
+            overflow: visible !important; /* CRUCIAL : Permet aux pastilles de dépasser */
+            z-index: 9000 !important;
+            display: flex;
+            align-items: center;
+        }
 
-        /* Conteneur du bouton */
+        /* Conteneur du bouton + pastilles */
         .tool-group {
             position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            height: 100%;
         }
 
-        /* La Bulle de couleur */
-        .color-tooltip {
+        /* La barre de pastilles (Toujours visible) */
+        .color-selector {
             position: absolute;
-            bottom: 100%; 
+            top: 65px; /* Juste en dessous du bouton */
             left: 50%;
             transform: translateX(-50%);
-            margin-bottom: 15px;
             
-            background: rgba(0, 0, 0, 0.95);
+            background: #000;
             border: 1px solid #00ff00;
-            padding: 8px 12px;
-            border-radius: 50px;
+            padding: 5px 10px;
+            border-radius: 20px;
             display: flex;
-            gap: 10px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
-            z-index: 9999;
-
-            /* --- LA MAGIE DU DÉLAI EST ICI --- */
-            opacity: 0;
-            visibility: hidden;
-            /* On met un délai de 5s sur la disparition */
-            transition: all 0.3s ease-in-out;
-            transition-delay: 5s; 
+            gap: 8px;
+            
+            z-index: 9999; /* Au-dessus de tout */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            white-space: nowrap;
         }
 
-        /* Petite flèche */
-        .color-tooltip::after {
+        /* Petite flèche de liaison */
+        .color-selector::before {
             content: '';
             position: absolute;
-            top: 100%; left: 50%; margin-left: -6px;
-            border-width: 6px; border-style: solid;
-            border-color: #00ff00 transparent transparent transparent;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -1px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent #00ff00 transparent;
         }
 
-        /* Au survol : Apparition immédiate */
-        .tool-group:hover .color-tooltip {
-            opacity: 1;
-            visibility: visible;
-            margin-bottom: 20px; /* Petit effet de montée */
-            /* On annule le délai pour que ça apparaisse tout de suite */
-            transition-delay: 0s; 
-        }
-
-        /* Les points de couleur */
+        /* Les ronds de couleur */
         .color-dot {
-            width: 22px; height: 22px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 1px solid #fff;
             cursor: pointer;
-            transition: transform 0.2s;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10px; font-weight: bold; color: #000;
+            transition: transform 0.1s;
+            
+            /* Pour centrer le texte (lettres tampons) */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: black;
+            text-shadow: none;
         }
+        
         .color-dot:hover {
-            transform: scale(1.4);
-            border-color: #fff;
-            z-index: 2;
+            transform: scale(1.3);
+            z-index: 10;
         }
 
-        /* Couleurs */
+        /* Définition des couleurs */
         .dot-white { background: #fff; }
         .dot-yellow { background: #ffeb3b; }
         .dot-red { background: #ff4141; }
@@ -86,19 +94,19 @@
         .dot-blue { background: #80d8ff; }
         .dot-green { background: #69f0ae; }
 
-        /* Couleurs Tampons */
-        .stamp-dot-wanted { background: #d32f2f; color: #fff; }
-        .stamp-dot-jailed { background: #f57c00; }
-        .stamp-dot-dead { background: #000; border: 1px solid #555; color: #fff; }
-        .stamp-dot-clear { background: #388e3c; color: #fff; }
-        .stamp-dot-none { background: #555; color: #fff; }
+        /* Couleurs spéciales Tampons */
+        .stamp-dot-wanted { background: #d32f2f; color: white; border-color: red; }
+        .stamp-dot-jailed { background: #f57c00; color: black; }
+        .stamp-dot-dead { background: #000; color: white; border: 1px solid #555; }
+        .stamp-dot-clear { background: #388e3c; color: white; }
+        .stamp-dot-none { background: #555; color: white; }
 
         /* Bouton Actif */
         #btn-stamp.active {
-            background: #ff0000; color: white; border-color: #ff0000;
-            box-shadow: 0 0 20px #ff0000; animation: pulse-red 1s infinite;
+            background: #ff0000 !important;
+            color: white !important;
+            box-shadow: 0 0 15px #ff0000 !important;
         }
-        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 10px #ff0000; } 50% { box-shadow: 0 0 25px #ff0000; } }
     </style>
 </head>
 <body>
@@ -115,20 +123,17 @@
     <div class="toolbar">
         <button class="tool-btn" onclick="window.location.href='/index.html'">&lt;&lt; RETOUR</button>
         
-        <div style="width: 1px; background: #333; margin: 0 5px;"></div>
+        <div style="width: 1px; height: 30px; background: #333; margin: 0 10px;"></div>
         
         <div class="tool-group">
             <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
-            <div class="color-tooltip">
-                <div class="color-dot dot-white" onclick="addItem('suspect', 'white')" title="Blanc"></div>
-                <div class="color-dot dot-yellow" onclick="addItem('suspect', 'yellow')" title="Jaune"></div>
-                <div class="color-dot dot-red" onclick="addItem('suspect', 'red')" title="Rouge"></div>
             </div>
-        </div>
+
+        <div style="width: 10px;"></div>
 
         <div class="tool-group">
             <button class="tool-btn" onclick="addItem('note')">+ NOTE</button>
-            <div class="color-tooltip">
+            <div class="color-selector">
                 <div class="color-dot dot-yellow" onclick="addItem('note', 'yellow')" title="Jaune"></div>
                 <div class="color-dot dot-pink" onclick="addItem('note', 'pink')" title="Rose"></div>
                 <div class="color-dot dot-blue" onclick="addItem('note', 'blue')" title="Bleu"></div>
@@ -136,21 +141,21 @@
             </div>
         </div>
         
-        <div style="width: 1px; background: #333; margin: 0 5px;"></div>
+        <div style="width: 1px; height: 30px; background: #333; margin: 0 10px;"></div>
 
-        <button class="tool-btn" id="btn-link-red" onclick="toggleLinkMode('red')">LIEN GUERRE</button>
-        <button class="tool-btn" id="btn-link-green" onclick="toggleLinkMode('green')">LIEN ALLIÉ</button>
-        <button class="tool-btn" id="btn-link-blue" onclick="toggleLinkMode('blue')">LIEN SUB</button>
+        <button class="tool-btn" id="btn-link-red" onclick="toggleLinkMode('red')">GUERRE</button>
+        <button class="tool-btn" id="btn-link-green" onclick="toggleLinkMode('green')">ALLIÉ</button>
+        <button class="tool-btn" id="btn-link-blue" onclick="toggleLinkMode('blue')">SUB</button>
         
-        <div style="width: 1px; background: #333; margin: 0 5px;"></div>
+        <div style="width: 1px; height: 30px; background: #333; margin: 0 10px;"></div>
 
         <div class="tool-group">
-            <button class="tool-btn" id="btn-stamp" onclick="toggleStampMode()">TAMPONNER</button>
-            <div class="color-tooltip">
+            <button class="tool-btn" id="btn-stamp" onclick="activateStampMode(null)">TAMPONNER</button>
+            <div class="color-selector">
                 <div class="color-dot stamp-dot-wanted" onclick="activateStampMode('WANTED')" title="WANTED">W</div>
                 <div class="color-dot stamp-dot-jailed" onclick="activateStampMode('JAILED')" title="PRISON">P</div>
-                <div class="color-dot stamp-dot-dead" onclick="activateStampMode('DECEASED')" title="DÉCÉDÉ">†</div>
-                <div class="color-dot stamp-dot-clear" onclick="activateStampMode('CLEARED')" title="INNOCENT">OK</div>
+                <div class="color-dot stamp-dot-dead" onclick="activateStampMode('DECEASED')" title="MORT">†</div>
+                <div class="color-dot stamp-dot-clear" onclick="activateStampMode('CLEARED')" title="CLEAN">OK</div>
                 <div class="color-dot stamp-dot-none" onclick="activateStampMode('NONE')" title="EFFACER">X</div>
             </div>
         </div>
@@ -168,18 +173,18 @@
         const board = document.getElementById('items-layer');
         const svgLayer = document.getElementById('connections-layer');
 
+        // --- CHARGEMENT ---
         async function loadBoard() {
             try {
                 const res = await fetch('/api/read?resource=investigation');
-                if (!res.ok) throw new Error(`Erreur API: ${res.status}`);
                 const data = await res.json();
-                if (!data.items || !data.links) return;
-                items = data.items;
-                links = data.links;
+                if (data.items) items = data.items;
+                if (data.links) links = data.links;
                 renderBoard();
-            } catch (error) { console.error("Erreur chargement:", error); }
+            } catch (error) { console.error("Erreur:", error); }
         }
 
+        // --- RENDU ---
         function renderBoard() {
             board.innerHTML = '';
             svgLayer.innerHTML = '';
@@ -206,6 +211,7 @@
                     el.innerText = item.label;
                 }
 
+                // Affichage du Tampon
                 if (item.status && item.status !== 'NONE') {
                     const stamp = document.createElement('div');
                     stamp.className = `stamp stamp-${item.status}`;
@@ -219,6 +225,7 @@
                 delBtn.onclick = (e) => { e.stopPropagation(); deleteItem(item.id); };
                 el.appendChild(delBtn);
 
+                // Événements souris
                 el.onmousedown = startDrag;
                 el.onclick = (e) => handleItemClick(e, item.id);
                 el.onwheel = (e) => handleResize(e, item);
@@ -227,6 +234,7 @@
                 board.appendChild(el);
             });
 
+            // Dessin des liens
             links.forEach(link => {
                 const fromItem = items.find(i => i.id === link.from_id);
                 const toItem = items.find(i => i.id === link.to_id);
@@ -253,41 +261,13 @@
             path.setAttribute("d", d);
             path.setAttribute("class", `link-${type}`);
             
-            path.onclick = (e) => {
-                path.style.stroke = "#fff";
-                setTimeout(() => {
-                    if(confirm("Couper ce lien ?")) deleteLink(id);
-                    else path.style.stroke = "";
-                }, 50);
+            path.onclick = () => {
+                if(confirm("Couper ce lien ?")) deleteLink(id);
             };
             svgLayer.appendChild(path);
         }
 
-        function toggleLinkMode(color) {
-            disableAllModes(); 
-            if(linkMode === color) { linkMode = null; } 
-            else {
-                linkMode = color;
-                document.getElementById(`btn-link-${color}`).classList.add('active');
-            }
-        }
-
-        function toggleStampMode() {
-            const wasActive = stampMode;
-            disableAllModes(); 
-            if(!wasActive) {
-                stampMode = true;
-                document.getElementById('btn-stamp').classList.add('active');
-                currentStampType = null; // Manuel par défaut
-            }
-        }
-
-        function activateStampMode(type) {
-            disableAllModes();
-            stampMode = true;
-            currentStampType = type;
-            document.getElementById('btn-stamp').classList.add('active');
-        }
+        // --- MODES ET CLICS ---
 
         function disableAllModes() {
             linkMode = null;
@@ -298,18 +278,58 @@
             document.querySelectorAll('.board-item').forEach(i => i.classList.remove('linking-source'));
         }
 
+        function toggleLinkMode(color) {
+            disableAllModes(); 
+            linkMode = color;
+            document.getElementById(`btn-link-${color}`).classList.add('active');
+        }
+
+        window.activateStampMode = function(type) {
+            disableAllModes();
+            stampMode = true;
+            currentStampType = type; 
+            document.getElementById('btn-stamp').classList.add('active');
+            console.log("Mode tampon activé :", type);
+        };
+
+        window.addItem = async function(type, chosenColor) {
+            let label, image_url, color;
+            
+            if (!chosenColor) chosenColor = (type === 'suspect') ? 'white' : 'yellow';
+            color = chosenColor;
+
+            if(type === 'suspect') {
+                label = prompt("Nom du Suspect :");
+                if(!label) return;
+                image_url = prompt("URL photo (facultatif) :");
+            } else {
+                label = prompt("Texte de la note :");
+                if(!label) return;
+            }
+
+            const x = window.innerWidth/2 - 100 + (Math.random()*50);
+            const y = window.innerHeight/2 - 100 + (Math.random()*50);
+
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ action: 'add_inv_item', type, label, image_url, x: parseInt(x), y: parseInt(y), color })
+            });
+            loadBoard();
+        };
+
         async function handleItemClick(e, id) {
             if (stampMode) {
                 let statusToApply = "";
                 if (currentStampType) {
                     statusToApply = currentStampType === 'NONE' ? '' : currentStampType;
                 } else {
-                    const stat = prompt("TAMPON MANUEL :\nEcrivez le statut (WANTED, DECEASED...) :");
-                    if (stat) statusToApply = stat.toUpperCase() === 'NONE' ? '' : stat.toUpperCase();
+                    const stat = prompt("STATUT MANUEL (WANTED, JAILED...) :");
+                    if (stat) statusToApply = stat.toUpperCase();
                     else return;
                 }
                 await updateItemData(id, { status: statusToApply });
-                if(currentStampType) activateStampMode(null); // Reset au mode manuel
+                // On reste en mode tampon pour enchaîner si besoin
                 return;
             }
 
@@ -318,19 +338,20 @@
                     linkSourceId = id;
                     document.getElementById(`item-${id}`).classList.add('linking-source');
                 } else {
-                    if(linkSourceId === id) return;
-                    await fetch('/api/execute-action', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ action: 'add_inv_link', from_id: linkSourceId, to_id: id, type: linkMode })
-                    });
-                    toggleLinkMode(linkMode);
+                    if(linkSourceId !== id) {
+                        await fetch('/api/execute-action', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ action: 'add_inv_link', from_id: linkSourceId, to_id: id, type: linkMode })
+                        });
+                    }
+                    toggleLinkMode(linkMode); // On coupe après un lien
                     loadBoard();
                 }
-                return;
             }
         }
 
+        // --- DRAG & DROP ---
         let activeDrag = null;
         let offsetX, offsetY;
 
@@ -347,10 +368,8 @@
 
         function doDrag(e) {
             if (!activeDrag) return;
-            const x = e.clientX - offsetX;
-            const y = e.clientY - offsetY;
-            activeDrag.style.left = x + 'px';
-            activeDrag.style.top = y + 'px';
+            activeDrag.style.left = (e.clientX - offsetX) + 'px';
+            activeDrag.style.top = (e.clientY - offsetY) + 'px';
         }
 
         async function stopDrag(e) {
@@ -359,71 +378,34 @@
             const x = parseInt(activeDrag.style.left);
             const y = parseInt(activeDrag.style.top);
             activeDrag.style.zIndex = "";
+            
             await fetch('/api/execute-action', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ action: 'move_inv_item', id, x, y })
             });
-            renderBoard(); // Important pour les liens
+
+            const item = items.find(i => i.id == id);
+            if(item) { item.x = x; item.y = y; }
+            renderBoard(); // Redessiner les lignes
+
             document.removeEventListener('mousemove', doDrag);
             document.removeEventListener('mouseup', stopDrag);
             activeDrag = null;
         }
 
-        async function addItem(type, chosenColor) {
-            let label, image_url, color;
-            if (!chosenColor) chosenColor = type === 'suspect' ? 'white' : 'yellow';
-            color = chosenColor;
-
-            if(type === 'suspect') {
-                label = prompt("Nom du Suspect :");
-                if(!label) return;
-                image_url = prompt("URL de la photo (laisser vide pour défaut) :");
-            } else {
-                label = prompt("Contenu de la note :");
-                if(!label) return;
-            }
-
-            const x = window.innerWidth/2 - 100 + (Math.random()*50);
-            const y = window.innerHeight/2 - 100 + (Math.random()*50);
-
-            await fetch('/api/execute-action', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'add_inv_item', type, label, image_url, x: parseInt(x), y: parseInt(y), color })
-            });
-            loadBoard();
-        }
-
-        async function editItem(e, item) {
-            e.stopPropagation();
-            const choice = prompt("MODIFIER :\n1. Texte\n2. Image/Couleur");
-            if (choice === '1') {
-                const newLabel = prompt("Nouveau texte :", item.label);
-                if (newLabel) updateItemData(item.id, { label: newLabel });
-            } 
-            else if (choice === '2') {
-                if (item.type === 'suspect') {
-                    const newImg = prompt("Nouvelle URL image :", item.image_url);
-                    if (newImg) updateItemData(item.id, { label: item.label, image_url: newImg });
-                } else {
-                    const newCol = prompt("Nouvelle couleur (yellow, pink, blue, green) :", item.color);
-                    if (newCol) updateItemData(item.id, { label: item.label, color: newCol });
-                }
-            }
-        }
-
+        // --- UTILS ---
         async function updateItemData(id, payload) {
             await fetch('/api/execute-action', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'update_inv_item_text', id: id, ...payload })
+                body: JSON.stringify({ action: 'update_inv_item_text', id, ...payload })
             });
             loadBoard();
         }
 
         async function deleteItem(id) {
-            if(!confirm("Supprimer cet élément ?")) return;
+            if(!confirm("Supprimer ?")) return;
             await fetch('/api/execute-action', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -441,13 +423,32 @@
             loadBoard();
         }
 
+        async function editItem(e, item) {
+            e.stopPropagation();
+            const choice = prompt("1. Texte\n2. Image/Couleur");
+            if(choice === '1') {
+                const val = prompt("Nouveau texte :", item.label);
+                if(val) updateItemData(item.id, { label: val });
+            } else if(choice === '2') {
+                if(item.type === 'suspect') {
+                    const val = prompt("URL Image :", item.image_url);
+                    if(val) updateItemData(item.id, { image_url: val });
+                } else {
+                    const val = prompt("Couleur (yellow, pink, blue, green) :", item.color);
+                    if(val) updateItemData(item.id, { color: val });
+                }
+            }
+        }
+
         function handleResize(e, item) {
             e.preventDefault();
             const el = document.getElementById(`item-${item.id}`);
             let scale = parseFloat(el.dataset.scale);
-            const delta = e.deltaY > 0 ? -0.1 : 0.1;
-            scale = Math.min(Math.max(scale + delta, 0.5), 3.0);
-            el.style.transform = `scale(${scale}) rotate(${item.type === 'suspect' ? -2 : 2}deg)`;
+            scale += (e.deltaY > 0 ? -0.1 : 0.1);
+            scale = Math.min(Math.max(scale, 0.5), 3.0);
+            
+            const rotation = item.type === 'suspect' ? -2 : 2; 
+            el.style.transform = `scale(${scale}) rotate(${rotation}deg)`;
             el.dataset.scale = scale;
 
             clearTimeout(resizeTimeout);
