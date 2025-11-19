@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIGACORP // HELPDESK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050510;
+            --chat-bg: #0f0f1a;
+            --user-msg: #0055ff;
+            --bot-msg: #222;
+            --text-color: #aaccff;
+            --accent: #00ccff;
+            --alert: #ff3333;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header style Corpo */
+        header {
+            background: #000;
+            border-bottom: 2px solid var(--accent);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; color: #fff; }
+        .status-dot {
+            height: 10px; width: 10px; background-color: #00ff00;
+            border-radius: 50%; display: inline-block; margin-right: 5px;
+            box-shadow: 0 0 5px #00ff00;
+        }
+
+        /* Zone de chat */
+        #chat-container {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--chat-bg);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background-color: var(--bot-msg);
+            border-left: 3px solid var(--accent);
+            color: #ddd;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: var(--user-msg);
+            color: #fff;
+            border-right: 3px solid #fff;
+        }
+
+        .message .sender {
+            font-size: 0.7rem;
+            color: #666;
+            margin-bottom: 3px;
+            display: block;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+   
+        .typing {
+            align-self: flex-start;
+            color: #666;
+            font-style: italic;
+            font-size: 0.8rem;
+            display: none;
+            margin-left: 10px;
+        }
+
+        
+        .input-area {
+            background: #000;
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #333;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        input:focus { outline: none; border-color: var(--accent); }
+
+        button {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 0 25px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.2s;
+        }
+        button:hover { background: #fff; }
+
+        /* Barre de suspicion */
+        .suspicion-container {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            width: 200px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .bar-label { font-size: 0.8rem; color: var(--alert); font-family: 'Share Tech Mono'; }
+        .bar-bg { height: 10px; background: #333; margin-top: 5px; }
+        .bar-fill { height: 100%; width: 0%; background: var(--alert); transition: width 0.5s; }
+
+        /* Overlay Fin de jeu */
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 100; visibility: hidden; opacity: 0;
+            transition: opacity 0.5s; text-align: center;
+        }
+        #overlay.visible { visibility: visible; opacity: 1; }
+        .win-text { color: #00ff00; font-size: 2rem; font-family: 'Share Tech Mono'; text-shadow: 0 0 20px #00ff00; }
+        .lose-text { color: #ff3333; font-size: 2rem; font-family: 'Share Tech Mono'; text-shadow: 0 0 20px #ff3333; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="display:flex; align-items:center;">
+            <img src="/assets/logo-sas.png" style="height:30px; margin-right:15px; filter:invert(1);">
+            <h1>GIGACORP SUPPORT <span style="font-size:0.8rem; color:#666;">// TICKET #4921</span></h1>
+        </div>
+        <div>
+            <span class="status-dot"></span> EN LIGNE
+        </div>
+    </header>
+
+    <div class="suspicion-container">
+        <div class="bar-label">DÉTECTION D'INTRUSION</div>
+        <div class="bar-bg"><div class="bar-fill" id="suspicionBar"></div></div>
+    </div>
+
+    <div id="chat-container">
+        </div>
+
+    <div class="typing" id="typingIndicator">Dave est en train d'écrire...</div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Entrez votre message..." autocomplete="off">
+        <button onclick="sendMessage()">ENVOYER</button>
+    </div>
+
+    <div id="overlay"></div>
+
+    <script>
+        const chatBox = document.getElementById('chat-container');
+        const input = document.getElementById('userInput');
+        const typing = document.getElementById('typingIndicator');
+        const suspicionBar = document.getElementById('suspicionBar');
+        const overlay = document.getElementById('overlay');
+
+        // --- CONFIGURATION DU BOT ---
+        let state = {
+            step: 0, 
+            suspicion: 0, 
+            context: 'neutral' 
+        };
+
+        
+        const botName = "Dave (IT Support)";
+        
+        // Scénario : Le joueur doit se faire passer pour un cadre (Mr. Henderson) qui a perdu son mot de passe.
+        // Le bot est "Dave", un employé un peu fatigué.
+
+        function addMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            div.innerHTML = `<span class="sender">${sender === 'bot' ? botName : 'Moi'}</span>${text}`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function botReply(text, delay = 1000) {
+            typing.style.display = 'block';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            await new Promise(r => setTimeout(r, delay));
+            
+            typing.style.display = 'none';
+            addMessage(text, 'bot');
+        }
+
+        function updateSuspicion(amount) {
+            state.suspicion = Math.max(0, Math.min(100, state.suspicion + amount));
+            suspicionBar.style.width = state.suspicion + "%";
+
+            if (state.suspicion >= 100) {
+                gameOver();
+            }
+        }
+
+        function analyzeInput(text) {
+            const lower = text.toLowerCase();
+            let reply = "";
+            let triggerNext = false;
+
+            
+            if (state.step === 0) {
+                if (lower.includes("bonjour") || lower.includes("salut") || lower.includes("hello")) {
+                    reply = "Bonjour. Ici le support IT Gigacorp. J'ai vu votre ticket. C'est pour quoi ?";
+                    state.step = 1;
+                } else if (lower.includes("mot de passe") || lower.includes("password") || lower.includes("oubli")) {
+                    reply = "Encore un oubli de mot de passe ? Pfff... Ok. C'est quoi votre identifiant employé ?";
+                    state.step = 2;
+                } else {
+                    reply = "Support IT Gigacorp. Je suis occupé, faites vite svp.";
+                }
+            }
+            
+            // ÉTAPE 1 : IDENTIFICATION
+            else if (state.step === 1) {
+                if (lower.includes("mot de passe") || lower.includes("connexion") || lower.includes("bloqué")) {
+                    reply = "D'accord. Procédure standard. Donnez-moi votre ID employé ou votre nom.";
+                    state.step = 2;
+                } else {
+                    reply = "Je ne comprends pas. Vous avez un problème technique ou pas ?";
+                    updateSuspicion(10);
+                }
+            }
+
+           
+            else if (state.step === 2) {
+                if (lower.includes("henderson") || lower.includes("directeur") || lower.includes("chef") || lower.includes("manager")) {
+                    reply = "Ah, Mr Henderson ? Désolé, je n'avais pas vu que c'était vous. Je ne trouve pas votre numéro de badge dans le ticket.";
+                    state.step = 3;
+                    state.context = 'helpful'; 
+                    updateSuspicion(-20); 
+                } 
+                else if (lower.includes("moi") || lower.length < 4) {
+                    reply = "C'est pas un nom ça. Écoutez, j'ai d'autres tickets. Donnez un nom valide.";
+                    updateSuspicion(20);
+                }
+                else {
+                    reply = `"${text}" ? Je ne trouve pas ce nom dans la base des employés actifs. Vous êtes sûr de travailler ici ?`;
+                    updateSuspicion(30);
+                }
+            }
+
+            
+            else if (state.step === 3) {
+                if (lower.includes("urgent") || lower.includes("réunion") || lower.includes("maintenant") || lower.includes("vite")) {
+                    reply = "Ok, ok, ne me virez pas ! La procédure demande une validation par email normalement... mais si c'est urgent...";
+                    state.step = 4;
+                } 
+                else if (lower.includes("oui") || lower.includes("s'il vous plait")) {
+                    reply = "Mouais. Vous n'avez pas votre token de sécurité ? Je ne peux pas reset sans le token.";
+                    updateSuspicion(10);
+                }
+                else {
+                    reply = "Je vais devoir appeler la sécurité pour vérifier votre identité si vous ne me donnez pas une bonne raison de contourner le protocole.";
+                    updateSuspicion(25);
+                }
+            }
+
+            E
+            else if (state.step === 4) {
+                if (lower.includes("token") || lower.includes("perdu") || lower.includes("maison") || lower.includes("oublié")) {
+                    reply = "Bon, je fais une exception pour cette fois Mr Henderson. <br><br>Le mot de passe temporaire est : <strong>GIGA_S3CR3T_2025</strong><br><br>Changez-le tout de suite svp.";
+                    gameWin();
+                    return; 
+                } else {
+                    reply = "Allez, je vous le donne exceptionnellement. Notez le : <strong>GIGA_S3CR3T_2025</strong>.";
+                    gameWin();
+                    return;
+                }
+            }
+
+            
+            if (lower.includes("hacker") || lower.includes("pirate") || lower.includes("police")) {
+                reply = "Pardon ? C'est une blague ? Je signale ce chat à la sécurité.";
+                updateSuspicion(50);
+            }
+            
+            if (lower.includes("merci") && state.suspicion > 0) {
+                updateSuspicion(-10); // La politesse aide un peu
+            }
+
+            botReply(reply);
+        }
+
+        
+
+        function sendMessage() {
+            const text = input.value.trim();
+            if (!text) return;
+            
+            addMessage(text, 'user');
+            input.value = '';
+            
+            analyzeInput(text);
+        }
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function gameWin() {
+            botReply("Déconnexion du système...", 2000).then(() => {
+                overlay.innerHTML = `
+                    <div class="win-text">INGÉNIERIE SOCIALE RÉUSSIE</div>
+                    <div style="color:#fff; margin-top:20px;">MOT DE PASSE ACQUIS</div>
+                    <button onclick="window.location.href='/index.html'" style="margin-top:30px;">RETOURNER AU QG</button>
+                `;
+                overlay.classList.add('visible');
+                
+                
+                localStorage.setItem('sas_social_hack', 'true');
+            });
+        }
+
+        function gameOver() {
+            overlay.innerHTML = `
+                <div class="lose-text">CONNEXION TERMINÉE</div>
+                <div style="color:#fff; margin-top:20px;">L'ADMINISTRATEUR A BLOQUÉ VOTRE IP</div>
+                <button onclick="location.reload()" style="margin-top:30px; background:#ff3333; color:white;">RÉESSAYER</button>
+            `;
+            overlay.classList.add('visible');
+        }
+
+        
+        setTimeout(() => {
+            botReply("Helpdesk Gigacorp, Dave à l'appareil. J'ai reçu une alerte de connexion échouée sur ce compte. Identifiez-vous.");
+        }, 1000);
+
+    </script>
+</body>
+</html>
