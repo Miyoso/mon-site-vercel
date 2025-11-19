@@ -3,11 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUR D'ENQUÊTE v2.0</title>
+    <title>MUR D'ENQUÊTE</title>
     <script> const REQUIRED_LEVEL = 3; </script>
     <script src="/js/security.js"></script>
     <link rel="stylesheet" href="/css/style-investigation.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS INTÉGRÉ POUR S'ASSURER QUE TOUT EST LÀ */
+        #world-layer {
+            position: absolute;
+            top: 0; left: 0;
+            transform-origin: 0 0;
+            width: 100vw; height: 100vh;
+        }
+        .tape {
+            position: absolute; top: -15px; left: 50%; width: 60px; height: 20px;
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateX(-50%) rotate(-2deg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2); backdrop-filter: blur(2px); z-index: 5;
+        }
+        .pin {
+            position: absolute; top: -10px; left: 50%; width: 16px; height: 16px;
+            border-radius: 50%; background: radial-gradient(circle at 30% 30%, #ff4141, #8b0000);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5); transform: translateX(-50%); z-index: 6;
+        }
+        #context-menu {
+            position: fixed; background: #1a1a1a; border: 1px solid #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); z-index: 9999;
+            display: none; flex-direction: column; min-width: 180px;
+        }
+        .ctx-item {
+            padding: 12px 15px; color: #c5c5c5; cursor: pointer;
+            font-family: 'Share Tech Mono', monospace; border-bottom: 1px solid #333;
+        }
+        .ctx-item:hover { background: #00ff00; color: #000; }
+        .ctx-item.delete:hover { background: #ff4141; color: #fff; }
+        
+        .edit-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 10000;
+        }
+        .edit-modal {
+            background: #0a0a0a; border: 2px solid #00ff00; padding: 20px; width: 400px;
+        }
+        .edit-input {
+            width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 10px; margin-bottom: 10px; font-family: monospace;
+        }
+        .modal-btns { display: flex; justify-content: flex-end; gap: 10px; }
+    </style>
 </head>
 <body>
 
@@ -15,8 +59,8 @@
         [ CLIC-DROIT : MENU | GLISSER FOND : PAN | MOLETTE : ZOOM ]
     </div>
 
-    <div id="world-layer" style="transform: translate(0px, 0px) scale(1);">
-        <svg id="connections-layer" style="overflow: visible;"></svg>
+    <div id="world-layer">
+        <svg id="connections-layer" style="overflow: visible; position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></svg>
         <div id="items-layer"></div>
     </div>
 
@@ -26,7 +70,7 @@
         <button class="tool-btn" onclick="openEditModal('new', 'suspect')">+ SUSPECT</button>
         <button class="tool-btn" onclick="openEditModal('new', 'note')">+ NOTE</button>
         <div style="width: 1px; height: 30px; background: #333; margin: 0 10px;"></div>
-        <button class="tool-btn" id="btn-reset-view" onclick="resetView()">RECADRER VUE</button>
+        <button class="tool-btn" onclick="resetView()">RECADRER</button>
     </div>
 
     <div id="context-menu">
@@ -38,7 +82,7 @@
 
     <div class="edit-modal-overlay" id="editModal">
         <div class="edit-modal">
-            <h3 id="modal-title">//: NOUVEAU DOSSIER</h3>
+            <h3 style="color:#0f0; font-family:'Share Tech Mono'; margin-top:0;">//: DOSSIER</h3>
             <input type="hidden" id="modal-mode">
             <input type="hidden" id="modal-type">
             <input type="hidden" id="modal-id">
@@ -47,57 +91,63 @@
             <textarea id="modal-label" class="edit-input" rows="3"></textarea>
             
             <div id="modal-image-group">
-                <label style="color:#888; font-size:0.8rem;">URL IMAGE (Optionnel)</label>
+                <label style="color:#888; font-size:0.8rem;">URL IMAGE</label>
                 <input type="text" id="modal-image" class="edit-input" placeholder="/assets/...">
             </div>
 
             <div class="modal-btns">
-                <button class="tool-btn" onclick="closeEditModal()">ANNULER</button>
+                <button class="tool-btn" onclick="document.getElementById('editModal').style.display='none'">ANNULER</button>
                 <button class="tool-btn active" onclick="saveModalData()">VALIDER</button>
             </div>
         </div>
     </div>
 
     <script>
+        // --- VARIABLES GLOBALES ---
         let items = [];
         let links = [];
         let viewState = { x: 0, y: 0, scale: 1 };
         let isPanning = false;
         let startPanX, startPanY;
-        let contextTargetId = null;
-        let linkingFromId = null;
+        
+        // Gestion du Drag
         let dragItem = null;
         let dragOffsetX, dragOffsetY;
+        let isDragging = false;
 
+        // Gestion du Contexte
+        let contextTargetId = null;
+        let linkingFromId = null;
+
+        // Éléments DOM
         const worldLayer = document.getElementById('world-layer');
         const itemsLayer = document.getElementById('items-layer');
         const svgLayer = document.getElementById('connections-layer');
         const ctxMenu = document.getElementById('context-menu');
         const editModal = document.getElementById('editModal');
-        const modalLabel = document.getElementById('modal-label');
-        const modalImage = document.getElementById('modal-image');
-        const modalMode = document.getElementById('modal-mode');
-        const modalType = document.getElementById('modal-type');
-        const modalId = document.getElementById('modal-id');
 
+        // --- INITIALISATION ---
         async function loadBoard() {
             try {
                 const res = await fetch('/api/read?resource=investigation');
                 const data = await res.json();
-                if (data.items) items = data.items;
-                if (data.links) links = data.links;
+                items = data.items || [];
+                links = data.links || [];
                 renderBoard();
-            } catch (error) { console.error("Erreur:", error); }
+            } catch (error) { 
+                console.error("Erreur de chargement:", error);
+            }
         }
 
         function renderBoard() {
             itemsLayer.innerHTML = '';
-            svgLayer.innerHTML = '';
+            svgLayer.innerHTML = ''; // Nettoyer les liens SVG
 
+            // 1. Afficher les Items
             items.forEach(item => {
                 const el = document.createElement('div');
                 el.className = `board-item item-${item.type}`;
-                if(item.type === 'note') {
+                if (item.type === 'note') {
                     el.classList.add(item.color || 'yellow');
                     el.innerHTML += '<div class="pin"></div>';
                 } else {
@@ -109,27 +159,33 @@
                 el.id = `item-${item.id}`;
                 el.dataset.id = item.id;
 
+                // Légère rotation aléatoire
                 const rot = (item.id % 6) - 3; 
                 const scale = item.scale || 1;
                 el.style.transform = `rotate(${rot}deg) scale(${scale})`;
 
-                if(item.type === 'suspect') {
+                // Contenu
+                if (item.type === 'suspect') {
                     const imgUrl = item.image_url || '/assets/petit.jpg';
                     el.innerHTML += `<img src="${imgUrl}" draggable="false"><div class="label">${item.label}</div>`;
                 } else {
                     el.innerHTML += `<div style="margin-top:10px;">${item.label}</div>`;
                 }
 
-                el.onmousedown = (e) => startItemDrag(e, item);
-                el.oncontextmenu = (e) => openContextMenu(e, item.id);
+                // Événements Souris
+                el.onmousedown = (e) => {
+                    if(e.button === 0) startItemDrag(e, item); // Clic gauche = Drag
+                };
+                el.oncontextmenu = (e) => openContextMenu(e, item.id); // Clic droit = Menu
 
                 itemsLayer.appendChild(el);
             });
 
+            // 2. Afficher les Liens (SVG)
             links.forEach(link => {
                 const from = items.find(i => i.id === link.from_id);
                 const to = items.find(i => i.id === link.to_id);
-                if(from && to) drawLink(from, to, link.type, link.id);
+                if (from && to) drawLink(from, to, link.type, link.id);
             });
         }
 
@@ -140,16 +196,20 @@
             const y2 = item2.y + 100;
 
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            
             const cx = (x1 + x2) / 2;
             const cy = Math.min(y1, y2) - 50;
             
             const d = `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
             path.setAttribute("d", d);
             path.setAttribute("class", `link-${type}`);
+            path.style.strokeWidth = "3";
+            path.style.stroke = type === 'red' ? '#ff4141' : (type === 'green' ? '#00ff00' : '#00ccff');
+            path.style.fill = "none";
+            path.style.cursor = "pointer";
             
+            // Double-clic pour supprimer le lien
             path.ondblclick = async () => {
-                if(confirm("Couper ce lien ?")) {
+                if(confirm("Supprimer ce lien ?")) {
                     await fetch('/api/execute-action', {
                         method: 'POST',
                         headers: {'Content-Type':'application/json'},
@@ -162,38 +222,52 @@
             svgLayer.appendChild(path);
         }
 
-        document.addEventListener('wheel', (e) => {
-            if (e.target.closest('.board-item')) return;
-            e.preventDefault();
-            const zoomIntensity = 0.1;
-            const newScale = viewState.scale + (e.deltaY > 0 ? -zoomIntensity : zoomIntensity);
-            viewState.scale = Math.min(Math.max(0.2, newScale), 3);
-            updateTransform();
-        }, { passive: false });
-
+        // --- NAVIGATION (PAN & ZOOM) ---
         document.addEventListener('mousedown', (e) => {
-            if(e.target.closest('.board-item') || e.target.closest('.tool-btn') || e.target.closest('.edit-modal-overlay')) return;
+            // Si on clique sur un item ou l'interface, on ignore le Pan
+            if(e.target.closest('.board-item') || e.target.closest('.tool-btn') || e.target.closest('.edit-modal-overlay') || e.target.closest('#context-menu')) return;
             
+            // Masquer menu si on clique ailleurs
             ctxMenu.style.display = 'none';
             
-            isPanning = true;
-            startPanX = e.clientX - viewState.x;
-            startPanY = e.clientY - viewState.y;
-            document.body.style.cursor = 'grabbing';
+            if(e.button === 0) { // Clic gauche fond
+                isPanning = true;
+                startPanX = e.clientX - viewState.x;
+                startPanY = e.clientY - viewState.y;
+                document.body.style.cursor = 'grabbing';
+            }
         });
 
         document.addEventListener('mousemove', (e) => {
-            if(!isPanning) return;
-            e.preventDefault();
-            viewState.x = e.clientX - startPanX;
-            viewState.y = e.clientY - startPanY;
-            updateTransform();
+            if(isPanning) {
+                e.preventDefault();
+                viewState.x = e.clientX - startPanX;
+                viewState.y = e.clientY - startPanY;
+                updateTransform();
+            }
+            else if(isDragging && dragItem) {
+                handleItemDrag(e);
+            }
         });
 
-        document.addEventListener('mouseup', () => {
-            isPanning = false;
-            document.body.style.cursor = 'default';
+        document.addEventListener('mouseup', async () => {
+            if(isPanning) {
+                isPanning = false;
+                document.body.style.cursor = 'default';
+            }
+            if(isDragging) {
+                await stopItemDrag();
+            }
         });
+
+        document.addEventListener('wheel', (e) => {
+            if (e.target.closest('.board-item')) return; // Pas de zoom sur item
+            e.preventDefault();
+            const zoomSpeed = 0.1;
+            const newScale = viewState.scale + (e.deltaY > 0 ? -zoomSpeed : zoomSpeed);
+            viewState.scale = Math.min(Math.max(0.2, newScale), 3);
+            updateTransform();
+        }, { passive: false });
 
         function updateTransform() {
             worldLayer.style.transform = `translate(${viewState.x}px, ${viewState.y}px) scale(${viewState.scale})`;
@@ -204,21 +278,25 @@
             updateTransform();
         }
 
+        // --- DRAG & DROP ITEMS ---
         function startItemDrag(e, item) {
-            if (e.button !== 0) return;
             e.stopPropagation();
+            ctxMenu.style.display = 'none'; // Fermer menu
             
+            isDragging = true;
             dragItem = item;
             
+            // Calcul de l'offset en prenant en compte le zoom
             dragOffsetX = (e.clientX - viewState.x) / viewState.scale - item.x;
             dragOffsetY = (e.clientY - viewState.y) / viewState.scale - item.y;
             
-            document.addEventListener('mousemove', onItemDrag);
-            document.addEventListener('mouseup', endItemDrag);
+            // Mettre l'item au premier plan
+            const el = document.getElementById(`item-${item.id}`);
+            el.style.zIndex = 1000;
         }
 
-        function onItemDrag(e) {
-            if (!dragItem) return;
+        function handleItemDrag(e) {
+            if(!dragItem) return;
             const mouseWorldX = (e.clientX - viewState.x) / viewState.scale;
             const mouseWorldY = (e.clientY - viewState.y) / viewState.scale;
 
@@ -230,24 +308,29 @@
             el.style.top = dragItem.y + 'px';
         }
 
-        async function endItemDrag() {
+        async function stopItemDrag() {
             if(dragItem) {
+                const el = document.getElementById(`item-${dragItem.id}`);
+                el.style.zIndex = "";
+                
                 await fetch('/api/execute-action', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ action: 'move_inv_item', id: dragItem.id, x: parseInt(dragItem.x), y: parseInt(dragItem.y) })
                 });
-                renderBoard();
+                renderBoard(); // Rafraîchir les liens
             }
+            isDragging = false;
             dragItem = null;
-            document.removeEventListener('mousemove', onItemDrag);
-            document.removeEventListener('mouseup', endItemDrag);
         }
 
+        // --- MENU CONTEXTUEL ---
         function openContextMenu(e, id) {
             e.preventDefault();
-            e.stopPropagation();
-            contextTargetId = id;
+            e.stopPropagation(); // Important
+            
+            contextTargetId = parseInt(id); // On force le type Entier
+            
             ctxMenu.style.display = 'flex';
             ctxMenu.style.left = e.clientX + 'px';
             ctxMenu.style.top = e.clientY + 'px';
@@ -256,49 +339,65 @@
         async function contextAction(action) {
             ctxMenu.style.display = 'none';
             if(!contextTargetId) return;
-            const item = items.find(i => i.id === contextTargetId);
 
+            const item = items.find(i => i.id === contextTargetId);
+            if (!item) return alert("Erreur: Item introuvable");
+
+            // 1. SUPPRIMER
             if (action === 'delete') {
-                if(confirm("Supprimer cet élément ?")) {
-                    await fetch('/api/execute-action', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ action: 'del_inv_item', id: contextTargetId })
-                    });
+                if(confirm("Supprimer définitivement ?")) {
+                    await apiCall({ action: 'del_inv_item', id: contextTargetId });
                     loadBoard();
                 }
-            } else if (action === 'edit') {
+            } 
+            // 2. ÉDITER
+            else if (action === 'edit') {
                 openEditModal('edit', item.type, item);
-            } else if (action === 'link') {
+            } 
+            // 3. LIER
+            else if (action === 'link') {
                 if (linkingFromId === null) {
                     linkingFromId = contextTargetId;
-                    alert("Sélectionnez maintenant la cible (Clic Droit -> Lier)");
+                    const el = document.getElementById(`item-${contextTargetId}`);
+                    el.style.outline = "3px dashed #00ff00";
+                    alert("Cible 1 sélectionnée.\nFaites un Clic Droit sur la Cible 2 et choisissez 'LIER À...' pour terminer.");
                 } else {
-                    const type = prompt("Type de lien (red, green, blue) ?", "red");
-                    await fetch('/api/execute-action', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ action: 'add_inv_link', from_id: linkingFromId, to_id: contextTargetId, type: type || 'red' })
+                    if(linkingFromId === contextTargetId) {
+                        alert("Impossible de lier à soi-même.");
+                        loadBoard(); // Reset style
+                        linkingFromId = null;
+                        return;
+                    }
+                    const type = prompt("Type de lien ? (red, green, blue)", "red");
+                    await apiCall({ 
+                        action: 'add_inv_link', 
+                        from_id: linkingFromId, 
+                        to_id: contextTargetId, 
+                        type: type || 'red' 
                     });
                     linkingFromId = null;
                     loadBoard();
                 }
-            } else if (action === 'color') {
+            } 
+            // 4. COULEUR
+            else if (action === 'color') {
                 const colors = ['yellow', 'pink', 'blue', 'green', 'white'];
                 const newColor = colors[Math.floor(Math.random() * colors.length)];
-                await fetch('/api/execute-action', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ action: 'update_inv_item_text', id: contextTargetId, label: item.label, color: newColor })
+                await apiCall({ 
+                    action: 'update_inv_item_text', 
+                    id: contextTargetId, 
+                    label: item.label, 
+                    color: newColor 
                 });
                 loadBoard();
             }
         }
 
+        // --- MODALE D'ÉDITION ---
         function openEditModal(mode, type, itemData = null) {
             editModal.style.display = 'flex';
-            modalMode.value = mode;
-            modalType.value = type;
+            document.getElementById('modal-mode').value = mode;
+            document.getElementById('modal-type').value = type;
             
             if (type === 'note') {
                 document.getElementById('modal-image-group').style.display = 'none';
@@ -307,64 +406,70 @@
             }
 
             if (mode === 'edit' && itemData) {
-                modalId.value = itemData.id;
-                modalLabel.value = itemData.label;
-                modalImage.value = itemData.image_url || '';
-                document.getElementById('modal-title').innerText = `//: ÉDITION ${itemData.type.toUpperCase()}`;
+                document.getElementById('modal-id').value = itemData.id;
+                document.getElementById('modal-label').value = itemData.label;
+                document.getElementById('modal-image').value = itemData.image_url || '';
             } else {
-                modalLabel.value = '';
-                modalImage.value = '';
-                document.getElementById('modal-title').innerText = `//: NOUVEAU ${type.toUpperCase()}`;
+                document.getElementById('modal-label').value = '';
+                document.getElementById('modal-image').value = '';
             }
         }
 
-        function closeEditModal() {
-            editModal.style.display = 'none';
-        }
-
         async function saveModalData() {
-            const mode = modalMode.value;
-            const type = modalType.value;
-            const label = modalLabel.value;
-            const image_url = modalImage.value;
+            const mode = document.getElementById('modal-mode').value;
+            const type = document.getElementById('modal-type').value;
+            const label = document.getElementById('modal-label').value;
+            const image_url = document.getElementById('modal-image').value;
+            const id = document.getElementById('modal-id').value;
 
-            if (!label) return alert("Texte requis");
-            closeEditModal();
+            if (!label) return alert("Le texte est requis !");
+            editModal.style.display = 'none';
 
             if (mode === 'new') {
+                // Création au centre de la vue
                 const x = (window.innerWidth/2 - viewState.x) / viewState.scale - 100;
                 const y = (window.innerHeight/2 - viewState.y) / viewState.scale - 100;
 
-                await fetch('/api/execute-action', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        action: 'add_inv_item', 
-                        type, label, image_url, 
-                        x: parseInt(x), y: parseInt(y), 
-                        color: 'yellow' 
-                    })
+                await apiCall({ 
+                    action: 'add_inv_item', 
+                    type, label, image_url, 
+                    x: parseInt(x), y: parseInt(y), 
+                    color: 'yellow' 
                 });
             } else {
-                const id = modalId.value;
-                await fetch('/api/execute-action', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ 
-                        action: 'update_inv_item_text', 
-                        id, label, image_url 
-                    })
+                // Mise à jour
+                await apiCall({ 
+                    action: 'update_inv_item_text', 
+                    id: parseInt(id), 
+                    label, image_url 
                 });
             }
             loadBoard();
         }
 
+        // --- UTILITAIRES ---
+        async function apiCall(data) {
+            try {
+                const res = await fetch('/api/execute-action', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                if(!res.ok) throw new Error("Erreur API");
+                return await res.json();
+            } catch(e) {
+                console.error(e);
+                alert("Erreur lors de l'opération.");
+            }
+        }
+
+        // Lancement
         loadBoard();
 
+        // Fermeture menu contextuel au clic global
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#context-menu')) ctxMenu.style.display = 'none';
         });
-
     </script>
 </body>
 </html>
