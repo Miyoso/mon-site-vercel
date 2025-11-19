@@ -6,6 +6,7 @@
     <title>SAS - Tableau des Opérations</title>
     <script> const REQUIRED_LEVEL = 1; </script>
     <script src="/js/security.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/style-operations.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,6 +107,19 @@
             const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
             document.getElementById('agent-name-display').textContent = agentName;
             loadTasks();
+
+            const pusher = new Pusher('TA_CLE_PUBLIQUE_PUSHER', {
+                cluster: 'eu'
+            });
+
+            const channel = pusher.subscribe('operations-channel');
+            
+            channel.bind('update-board', function(data) {
+                const header = document.querySelector('.ops-header h1');
+                header.style.color = '#00ff00';
+                setTimeout(() => header.style.color = '', 500);
+                loadTasks();
+            });
         });
 
         async function loadTasks() {
@@ -234,7 +248,6 @@
             if(res.ok) {
                 closeModal();
                 form.reset();
-                loadTasks();
             }
         });
     </script>
