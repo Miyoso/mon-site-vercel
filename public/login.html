@@ -10,29 +10,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <main class="terminal">
-        
         <img src="/assets/logo-sas.png" alt="Logo SAS" class="logo">
-        
         <h1>SAS MAINFRAME<span class="blinker">_</span></h1>
         <p class="status">AUTHENTICATION_REQUIRED</p>
-
         <form class="login-form" id="loginForm">
-            
             <label for="username">//: AGENT_ID:</label>
             <input type="text" id="username" class="login-input" autofocus>
-
             <label for="password">//: PASSPHRASE:</label>
             <input type="password" id="password" class="login-input">
-            
             <p id="errorMessage" class="error-message"></p>
-            
             <button type="submit" class="login-button">&gt;&gt; CONNECT</button>
         </form>
-
     </main>
-
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault(); 
@@ -42,12 +32,11 @@
             const errorMessage = document.getElementById('errorMessage');
             const button = document.querySelector('.login-button');
 
-            button.disabled = true; // Désactive le bouton
+            button.disabled = true;
             errorMessage.textContent = "//: CONNECTING TO MAINFRAME...";
             errorMessage.style.color = "#c5c5c5";
 
             try {
-                // 1. On envoie les données au "Cerveau" (API)
                 const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -57,33 +46,31 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // --- SUCCÈS ---
-                    // Le "Cerveau" a dit OUI.
                     localStorage.setItem('sas_user', data.user);
                     localStorage.setItem('sas_level', data.level);
+
+                    const SECRET_KEY = "SAS_SECURE_HASH_KEY_x99";
+                    const signature = btoa(`${data.level}-${SECRET_KEY}`);
+                    localStorage.setItem('sas_integrity', signature);
 
                     errorMessage.textContent = `//: ACCREDITATION_LEVEL_${data.level}_ACCEPTED... WELCOME, ${data.user}.`;
                     errorMessage.style.color = "#00ff00";
                     
                     setTimeout(() => {
-                        window.location.href = "/index.html"; // On envoie au portail
+                        window.location.href = "/index.html";
                     }, 1500);
 
                 } else {
-                    // --- ÉCHEC ---
-                    // Le "Cerveau" a dit NON.
                     errorMessage.textContent = data.message;
                     errorMessage.style.color = "#ff4141";
-                    button.disabled = false; // Réactive le bouton
+                    button.disabled = false;
                 }
             } catch (error) {
-                // Erreur de connexion au "Cerveau"
                 errorMessage.textContent = "//: ERROR :: MAINFRAME_CONNECTION_FAILED";
                 errorMessage.style.color = "#ff4141";
                 button.disabled = false;
             }
         });
     </script>
-
 </body>
 </html>

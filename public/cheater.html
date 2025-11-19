@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALERTE SÉCURITÉ</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body { text-align: center; justify-content: center; align-items: center; display: flex; flex-direction: column; }
+        h1 { color: red; font-size: 3rem; animation: blink 0.2s infinite; }
+        .troll-img { width: 300px; border: 5px solid red; margin: 20px; }
+    </style>
+</head>
+<body>
+    <main class="terminal" style="border-color: red;">
+        <h1>TRICHE DÉTECTÉE !</h1>
+        
+        <img src="/assets/oui.png" class="troll-img">
+        
+        <p style="color: #ff4141; font-size: 1.2rem;">
+            Modification illégale du LocalStorage détectée.<br>
+            La police du cyber-espace est en route.
+        </p>
+
+        <button onclick="localStorage.clear(); window.location.href='/login.html'" class="login-button" style="margin-top: 20px; border-color: red; color: red;">
+            >> PARDON, JE RECOMMENCE
+        </button>
+    </main>
+</body>
+</html>
