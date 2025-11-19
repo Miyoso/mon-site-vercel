@@ -1,20 +1,23 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Utilisez ce nom exact
-});
- 
-
 export default async function handler(req, res) {
+  // 1. Vérifier la méthode
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // 2. Vérifier que la clé est présente
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ error: 'Clé API OpenAI manquante côté serveur' });
+  }
 
+  // 3. Initialiser OpenAI ici (plus sûr)
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 
   const { message, history } = req.body;
 
-  // Le contexte donne sa personnalité à l'IA
   const systemPrompt = `
     Tu es Dave, un administrateur système fatigué et cynique du support IT de Gigacorp.
     L'utilisateur essaie de te manipuler (Social Engineering) pour obtenir un reset de mot de passe.
@@ -29,10 +32,10 @@ export default async function handler(req, res) {
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // ou "gpt-4o" pour plus d'intelligence
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: systemPrompt },
-        ...history, // On garde la mémoire de la conversation
+        ...(history || []), // Sécurité si l'historique est vide
         { role: "user", content: message }
       ],
       temperature: 0.7,
@@ -40,8 +43,10 @@ export default async function handler(req, res) {
 
     const reply = completion.choices[0].message.content;
     res.status(200).json({ reply });
+    
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Erreur de connexion au cerveau IA' });
+    console.error("Erreur OpenAI:", error);
+    // On renvoie du JSON même en cas d'erreur pour éviter le bug du front-end
+    res.status(500).json({ reply: "Erreur critique du système... (Vérifiez les logs Vercel)" });
   }
 }
