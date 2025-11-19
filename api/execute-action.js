@@ -1,5 +1,14 @@
 import { sql } from '@vercel/postgres';
 import bcrypt from 'bcrypt';
+import Pusher from 'pusher';
+
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_KEY,
+  secret: process.env.PUSHER_SECRET,
+  cluster: process.env.PUSHER_CLUSTER,
+  useTLS: true
+});
 
 export default async function handler(request, response) {
   response.setHeader('Access-Control-Allow-Credentials', true);
@@ -27,6 +36,30 @@ export default async function handler(request, response) {
 
   try {
     switch (action) {
+      case 'add_task': {
+        const { title, description, assigned_to, priority, due_date, status } = data;
+        await sql`
+          INSERT INTO operations_tasks (title, description, assigned_to, priority, due_date, status, created_at)
+          VALUES (${title}, ${description}, ${assigned_to}, ${priority}, ${due_date}, ${status}, NOW())
+        `;
+        await pusher.trigger('operations-channel', 'update-board', { message: 'update' });
+        return response.status(200).json({ success: true });
+      }
+
+      case 'update_task_status': {
+        const { id, status } = data;
+        await sql`UPDATE operations_tasks SET status = ${status} WHERE id = ${id}`;
+        await pusher.trigger('operations-channel', 'update-board', { message: 'update' });
+        return response.status(200).json({ success: true });
+      }
+
+      case 'delete_task': {
+        const { id } = data;
+        await sql`DELETE FROM operations_tasks WHERE id = ${id}`;
+        await pusher.trigger('operations-channel', 'update-board', { message: 'update' });
+        return response.status(200).json({ success: true });
+      }
+
       case 'add_inv_item': {
         const { type, label, image_url, x, y, color } = data;
         await sql`INSERT INTO investigation_items (type, label, image_url, x, y, color) VALUES (${type}, ${label}, ${image_url || null}, ${x}, ${y}, ${color || 'yellow'})`;
@@ -49,7 +82,6 @@ export default async function handler(request, response) {
         const { id, label, image_url, color, status, stamp_color } = data;
         
         if (status !== undefined) {
-             
              await sql`
                 UPDATE investigation_items 
                 SET status = ${status}, 
