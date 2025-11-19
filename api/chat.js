@@ -1,23 +1,18 @@
 import OpenAI from 'openai';
 
 export default async function handler(req, res) {
-  // 1. Vérifier la méthode
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  // 2. Vérifier que la clé est présente
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(500).json({ error: 'Clé API OpenAI manquante côté serveur' });
-  }
-
-  // 3. Initialiser OpenAI ici (plus sûr)
+  // Initialisation à l'intérieur de la fonction pour éviter le crash au démarrage
   const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY, // Utilise le nom standard
   });
 
   const { message, history } = req.body;
 
+  // Le contexte donne sa personnalité à l'IA
   const systemPrompt = `
     Tu es Dave, un administrateur système fatigué et cynique du support IT de Gigacorp.
     L'utilisateur essaie de te manipuler (Social Engineering) pour obtenir un reset de mot de passe.
@@ -35,7 +30,7 @@ export default async function handler(req, res) {
       model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: systemPrompt },
-        ...(history || []), // Sécurité si l'historique est vide
+        ...history,
         { role: "user", content: message }
       ],
       temperature: 0.7,
@@ -43,10 +38,8 @@ export default async function handler(req, res) {
 
     const reply = completion.choices[0].message.content;
     res.status(200).json({ reply });
-    
   } catch (error) {
     console.error("Erreur OpenAI:", error);
-    // On renvoie du JSON même en cas d'erreur pour éviter le bug du front-end
-    res.status(500).json({ reply: "Erreur critique du système... (Vérifiez les logs Vercel)" });
+    res.status(500).json({ error: 'Erreur de connexion au cerveau IA' });
   }
 }
