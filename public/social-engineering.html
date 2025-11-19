@@ -250,15 +250,17 @@
                         reply = "Ici le Support. Je suis débordé, expliquez votre problème rapidement.";
                     }
                 }
-                else if (state.step === 1) {
-                    if (lower.includes("mot de passe") || lower.includes("connexion")) {
-                        reply = "D'accord. Procédure standard. Donnez-moi votre nom ou ID employé.";
-                        state.step = 2;
-                    } else {
-                        reply = "Je ne comprends pas. C'est un problème réseau ou compte ?";
-                        updateSuspicion(10);
-                    }
+                
+            else if (state.step === 1) {
+                
+                if (lower.includes("mot de passe") || lower.includes("connexion") || lower.includes("compte") || lower.includes("réseau") || lower.includes("bloqué")) {
+                    reply = "D'accord. Procédure standard. Donnez-moi votre nom ou ID employé.";
+                    state.step = 2;
+                } else {
+                    reply = "Je ne comprends pas. C'est un problème réseau ou compte ?";
+                    updateSuspicion(10);
                 }
+            }
                 else if (state.step === 2) {
                     if (lower.includes("henderson") || lower.includes("directeur")) {
                         reply = "Ah, Mr Henderson ? Désolé monsieur, je n'avais pas vu que c'était vous ! Je ne trouve pas votre numéro de badge dans le ticket.";
