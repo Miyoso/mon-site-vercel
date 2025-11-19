@@ -2,30 +2,43 @@
 .kanban-board {
     display: flex;
     gap: 1.5rem;
-    overflow-x: auto;
+    overflow-x: auto; /* Scroll horizontal sur grand écran si besoin */
     padding-bottom: 1rem;
     align-items: flex-start;
     min-height: 60vh;
 }
 
+/* --- EN-TÊTE DE PAGE --- */
+.ops-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.action-btn {
+    margin: 0;
+    background: #003300;
+    border-color: #00ff00;
+}
+
 /* --- COLONNES --- */
 .kanban-column {
     flex: 1;
-    min-width: 300px;
+    min-width: 300px; /* Largeur min pour lisibilité PC */
     background: rgba(10, 15, 20, 0.6);
     border: 1px solid #333;
-    border-top: 2px solid #333; /* Couleur par défaut */
+    border-top: 2px solid #333;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100%; /* Pour que toutes les colonnes aient la même hauteur si vide */
     backdrop-filter: blur(5px);
 }
 
-/* Couleurs spécifiques par colonne (via nth-child ou ID si tu préfères) */
-.kanban-column:nth-child(1) { border-top-color: #c5c5c5; } /* À FAIRE */
-.kanban-column:nth-child(2) { border-top-color: #00ccff; } /* EN COURS */
-.kanban-column:nth-child(3) { border-top-color: #ff9900; } /* EN ATTENTE */
-.kanban-column:nth-child(4) { border-top-color: #00ff00; } /* TERMINÉ */
+.kanban-column:nth-child(1) { border-top-color: #c5c5c5; }
+.kanban-column:nth-child(2) { border-top-color: #00ccff; }
+.kanban-column:nth-child(3) { border-top-color: #ff9900; }
+.kanban-column:nth-child(4) { border-top-color: #00ff00; }
 
 .column-header {
     padding: 1rem;
@@ -41,7 +54,7 @@
 .task-list {
     padding: 1rem;
     flex-grow: 1;
-    min-height: 150px;
+    min-height: 150px; /* Zone de drop toujours accessible */
     transition: background 0.3s;
 }
 
@@ -54,7 +67,7 @@
 .task-card {
     background: #050505;
     border: 1px solid #333;
-    border-left: 4px solid #555; /* Indicateur priorité par défaut */
+    border-left: 4px solid #555;
     padding: 1rem;
     margin-bottom: 1rem;
     cursor: grab;
@@ -73,17 +86,15 @@
     cursor: grabbing;
 }
 
-/* Style du titre de la mission */
 .task-title {
     font-weight: bold;
     color: #eaeaea;
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
-    padding-right: 20px; /* Place pour le bouton delete */
+    padding-right: 20px;
     text-transform: uppercase;
 }
 
-/* Description */
 .task-meta {
     font-size: 0.85rem;
     color: #888;
@@ -91,9 +102,9 @@
     line-height: 1.4;
     border-left: 1px solid #333;
     padding-left: 0.5rem;
+    word-wrap: break-word;
 }
 
-/* Conteneur des badges */
 .task-badges {
     display: flex;
     flex-wrap: wrap;
@@ -102,7 +113,6 @@
     font-size: 0.75rem;
 }
 
-/* Style des Badges */
 .badge {
     padding: 2px 6px;
     border-radius: 2px;
@@ -113,12 +123,8 @@
     letter-spacing: 1px;
 }
 
-.badge-assignee {
-    color: #00ccff;
-    border-color: #004466;
-}
+.badge-assignee { color: #00ccff; border-color: #004466; }
 
-/* Couleurs de priorité (Bordure gauche de la carte + Badge) */
 .task-card[data-priority="low"] { border-left-color: #00ff00; }
 .badge-prio-low { color: #00ff00; border-color: #004400; }
 
@@ -138,11 +144,9 @@
     animation: pulse-text 2s infinite;
 }
 
-/* Bouton supprimer */
 .delete-task {
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 5px; right: 5px;
     cursor: pointer;
     color: #555;
     font-size: 0.8rem;
@@ -155,12 +159,10 @@
 }
 
 @keyframes pulse-text {
-    0% { opacity: 0.7; }
-    50% { opacity: 1; }
-    100% { opacity: 0.7; }
+    0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; }
 }
 
-/* --- MODAL (FORMULAIRE) --- */
+/* --- MODAL --- */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -172,9 +174,7 @@
     align-items: center;
 }
 
-.modal-overlay.active {
-    display: flex;
-}
+.modal-overlay.active { display: flex; }
 
 .modal-content {
     background: #050505;
@@ -184,6 +184,8 @@
     max-width: 600px;
     box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
     position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-content::before {
@@ -206,7 +208,6 @@
     text-transform: uppercase;
 }
 
-/* Inputs du formulaire améliorés */
 .form-input, .form-select, textarea.form-input {
     background: #0a0a0a;
     border: 1px solid #333;
@@ -229,4 +230,48 @@
     text-transform: uppercase;
     margin-bottom: 5px;
     display: block;
+}
+
+/* --- RESPONSIVE / MOBILE --- */
+@media (max-width: 900px) {
+    .kanban-board {
+        flex-direction: column; /* Empile les colonnes */
+        overflow-x: hidden;
+        min-height: auto;
+    }
+
+    .kanban-column {
+        width: 100%;
+        min-width: 0; /* Important pour flexbox */
+        margin-bottom: 1rem;
+        height: auto;
+    }
+
+    .task-list {
+        min-height: 100px; /* Plus petit sur mobile */
+    }
+    
+    .ops-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .action-btn {
+        width: 100%;
+    }
+    
+    .modal-content {
+        width: 95%;
+        padding: 1rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr; /* Formulaire sur une colonne */
+    }
+    
+    .full-width {
+        grid-column: auto;
+    }
 }

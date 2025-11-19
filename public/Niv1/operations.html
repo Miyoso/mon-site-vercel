@@ -13,12 +13,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-    <main class="terminal" style="max-width: 1600px;"> <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <main class="terminal" style="max-width: 1600px;">
+        
+        <div class="ops-header">
             <div>
                 <h1>TABLEAU DES OPÉRATIONS<span class="blinker">_</span></h1>
                 <p class="status">KANBAN TACTIQUE :: ACCES: <span class="secure" id="agent-name-display"></span></p>
             </div>
-            <button onclick="openModal()" class="form-button" style="margin: 0; background: #003300; border-color: #00ff00;">+ NOUVELLE MISSION</button>
+            <button onclick="openModal()" class="form-button action-btn">+ NOUVELLE MISSION</button>
         </div>
 
         <div class="kanban-board">
@@ -100,7 +102,6 @@
     </div>
 
     <script>
-        // Copie le script existant ici, mais je vais te donner le petit bout modifié pour la création de cartes
         document.addEventListener('DOMContentLoaded', () => {
             const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
             document.getElementById('agent-name-display').textContent = agentName;
@@ -127,7 +128,6 @@
             if (!col) return;
 
             const card = document.createElement('div');
-            // AJOUT: l'attribut data-priority pour que le CSS colore la bordure gauche
             card.className = 'task-card';
             card.setAttribute('data-priority', task.priority);
             
@@ -143,7 +143,6 @@
                 dateHtml = `<span class="badge" style="border: 1px solid #555; color: #aaa;">DEADLINE: ${d}</span>`;
             }
 
-            // On nettoie la priorité pour l'affichage (anglais -> français ou majuscules)
             const prioLabel = task.priority === 'critical' ? 'CRITIQUE' : 
                               task.priority === 'high' ? 'HAUTE' : 
                               task.priority === 'low' ? 'BASSE' : 'NORMALE';
