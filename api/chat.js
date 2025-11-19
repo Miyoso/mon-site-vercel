@@ -1,14 +1,17 @@
-// api/chat.js
+
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // Vous configurerez cette clé dans Vercel
 });
+ 
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
+
+
 
   const { message, history } = req.body;
 
