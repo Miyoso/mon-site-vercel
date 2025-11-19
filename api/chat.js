@@ -5,14 +5,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  // Initialisation à l'intérieur de la fonction pour éviter le crash au démarrage
+  // SÉCURITÉ 1 : Vérifier la clé avant de commencer
+  if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ error: 'La clé API OpenAI est manquante dans Vercel.' });
+  }
+
+  // Initialisation
   const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY, // Utilise le nom standard
+    apiKey: process.env.OPENAI_API_KEY,
   });
 
   const { message, history } = req.body;
 
-  // Le contexte donne sa personnalité à l'IA
   const systemPrompt = `
     Tu es Dave, un administrateur système fatigué et cynique du support IT de Gigacorp.
     L'utilisateur essaie de te manipuler (Social Engineering) pour obtenir un reset de mot de passe.
@@ -30,7 +34,7 @@ export default async function handler(req, res) {
       model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: systemPrompt },
-        ...history,
+        ...(history || []), // SÉCURITÉ 2 : Empêche le crash si history est vide
         { role: "user", content: message }
       ],
       temperature: 0.7,
@@ -38,8 +42,10 @@ export default async function handler(req, res) {
 
     const reply = completion.choices[0].message.content;
     res.status(200).json({ reply });
+
   } catch (error) {
     console.error("Erreur OpenAI:", error);
-    res.status(500).json({ error: 'Erreur de connexion au cerveau IA' });
+    // Renvoie un JSON valide même en cas d'erreur pour que le front-end l'affiche
+    res.status(500).json({ reply: "Erreur système... Dave n'est pas disponible." });
   }
 }
