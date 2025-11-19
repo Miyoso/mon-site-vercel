@@ -3,147 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUR D'ENQUÊTE</title>
+    <title>MUR D'ENQUÊTE v2.0</title>
     <script> const REQUIRED_LEVEL = 3; </script>
     <script src="/js/security.js"></script>
     <link rel="stylesheet" href="/css/style-investigation.css">
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Indie+Flower&display=swap" rel="stylesheet">
-    <style>
-        /* --- STYLES SUPPLÉMENTAIRES --- */
-        
-        #btn-stamp.active {
-            background: #ff0000;
-            color: white;
-            border-color: #ff0000;
-            box-shadow: 0 0 20px #ff0000;
-            animation: pulse-red 1s infinite;
-        }
-        @keyframes pulse-red { 
-            0% { box-shadow: 0 0 10px #ff0000; } 
-            50% { box-shadow: 0 0 25px #ff0000; } 
-            100% { box-shadow: 0 0 10px #ff0000; } 
-        }
-
-        /* Styles des tampons génériques (Couleurs) */
-        .stamp-red { color: #d32f2f; border-color: #d32f2f; }
-        .stamp-orange { color: #f57c00; border-color: #f57c00; }
-        .stamp-black { color: #000; border-color: #000; background: rgba(255,255,255,0.5); }
-        .stamp-green { color: #388e3c; border-color: #388e3c; }
-        .stamp-blue { color: #2196f3; border-color: #2196f3; }
-
-        /* Barre d'outils et Pastilles */
-        .toolbar {
-            bottom: 70px !important; 
-            height: 60px !important;
-            overflow: visible !important;
-            z-index: 9000 !important;
-            display: flex;
-            align-items: center;
-        }
-
-        .tool-group {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
-
-        .color-selector {
-            position: absolute;
-            top: 65px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            border: 1px solid #00ff00;
-            padding: 5px 10px;
-            border-radius: 20px;
-            display: flex;
-            gap: 8px;
-            z-index: 9999;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-            white-space: nowrap;
-        }
-
-        .color-selector::before {
-            content: '';
-            position: absolute;
-            bottom: 100%; left: 50%; margin-left: -1px;
-            border-width: 5px; border-style: solid;
-            border-color: transparent transparent #00ff00 transparent;
-        }
-
-        .color-dot {
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            border: 1px solid #fff;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .color-dot:hover { transform: scale(1.3); z-index: 10; }
-
-        /* Couleurs Notes & Tampons */
-        .dot-white { background: #fff; }
-        .dot-yellow { background: #ffeb3b; }
-        .dot-red { background: #ff4141; }
-        .dot-pink { background: #ff80ab; }
-        .dot-blue { background: #2196f3; }
-        .dot-green { background: #4caf50; }
-        .dot-orange { background: #ff9800; }
-        .dot-black { background: #000; border-color: #666; }
-        .dot-none { background: #555; position:relative; }
-        .dot-none::after { content:'X'; color:white; font-size:12px; position:absolute; top:1px; left:5px; font-weight:bold; }
-
-    </style>
 </head>
 <body>
 
     <div class="help-indicator">
-        [ MOLETTE : ZOOM | DOUBLE-CLIC : ÉDITER | ÉCHAP : ANNULER ]
+        [ CLIC-DROIT : MENU | GLISSER FOND : PAN | MOLETTE : ZOOM ]
     </div>
 
-    <div id="board-container">
-        <svg id="connections-layer"></svg>
+    <div id="world-layer" style="transform: translate(0px, 0px) scale(1);">
+        <svg id="connections-layer" style="overflow: visible;"></svg>
         <div id="items-layer"></div>
     </div>
 
     <div class="toolbar">
         <button class="tool-btn" onclick="window.location.href='/index.html'">&lt;&lt; RETOUR</button>
-        
         <div style="width: 1px; height: 30px; background: #333; margin: 0 10px;"></div>
-        
-        <button class="tool-btn" onclick="addItem('suspect')">+ SUSPECT</button>
+        <button class="tool-btn" onclick="openEditModal('new', 'suspect')">+ SUSPECT</button>
+        <button class="tool-btn" onclick="openEditModal('new', 'note')">+ NOTE</button>
+        <div style="width: 1px; height: 30px; background: #333; margin: 0 10px;"></div>
+        <button class="tool-btn" id="btn-reset-view" onclick="resetView()">RECADRER VUE</button>
+    </div>
 
-        <div style="width: 10px;"></div>
+    <div id="context-menu">
+        <div class="ctx-item" onclick="contextAction('edit')">ÉDITER</div>
+        <div class="ctx-item" onclick="contextAction('link')">LIER À...</div>
+        <div class="ctx-item" onclick="contextAction('color')">CHANGER COULEUR</div>
+        <div class="ctx-item delete" onclick="contextAction('delete')">SUPPRIMER</div>
+    </div>
 
-        <div class="tool-group">
-            <button class="tool-btn" onclick="addItem('note')">+ NOTE</button>
-            <div class="color-selector">
-                <div class="color-dot dot-yellow" onclick="addItem('note', 'yellow')" title="Jaune"></div>
-                <div class="color-dot dot-pink" onclick="addItem('note', 'pink')" title="Rose"></div>
-                <div class="color-dot dot-blue" onclick="addItem('note', 'blue')" title="Bleu"></div>
-                <div class="color-dot dot-green" onclick="addItem('note', 'green')" title="Vert"></div>
+    <div class="edit-modal-overlay" id="editModal">
+        <div class="edit-modal">
+            <h3 id="modal-title">//: NOUVEAU DOSSIER</h3>
+            <input type="hidden" id="modal-mode">
+            <input type="hidden" id="modal-type">
+            <input type="hidden" id="modal-id">
+            
+            <label style="color:#888; font-size:0.8rem;">LABEL / CONTENU</label>
+            <textarea id="modal-label" class="edit-input" rows="3"></textarea>
+            
+            <div id="modal-image-group">
+                <label style="color:#888; font-size:0.8rem;">URL IMAGE (Optionnel)</label>
+                <input type="text" id="modal-image" class="edit-input" placeholder="/assets/...">
             </div>
-        </div>
-        
-        <div style="width: 1px; height: 30px; background: #333; margin: 0 10px;"></div>
 
-        <button class="tool-btn" id="btn-link-red" onclick="toggleLinkMode('red')">GUERRE</button>
-        <button class="tool-btn" id="btn-link-green" onclick="toggleLinkMode('green')">ALLIÉ</button>
-        <button class="tool-btn" id="btn-link-blue" onclick="toggleLinkMode('blue')">SUB</button>
-        
-        <div style="width: 1px; height: 30px; background: #333; margin: 0 10px;"></div>
-
-        <div class="tool-group">
-            <button class="tool-btn" id="btn-stamp" onclick="activateStampMode(null)">TAMPONNER</button>
-            <div class="color-selector">
-                <div class="color-dot dot-red" onclick="activateStampMode('red')" title="Rouge"></div>
-                <div class="color-dot dot-orange" onclick="activateStampMode('orange')" title="Orange"></div>
-                <div class="color-dot dot-black" onclick="activateStampMode('black')" title="Noir"></div>
-                <div class="color-dot dot-green" onclick="activateStampMode('green')" title="Vert"></div>
-                <div class="color-dot dot-blue" onclick="activateStampMode('blue')" title="Bleu"></div>
-                <div class="color-dot dot-none" onclick="activateStampMode('NONE')" title="EFFACER"></div>
+            <div class="modal-btns">
+                <button class="tool-btn" onclick="closeEditModal()">ANNULER</button>
+                <button class="tool-btn active" onclick="saveModalData()">VALIDER</button>
             </div>
         </div>
     </div>
@@ -151,16 +61,25 @@
     <script>
         let items = [];
         let links = [];
-        let linkMode = null; 
-        let stampMode = false; 
-        let currentStampColor = 'red'; // Couleur par défaut
-        let linkSourceId = null;
-        let resizeTimeout;
+        let viewState = { x: 0, y: 0, scale: 1 };
+        let isPanning = false;
+        let startPanX, startPanY;
+        let contextTargetId = null;
+        let linkingFromId = null;
+        let dragItem = null;
+        let dragOffsetX, dragOffsetY;
 
-        const board = document.getElementById('items-layer');
+        const worldLayer = document.getElementById('world-layer');
+        const itemsLayer = document.getElementById('items-layer');
         const svgLayer = document.getElementById('connections-layer');
+        const ctxMenu = document.getElementById('context-menu');
+        const editModal = document.getElementById('editModal');
+        const modalLabel = document.getElementById('modal-label');
+        const modalImage = document.getElementById('modal-image');
+        const modalMode = document.getElementById('modal-mode');
+        const modalType = document.getElementById('modal-type');
+        const modalId = document.getElementById('modal-id');
 
-        // --- CHARGEMENT ---
         async function loadBoard() {
             try {
                 const res = await fetch('/api/read?resource=investigation');
@@ -171,310 +90,281 @@
             } catch (error) { console.error("Erreur:", error); }
         }
 
-        // --- RENDU ---
         function renderBoard() {
-            board.innerHTML = '';
+            itemsLayer.innerHTML = '';
             svgLayer.innerHTML = '';
 
             items.forEach(item => {
                 const el = document.createElement('div');
                 el.className = `board-item item-${item.type}`;
-                if(item.type === 'note' && item.color) el.classList.add(item.color);
+                if(item.type === 'note') {
+                    el.classList.add(item.color || 'yellow');
+                    el.innerHTML += '<div class="pin"></div>';
+                } else {
+                    el.innerHTML += '<div class="tape"></div>';
+                }
                 
                 el.style.left = item.x + 'px';
                 el.style.top = item.y + 'px';
                 el.id = `item-${item.id}`;
                 el.dataset.id = item.id;
 
-                const currentScale = item.scale || 1.0;
-                const rotation = item.type === 'suspect' ? -2 : 2; 
-                el.style.transform = `scale(${currentScale}) rotate(${rotation}deg)`;
-                el.dataset.scale = currentScale;
+                const rot = (item.id % 6) - 3; 
+                const scale = item.scale || 1;
+                el.style.transform = `rotate(${rot}deg) scale(${scale})`;
 
                 if(item.type === 'suspect') {
                     const imgUrl = item.image_url || '/assets/petit.jpg';
-                    el.innerHTML = `<img src="${imgUrl}" draggable="false"><div class="label">${item.label}</div>`;
+                    el.innerHTML += `<img src="${imgUrl}" draggable="false"><div class="label">${item.label}</div>`;
                 } else {
-                    el.innerText = item.label;
+                    el.innerHTML += `<div style="margin-top:10px;">${item.label}</div>`;
                 }
 
-                // Affichage du Tampon
-                if (item.status && item.status !== 'NONE') {
-                    const stamp = document.createElement('div');
-                    // On applique la classe de couleur stockée (ex: stamp-red)
-                    const colorClass = item.stamp_color ? `stamp-${item.stamp_color}` : 'stamp-red';
-                    stamp.className = `stamp ${colorClass}`;
-                    stamp.innerText = item.status;
-                    el.appendChild(stamp);
-                }
+                el.onmousedown = (e) => startItemDrag(e, item);
+                el.oncontextmenu = (e) => openContextMenu(e, item.id);
 
-                const delBtn = document.createElement('div');
-                delBtn.className = 'delete-btn';
-                delBtn.innerText = 'X';
-                delBtn.onclick = (e) => { e.stopPropagation(); deleteItem(item.id); };
-                el.appendChild(delBtn);
-
-                el.onmousedown = startDrag;
-                el.onclick = (e) => handleItemClick(e, item.id);
-                el.onwheel = (e) => handleResize(e, item);
-                el.ondblclick = (e) => editItem(e, item);
-
-                board.appendChild(el);
+                itemsLayer.appendChild(el);
             });
 
             links.forEach(link => {
-                const fromItem = items.find(i => i.id === link.from_id);
-                const toItem = items.find(i => i.id === link.to_id);
-                if(fromItem && toItem) drawLine(fromItem, toItem, link.type, link.id);
+                const from = items.find(i => i.id === link.from_id);
+                const to = items.find(i => i.id === link.to_id);
+                if(from && to) drawLink(from, to, link.type, link.id);
             });
         }
 
-        function drawLine(item1, item2, type, id) {
-            const w1 = item1.type === 'suspect' ? 180 : 200;
-            const h1 = item1.type === 'suspect' ? 200 : 150;
-            const x1 = item1.x + (w1 * (item1.scale||1)) / 2;
-            const y1 = item1.y + (h1 * (item1.scale||1)) / 2;
-            const w2 = item2.type === 'suspect' ? 180 : 200;
-            const h2 = item2.type === 'suspect' ? 200 : 150;
-            const x2 = item2.x + (w2 * (item2.scale||1)) / 2;
-            const y2 = item2.y + (h2 * (item2.scale||1)) / 2;
+        function drawLink(item1, item2, type, id) {
+            const x1 = item1.x + 100;
+            const y1 = item1.y + 100;
+            const x2 = item2.x + 100;
+            const y2 = item2.y + 100;
 
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            
             const cx = (x1 + x2) / 2;
-            const cy = (y1 + y2) / 2 + 40;
+            const cy = Math.min(y1, y2) - 50;
+            
             const d = `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
-
             path.setAttribute("d", d);
             path.setAttribute("class", `link-${type}`);
-            path.onclick = () => {
-                if(confirm("Couper ce lien ?")) deleteLink(id);
+            
+            path.ondblclick = async () => {
+                if(confirm("Couper ce lien ?")) {
+                    await fetch('/api/execute-action', {
+                        method: 'POST',
+                        headers: {'Content-Type':'application/json'},
+                        body: JSON.stringify({ action: 'del_inv_link', id })
+                    });
+                    loadBoard();
+                }
             };
+
             svgLayer.appendChild(path);
         }
 
-        // --- GESTION DES MODES ---
-
-        function disableAllModes() {
-            linkMode = null;
-            linkSourceId = null;
-            stampMode = false;
-            currentStampColor = 'red';
-            
-            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.board-item').forEach(i => i.classList.remove('linking-source'));
-        }
-
-        function toggleLinkMode(color) {
-            disableAllModes(); 
-            linkMode = color;
-            document.getElementById(`btn-link-${color}`).classList.add('active');
-        }
-
-        function activateStampMode(color) {
-            disableAllModes();
-            stampMode = true;
-            // Si color est null (clic bouton principal), on met rouge par défaut
-            currentStampColor = color || 'red'; 
-            document.getElementById('btn-stamp').classList.add('active');
-        }
-
-        // --- CLIC SUR ITEM ---
-
-        async function handleItemClick(e, id) {
-            // 1. MODE TAMPON
-            if (stampMode) {
-                let statusToApply = "";
-                let colorToApply = currentStampColor;
-
-                if (currentStampColor === 'NONE') {
-                    // Si on a cliqué sur la gomme, on efface
-                    statusToApply = '';
-                } else {
-                    // Sinon on demande le texte
-                    const stat = prompt("TEXTE DU TAMPON (ex: WANTED, TRAITRE...) :");
-                    if (stat) {
-                        statusToApply = stat.toUpperCase();
-                    } else {
-                        return; // Annulé
-                    }
-                }
-
-                await updateItemData(id, { status: statusToApply, stamp_color: colorToApply });
-                disableAllModes(); // On quitte le mode après avoir tamponné
-                return;
-            }
-
-            // 2. MODE LIEN
-            if (linkMode) {
-                if(linkSourceId === null) {
-                    linkSourceId = id;
-                    document.getElementById(`item-${id}`).classList.add('linking-source');
-                } else {
-                    if(linkSourceId !== id) {
-                        await fetch('/api/execute-action', {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ action: 'add_inv_link', from_id: linkSourceId, to_id: id, type: linkMode })
-                        });
-                    }
-                    disableAllModes(); // On quitte le mode après avoir lié
-                    loadBoard();
-                }
-                return;
-            }
-        }
-
-        // --- DRAG & DROP ---
-        let activeDrag = null;
-        let offsetX, offsetY;
-
-        function startDrag(e) {
-            // IMPORTANT : Si un mode est actif, on interdit le drag
-            if(linkMode || stampMode) return;
-
-            activeDrag = e.currentTarget;
-            activeDrag.style.zIndex = 1000;
-            const rect = activeDrag.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
-            document.addEventListener('mousemove', doDrag);
-            document.addEventListener('mouseup', stopDrag);
-        }
-
-        function doDrag(e) {
-            if (!activeDrag) return;
-            activeDrag.style.left = (e.clientX - offsetX) + 'px';
-            activeDrag.style.top = (e.clientY - offsetY) + 'px';
-        }
-
-        async function stopDrag(e) {
-            if (!activeDrag) return;
-            const id = activeDrag.dataset.id;
-            const x = parseInt(activeDrag.style.left);
-            const y = parseInt(activeDrag.style.top);
-            activeDrag.style.zIndex = "";
-            
-            await fetch('/api/execute-action', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'move_inv_item', id, x, y })
-            });
-
-            const item = items.find(i => i.id == id);
-            if(item) { item.x = x; item.y = y; }
-            renderBoard(); 
-
-            document.removeEventListener('mousemove', doDrag);
-            document.removeEventListener('mouseup', stopDrag);
-            activeDrag = null;
-        }
-
-        // --- RACCOURCIS CLAVIER ---
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape") {
-                disableAllModes();
-            }
-        });
-        
-        document.addEventListener('contextmenu', (e) => {
+        document.addEventListener('wheel', (e) => {
+            if (e.target.closest('.board-item')) return;
             e.preventDefault();
-            disableAllModes();
+            const zoomIntensity = 0.1;
+            const newScale = viewState.scale + (e.deltaY > 0 ? -zoomIntensity : zoomIntensity);
+            viewState.scale = Math.min(Math.max(0.2, newScale), 3);
+            updateTransform();
+        }, { passive: false });
+
+        document.addEventListener('mousedown', (e) => {
+            if(e.target.closest('.board-item') || e.target.closest('.tool-btn') || e.target.closest('.edit-modal-overlay')) return;
+            
+            ctxMenu.style.display = 'none';
+            
+            isPanning = true;
+            startPanX = e.clientX - viewState.x;
+            startPanY = e.clientY - viewState.y;
+            document.body.style.cursor = 'grabbing';
         });
 
-        // --- UTILS ---
-        async function addItem(type, chosenColor) {
-            let label, image_url, color;
-            if (!chosenColor) chosenColor = (type === 'suspect') ? 'white' : 'yellow';
-            color = chosenColor;
+        document.addEventListener('mousemove', (e) => {
+            if(!isPanning) return;
+            e.preventDefault();
+            viewState.x = e.clientX - startPanX;
+            viewState.y = e.clientY - startPanY;
+            updateTransform();
+        });
 
-            if(type === 'suspect') {
-                label = prompt("Nom du Suspect :");
-                if(!label) return;
-                image_url = prompt("URL de la photo (laisser vide pour défaut) :");
-            } else {
-                label = prompt("Contenu de la note :");
-                if(!label) return;
-            }
+        document.addEventListener('mouseup', () => {
+            isPanning = false;
+            document.body.style.cursor = 'default';
+        });
 
-            const x = window.innerWidth/2 - 100 + (Math.random()*50);
-            const y = window.innerHeight/2 - 100 + (Math.random()*50);
-
-            await fetch('/api/execute-action', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'add_inv_item', type, label, image_url, x: parseInt(x), y: parseInt(y), color })
-            });
-            loadBoard();
+        function updateTransform() {
+            worldLayer.style.transform = `translate(${viewState.x}px, ${viewState.y}px) scale(${viewState.scale})`;
         }
 
-        async function editItem(e, item) {
+        function resetView() {
+            viewState = { x: 0, y: 0, scale: 1 };
+            updateTransform();
+        }
+
+        function startItemDrag(e, item) {
+            if (e.button !== 0) return;
             e.stopPropagation();
-            const choice = prompt("MODIFIER :\n1. Texte\n2. Image/Couleur");
-            if (choice === '1') {
-                const val = prompt("Nouveau texte :", item.label);
-                if(val) updateItemData(item.id, { label: val });
-            } else if(choice === '2') {
-                if(item.type === 'suspect') {
-                    const val = prompt("URL Image :", item.image_url);
-                    if(val) updateItemData(item.id, { image_url: val });
-                } else {
-                    const val = prompt("Couleur (yellow, pink, blue, green) :", item.color);
-                    if(val) updateItemData(item.id, { color: val });
-                }
-            }
+            
+            dragItem = item;
+            
+            dragOffsetX = (e.clientX - viewState.x) / viewState.scale - item.x;
+            dragOffsetY = (e.clientY - viewState.y) / viewState.scale - item.y;
+            
+            document.addEventListener('mousemove', onItemDrag);
+            document.addEventListener('mouseup', endItemDrag);
         }
 
-        async function updateItemData(id, payload) {
-            await fetch('/api/execute-action', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'update_inv_item_text', id, ...payload })
-            });
-            loadBoard();
+        function onItemDrag(e) {
+            if (!dragItem) return;
+            const mouseWorldX = (e.clientX - viewState.x) / viewState.scale;
+            const mouseWorldY = (e.clientY - viewState.y) / viewState.scale;
+
+            dragItem.x = mouseWorldX - dragOffsetX;
+            dragItem.y = mouseWorldY - dragOffsetY;
+
+            const el = document.getElementById(`item-${dragItem.id}`);
+            el.style.left = dragItem.x + 'px';
+            el.style.top = dragItem.y + 'px';
         }
 
-        async function deleteItem(id) {
-            if(!confirm("Supprimer ?")) return;
-            await fetch('/api/execute-action', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'del_inv_item', id })
-            });
-            loadBoard();
-        }
-
-        async function deleteLink(id) {
-            await fetch('/api/execute-action', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ action: 'del_inv_link', id })
-            });
-            loadBoard();
-        }
-
-        function handleResize(e, item) {
-            e.preventDefault();
-            const el = document.getElementById(`item-${item.id}`);
-            let scale = parseFloat(el.dataset.scale);
-            scale += (e.deltaY > 0 ? -0.1 : 0.1);
-            scale = Math.min(Math.max(scale, 0.5), 3.0);
-            el.style.transform = `scale(${scale}) rotate(${item.type === 'suspect' ? -2 : 2}deg)`;
-            el.dataset.scale = scale;
-
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(async () => {
+        async function endItemDrag() {
+            if(dragItem) {
                 await fetch('/api/execute-action', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ action: 'resize_inv_item', id: item.id, scale: scale })
+                    body: JSON.stringify({ action: 'move_inv_item', id: dragItem.id, x: parseInt(dragItem.x), y: parseInt(dragItem.y) })
                 });
-                const it = items.find(i => i.id === item.id);
-                if(it) it.scale = scale;
                 renderBoard();
-            }, 500);
+            }
+            dragItem = null;
+            document.removeEventListener('mousemove', onItemDrag);
+            document.removeEventListener('mouseup', endItemDrag);
+        }
+
+        function openContextMenu(e, id) {
+            e.preventDefault();
+            e.stopPropagation();
+            contextTargetId = id;
+            ctxMenu.style.display = 'flex';
+            ctxMenu.style.left = e.clientX + 'px';
+            ctxMenu.style.top = e.clientY + 'px';
+        }
+
+        async function contextAction(action) {
+            ctxMenu.style.display = 'none';
+            if(!contextTargetId) return;
+            const item = items.find(i => i.id === contextTargetId);
+
+            if (action === 'delete') {
+                if(confirm("Supprimer cet élément ?")) {
+                    await fetch('/api/execute-action', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ action: 'del_inv_item', id: contextTargetId })
+                    });
+                    loadBoard();
+                }
+            } else if (action === 'edit') {
+                openEditModal('edit', item.type, item);
+            } else if (action === 'link') {
+                if (linkingFromId === null) {
+                    linkingFromId = contextTargetId;
+                    alert("Sélectionnez maintenant la cible (Clic Droit -> Lier)");
+                } else {
+                    const type = prompt("Type de lien (red, green, blue) ?", "red");
+                    await fetch('/api/execute-action', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ action: 'add_inv_link', from_id: linkingFromId, to_id: contextTargetId, type: type || 'red' })
+                    });
+                    linkingFromId = null;
+                    loadBoard();
+                }
+            } else if (action === 'color') {
+                const colors = ['yellow', 'pink', 'blue', 'green', 'white'];
+                const newColor = colors[Math.floor(Math.random() * colors.length)];
+                await fetch('/api/execute-action', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ action: 'update_inv_item_text', id: contextTargetId, label: item.label, color: newColor })
+                });
+                loadBoard();
+            }
+        }
+
+        function openEditModal(mode, type, itemData = null) {
+            editModal.style.display = 'flex';
+            modalMode.value = mode;
+            modalType.value = type;
+            
+            if (type === 'note') {
+                document.getElementById('modal-image-group').style.display = 'none';
+            } else {
+                document.getElementById('modal-image-group').style.display = 'block';
+            }
+
+            if (mode === 'edit' && itemData) {
+                modalId.value = itemData.id;
+                modalLabel.value = itemData.label;
+                modalImage.value = itemData.image_url || '';
+                document.getElementById('modal-title').innerText = `//: ÉDITION ${itemData.type.toUpperCase()}`;
+            } else {
+                modalLabel.value = '';
+                modalImage.value = '';
+                document.getElementById('modal-title').innerText = `//: NOUVEAU ${type.toUpperCase()}`;
+            }
+        }
+
+        function closeEditModal() {
+            editModal.style.display = 'none';
+        }
+
+        async function saveModalData() {
+            const mode = modalMode.value;
+            const type = modalType.value;
+            const label = modalLabel.value;
+            const image_url = modalImage.value;
+
+            if (!label) return alert("Texte requis");
+            closeEditModal();
+
+            if (mode === 'new') {
+                const x = (window.innerWidth/2 - viewState.x) / viewState.scale - 100;
+                const y = (window.innerHeight/2 - viewState.y) / viewState.scale - 100;
+
+                await fetch('/api/execute-action', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        action: 'add_inv_item', 
+                        type, label, image_url, 
+                        x: parseInt(x), y: parseInt(y), 
+                        color: 'yellow' 
+                    })
+                });
+            } else {
+                const id = modalId.value;
+                await fetch('/api/execute-action', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ 
+                        action: 'update_inv_item_text', 
+                        id, label, image_url 
+                    })
+                });
+            }
+            loadBoard();
         }
 
         loadBoard();
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#context-menu')) ctxMenu.style.display = 'none';
+        });
+
     </script>
 </body>
 </html>
