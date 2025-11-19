@@ -16,7 +16,7 @@ export default async function handler(request, response) {
         result = await sql`SELECT id, name, level, status_text, map_x, map_y, profile_url, css_class FROM agents ORDER BY id ASC;`;
         return response.status(200).json({ agents: result.rows });
 
-        case 'evidence':
+      case 'evidence':
         result = await sql`SELECT * FROM evidence ORDER BY created_at DESC`;
         return response.status(200).json({ evidence: result.rows });
 
@@ -97,6 +97,23 @@ export default async function handler(request, response) {
             ORDER BY created_at DESC;
         `;
         return response.status(200).json({ warningLevel, warningNotes: notesResult.rows });
+
+      case 'messages':
+        const box = request.query.box || 'inbox';
+        if (box === 'sent') {
+            result = await sql`
+                SELECT * FROM messages 
+                WHERE sender = ${username} 
+                ORDER BY created_at DESC
+            `;
+        } else {
+            result = await sql`
+                SELECT * FROM messages 
+                WHERE recipient = ${username} 
+                ORDER BY created_at DESC
+            `;
+        }
+        return response.status(200).json({ messages: result.rows });
 
       default:
         return response.status(404).json({ error: 'Ressource non trouvée.' });

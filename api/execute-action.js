@@ -1,5 +1,4 @@
 import { sql } from '@vercel/postgres';
-import bcrypt from 'bcrypt';
 import Pusher from 'pusher';
 
 const pusher = new Pusher({
@@ -60,6 +59,25 @@ export default async function handler(request, response) {
         return response.status(200).json({ success: true });
       }
 
+      case 'send_message': {
+        const { sender, recipient, subject, body } = data;
+        await sql`
+          INSERT INTO messages (sender, recipient, subject, body)
+          VALUES (${sender}, ${recipient}, ${subject}, ${body})
+        `;
+        await pusher.trigger('operations-channel', 'new-message', {
+            recipient: recipient,
+            sender: sender
+        });
+        return response.status(200).json({ success: true });
+      }
+
+      case 'delete_message': {
+        const { id } = data;
+        await sql`DELETE FROM messages WHERE id = ${id}`;
+        return response.status(200).json({ success: true });
+      }
+
       case 'add_inv_item': {
         const { type, label, image_url, x, y, color } = data;
         await sql`INSERT INTO investigation_items (type, label, image_url, x, y, color) VALUES (${type}, ${label}, ${image_url || null}, ${x}, ${y}, ${color || 'yellow'})`;
@@ -80,7 +98,6 @@ export default async function handler(request, response) {
 
       case 'update_inv_item_text': {
         const { id, label, image_url, color, status, stamp_color } = data;
-        
         if (status !== undefined) {
              await sql`
                 UPDATE investigation_items 
@@ -113,6 +130,27 @@ export default async function handler(request, response) {
       case 'del_inv_link': {
         const { id } = data;
         await sql`DELETE FROM investigation_links WHERE id = ${id}`;
+        return response.status(200).json({ success: true });
+      }
+      
+      case 'delete_agent': {
+        const { agentId } = data;
+        await sql`DELETE FROM agents WHERE id = ${agentId}`;
+        return response.status(200).json({ success: true });
+      }
+      
+      case 'set_agent_level': {
+        const { agentId, newLevel } = data;
+        await sql`UPDATE agents SET level = ${newLevel} WHERE id = ${agentId}`;
+        return response.status(200).json({ success: true });
+      }
+      
+      case 'add_note': {
+        const { agent_id, author_name, note_text, addWarning } = data;
+        await sql`INSERT INTO agent_notes (agent_id, author_name, note_text, is_warning) VALUES (${agent_id}, ${author_name}, ${note_text}, ${addWarning})`;
+        if (addWarning) {
+             await sql`UPDATE agents SET warning_level = warning_level + 1 WHERE id = ${agent_id}`;
+        }
         return response.status(200).json({ success: true });
       }
 
