@@ -45,7 +45,7 @@
             box-shadow: 0 0 5px #00ff00;
         }
 
-        /* Zone de chat */
+        /
         #chat-container {
             flex-grow: 1;
             padding: 20px;
@@ -132,7 +132,7 @@
         }
         button:hover { background: #fff; }
 
-        /* Barre de suspicion */
+        
         .suspicion-container {
             position: fixed;
             top: 70px;
@@ -147,7 +147,7 @@
         .bar-bg { height: 10px; background: #333; margin-top: 5px; }
         .bar-fill { height: 100%; width: 0%; background: var(--alert); transition: width 0.5s; }
 
-        /* Overlay Fin de jeu */
+       
         #overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95);
@@ -199,7 +199,7 @@
         const suspicionBar = document.getElementById('suspicionBar');
         const overlay = document.getElementById('overlay');
 
-        // --- CONFIGURATION DU BOT ---
+   
         let state = {
             step: 0, 
             suspicion: 0, 
@@ -257,7 +257,7 @@
                 }
             }
             
-            // ÉTAPE 1 : IDENTIFICATION
+         
             else if (state.step === 1) {
                 if (lower.includes("mot de passe") || lower.includes("connexion") || lower.includes("bloqué")) {
                     reply = "D'accord. Procédure standard. Donnez-moi votre ID employé ou votre nom.";
