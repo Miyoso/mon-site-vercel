@@ -2,236 +2,226 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS - Inventaire (Niv 3)</title>
-    <script>
-        const REQUIRED_LEVEL = 3;
-    </script>
+    <title>SAS - Gestion Équipement</title>
+    <script> const REQUIRED_LEVEL = 3; </script>
     <script src="/js/security.js"></script>
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* --- STYLES DRAG & DROP --- */
+        .equipment-grid {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            justify-content: center;
+            background: rgba(0, 20, 0, 0.3);
+            padding: 20px;
+            border: 1px dashed #004400;
+        }
+
+        .equip-slot {
+            width: 120px;
+            height: 120px;
+            border: 2px solid #333;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .equip-slot.drag-over {
+            border-color: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .slot-label {
+            font-size: 0.7rem;
+            color: #555;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .inventory-item-card {
+            background: #111;
+            border: 1px solid #003300;
+            padding: 10px;
+            margin: 5px;
+            cursor: grab;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .inventory-item-card:active { cursor: grabbing; }
+        .inventory-item-card:hover { border-color: #00ff00; }
+
+        .item-icon { font-size: 1.5rem; }
+        
+        /* Indicateur visuel d'un objet équipé */
+        .equipped-badge {
+            position: absolute;
+            top: -5px; right: -5px;
+            background: #00ff00;
+            color: #000;
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <main class="terminal">
-        <h1>INVENTAIRE (NIV 3)<span class="blinker">_</span></h1>
-        <p class="status">STATUS: <span class="secure">DECRYPTED</span> :: ACCES: <span class="restricted" id="agent-name-display"></span></p>
-        <div class="report-content" id="inventory-container">
-            <p>[CHARGEMENT DE L'INVENTAIRE...]</p>
+        <h1>GESTION D'ÉQUIPEMENT<span class="blinker">_</span></h1>
+        <p class="status">AGENT: <span class="secure" id="agent-display"></span></p>
+
+        <div class="equipment-grid">
+            <div class="equip-slot" data-slot="access_card" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="slot-content">VIDE</div>
+                <span class="slot-label">BADGE ACCÈS</span>
+            </div>
+            <div class="equip-slot" data-slot="weapon" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="slot-content">VIDE</div>
+                <span class="slot-label">ARME</span>
+            </div>
+            <div class="equip-slot" data-slot="gadget" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <div class="slot-content">VIDE</div>
+                <span class="slot-label">GADGET</span>
+            </div>
         </div>
-        <div class="report-content" id="forms-container">
-            <h3 class="category-title" id="form-title-add">//: AJOUTER UN NOUVEL OBJET</h3>
-            <form id="add-item-form" class="form-grid">
-                <div class="form-group">
-                    <label for="add-category">Catégorie</label>
-                    <input type="text" id="add-category" name="category" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="add-item-name">Nom de l'objet</label>
-                    <input type="text" id="add-item-name" name="item_name" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="add-serial">N° de série</label>
-                    <input type="text" id="add-serial" name="serial_number" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label for="add-status">Statut initial</label>
-                    <select id="add-status" name="status" class="form-select" required>
-                        <option value="Opérationnel">Opérationnel</option>
-                        <option value="Stock">Stock</option>
-                        <option value="En maintenance">En maintenance</option>
-                    </select>
-                </div>
-                <button type="submit" class="form-button full-width">&gt;&gt; AJOUTER L'OBJET</button>
-                <p id="add-form-message" class="form-message full-width"></p>
-            </form>
-            <h3 class="category-title" id="form-title-update">//: METTRE À JOUR UN OBJET</h3>
-            <form id="update-item-form" class="assignment-form">
-                <label for="update-item-select">//: 1. SÉLECTIONNER L'OBJET</label>
-                <select id="update-item-select" name="itemId" class="form-select" required>
-                    <option value="">-- En attente de l'API... --</option>
-                </select>
-                <label for="update-agent-select">//: 2. ASSIGNER À</label>
-                <select id="update-agent-select" name="agentName" class="form-select" required>
-                    <option value="">-- En attente de l'API... --</option>
-                </select>
-                <label for="update-status-select">//: 3. CHANGER STATUT</label>
-                <select id="update-status-select" name="status" class="form-select" required>
-                    <option value="Opérationnel">Opérationnel</option>
-                    <option value="Stock">Stock</option>
-                    <option value="En maintenance">En maintenance</option>
-                    <option value="Perdu">Perdu</option>
-                </select>
-                <button type="submit" class="form-button">&gt;&gt; CONFIRMER LA MISE À JOUR</button>
-                <p id="update-form-message" class="form-message"></p>
-            </form>
-            <h3 class="category-title" id="form-title-delete">//: SUPPRIMER UN OBJET (IRRÉVERSIBLE)</h3>
-            <form id="delete-item-form" class="assignment-form">
-                <label for="delete-item-select">//: SÉLECTIONNER L'OBJET À SUPPRIMER</label>
-                <select id="delete-item-select" name="itemId" class="form-select" required>
-                    <option value="">-- En attente de l'API... --</option>
-                </select>
-                <button type="submit" class="form-button delete">&gt;&gt; SUPPRIMER DÉFINITIVEMENT</button>
-                <p id="delete-form-message" class="form-message"></p>
-            </form>
-        </div>
+
+        <h3 class="category-title">//: RÉSERVE DISPONIBLE</h3>
+        <div id="inventory-list" class="report-content" style="min-height: 200px;">
+            </div>
+
         <footer class="portal-footer">
-            <a href="/index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
+            <a href="/index.html" class="back-link"><< RETOUR</a>
         </footer>
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const agentName = localStorage.getItem('sas_user') || 'UNKNOWN';
-            document.getElementById('agent-name-display').textContent = agentName;
-            const inventoryContainer = document.getElementById('inventory-container');
-            const updateItemSelect = document.getElementById('update-item-select');
-            const updateAgentSelect = document.getElementById('update-agent-select');
-            const deleteItemSelect = document.getElementById('delete-item-select');
+        const currentUser = localStorage.getItem('sas_user') || 'UNKNOWN';
+        document.getElementById('agent-display').textContent = currentUser;
 
-            async function fetchAndDisplayInventory() {
-                try {
-                    const response = await fetch('/api/read?resource=inventory');
-                    const data = await response.json();
-                    if (!data.items) throw new Error('Données d\'inventaire non reçues');
+        // --- 1. CHARGEMENT DES DONNÉES ---
+        async function loadInventory() {
+            const res = await fetch('/api/read?resource=inventory');
+            const data = await res.json();
+            
+            const listContainer = document.getElementById('inventory-list');
+            const slots = document.querySelectorAll('.equip-slot');
+            
+            // Reset visuel
+            listContainer.innerHTML = '';
+            slots.forEach(s => {
+                s.querySelector('.slot-content').innerHTML = '<span style="color:#333; font-size:2rem;">+</span>';
+                s.classList.remove('has-item');
+            });
 
-                    inventoryContainer.innerHTML = '';
-                    let htmlToInsert = '';
-                    let currentCategory = '';
-                    let itemOptionsHTML = '<option value="">-- Sélectionner un objet --</option>';
-
-                    data.items.forEach(item => {
-                        if (item.category !== currentCategory) {
-                            if (currentCategory !== '') htmlToInsert += `</ul>`;
-                            currentCategory = item.category;
-                            htmlToInsert += `<h3 class="category-title">//: ${currentCategory.toUpperCase()}</h3><ul class="inventory-list">`;
-                        }
-                        htmlToInsert += `
-                            <li>
-                                <span class="item-name">${item.item_name}</span>
-                                <ul class="item-details">
-                                    <li><span class="detail-label">N° de série:</span> ${item.serial_number || 'N/A'}</li>
-                                    <li><span class="detail-label">Attribution:</span> ${item.assigned_to || 'Aucune'}</li>
-                                    <li><span class="detail-label">Statut:</span> ${item.status}</li>
-                                </ul>
-                            </li>
-                        `;
-                        itemOptionsHTML += `<option value="${item.id}">${item.item_name} (N°: ${item.serial_number})</option>`;
-                    });
-                    htmlToInsert += `</ul>`;
-                    inventoryContainer.innerHTML = htmlToInsert;
-                    updateItemSelect.innerHTML = itemOptionsHTML;
-                    deleteItemSelect.innerHTML = itemOptionsHTML;
-
-                } catch (error) {
-                    console.error('Erreur:', error);
-                    inventoryContainer.innerHTML = '<p>[ERREUR DE CONNEXION AU MAINFRAME]</p>';
+            data.items.forEach(item => {
+                // Si l'objet est assigné à l'agent actuel ET marqué comme "Equipped" (statut spécial)
+                // Note: Tu devras adapter ta logique selon comment tu stockes "équipé" vs "dans la poche"
+                if (item.assigned_to === currentUser && item.status === 'EQUIPPED') {
+                    placeItemInSlot(item);
+                } else if (item.status !== 'Perdu') {
+                    createDraggableItem(item, listContainer);
                 }
+            });
+        }
+
+        function createDraggableItem(item, container) {
+            const div = document.createElement('div');
+            div.className = 'inventory-item-card';
+            div.draggable = true;
+            div.id = `item-${item.id}`;
+            // On stocke les données importantes dans des attributs data
+            div.dataset.id = item.id;
+            div.dataset.category = item.category; // ex: 'access_card', 'weapon'
+            div.dataset.name = item.item_name;
+            
+            // Icône selon catégorie (simple exemple)
+            let icon = '📦';
+            if(item.category.includes('Badge')) icon = '💳';
+            if(item.category.includes('Arme')) icon = '🔫';
+            
+            div.innerHTML = `<span class="item-icon">${icon}</span> <span>${item.item_name}</span>`;
+            
+            div.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData("text/plain", item.id);
+                e.dataTransfer.setData("category", item.category); // Pour vérifier la compatibilité du slot
+            });
+            
+            container.appendChild(div);
+        }
+
+        function placeItemInSlot(item) {
+            // Trouve le slot correspondant (logique simplifiée ici)
+            let slotType = 'gadget';
+            if (item.category.toLowerCase().includes('badge') || item.item_name.includes('Carte')) slotType = 'access_card';
+            else if (item.category.toLowerCase().includes('arme')) slotType = 'weapon';
+
+            const slot = document.querySelector(`.equip-slot[data-slot="${slotType}"]`);
+            if (slot) {
+                slot.querySelector('.slot-content').innerHTML = `
+                    <div style="color:#00ff00; text-align:center;">
+                        <div style="font-size:1.5rem;">🛡️</div>
+                        <div style="font-size:0.8rem;">${item.item_name}</div>
+                        <button onclick="unequipItem(${item.id})" style="font-size:0.6rem; color:#ff4141; background:none; border:1px solid #ff4141; cursor:pointer; margin-top:5px;">RETIRER</button>
+                    </div>
+                `;
+                slot.classList.add('has-item');
             }
+        }
 
-            async function fetchAgentsForForm() {
-                try {
-                    const response = await fetch('/api/read?resource=agents');
-                    const data = await response.json();
-                    if (!data.agents) throw new Error('Agents non reçus');
-                    let agentOptionsHTML = '<option value="Réserve SAS">-- Réserve SAS --</option>';
-                    data.agents.forEach(agent => {
-                        agentOptionsHTML += `<option value="${agent.name}">${agent.name} (Niv ${agent.level})</option>`;
-                    });
-                    updateAgentSelect.innerHTML = agentOptionsHTML;
-                } catch (error) {
-                    console.error('Erreur agents:', error);
-                    updateAgentSelect.innerHTML = '<option value="">Erreur API</option>';
-                }
-            }
+        // --- 2. GESTION DRAG & DROP ---
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
 
-            const addForm = document.getElementById('add-item-form');
-            const addMessageEl = document.getElementById('add-form-message');
-            addForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                addMessageEl.textContent = 'Ajout en cours...';
-                addMessageEl.className = 'form-message';
-                try {
-                    const formData = new FormData(addForm);
-                    const data = Object.fromEntries(formData.entries());
-                    
-                    const response = await fetch('/api/execute-action', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ ...data, action: 'add_item' })
-                    });
-
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error);
-                    addMessageEl.textContent = 'Objet ajouté ! Mise à jour...';
-                    addMessageEl.className = 'form-message success';
-                    addForm.reset();
-                    setTimeout(fetchAndDisplayInventory, 500);
-                } catch (error) {
-                    addMessageEl.textContent = `Erreur: ${error.message}`;
-                    addMessageEl.className = 'form-message error';
-                }
-            });
-
-            const updateForm = document.getElementById('update-item-form');
-            const updateMessageEl = document.getElementById('update-form-message');
-            updateForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                updateMessageEl.textContent = 'Mise à jour en cours...';
-                updateMessageEl.className = 'form-message';
-                try {
-                    const response = await fetch('/api/execute-action', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            action: 'update_item',
-                            itemId: updateForm.itemId.value,
-                            agentName: updateForm.agentName.value,
-                            status: updateForm.status.value
-                        })
-                    });
-
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error);
-                    updateMessageEl.textContent = 'Objet mis à jour ! Mise à jour...';
-                    updateMessageEl.className = 'form-message success';
-                    setTimeout(fetchAndDisplayInventory, 500);
-                } catch (error) {
-                    updateMessageEl.textContent = `Erreur: ${error.message}`;
-                    updateMessageEl.className = 'form-message error';
-                }
-            });
-
-            const deleteForm = document.getElementById('delete-item-form');
-            const deleteMessageEl = document.getElementById('delete-form-message');
-            deleteForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const itemId = deleteForm.itemId.value;
-                if (!confirm("Voulez-vous vraiment supprimer cet objet ?\nCette action est IRRÉVERSIBLE.")) return;
-                deleteMessageEl.textContent = 'Suppression en cours...';
-                deleteMessageEl.className = 'form-message';
-                try {
-                    const response = await fetch('/api/execute-action', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'delete_item', itemId })
-                    });
-
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error);
-                    deleteMessageEl.textContent = 'Objet supprimé ! Mise à jour...';
-                    deleteMessageEl.className = 'form-message success';
-                    setTimeout(fetchAndDisplayInventory, 500);
-                } catch (error) {
-                    deleteMessageEl.textContent = `Erreur: ${error.message}`;
-                    deleteMessageEl.className = 'form-message error';
-                }
-            });
-
-            fetchAndDisplayInventory();
-            fetchAgentsForForm();
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            
+            const itemId = ev.dataTransfer.getData("text/plain");
+            // Ici on pourrait vérifier si la catégorie match avec ev.dataTransfer.getData("category")
+            
+            equipItem(itemId);
+        }
+        
+        // Nettoyage visuel si on sort de la zone
+        document.querySelectorAll('.equip-slot').forEach(slot => {
+            slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
         });
+
+        // --- 3. API CALLS ---
+        async function equipItem(id) {
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    action: 'equip_item', 
+                    itemId: id, 
+                    agentName: currentUser 
+                })
+            });
+            loadInventory(); // Rafraîchir l'affichage
+        }
+
+        async function unequipItem(id) {
+            await fetch('/api/execute-action', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    action: 'unequip_item', 
+                    itemId: id 
+                })
+            });
+            loadInventory();
+        }
+
+        loadInventory();
     </script>
 </body>
 </html>
