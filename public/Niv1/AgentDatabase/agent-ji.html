@@ -3,235 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dossier Agent :: Lin Ji (Jackal) [ENCRYPTED]</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>SHADOW CO. :: AGENT [LIN JI]</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <style>
-        .font-tech {
-            font-family: 'Share Tech Mono', monospace;
-        }
-        body {
-            background-color: #000000 !important;
-            background-image: radial-gradient(rgba(0, 150, 0, 0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-        @keyframes scan {
-            0% { background-position: 0 -100vh; }
-            100% { background-position: 0 100vh; }
-        }
-        .animate-scan {
-            animation: scan 3s linear infinite;
-        }
-        .cursor-blink::after {
-            content: '_';
-            animation: blink 1s step-start infinite;
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-        .agent-photo-frame {
-            position: relative;
-        }
-        .agent-photo-frame img {
-            filter: grayscale(100%) sepia(100%) hue-rotate(70deg) saturate(300%) contrast(1.2);
-            mix-blend-mode: hard-light;
-            opacity: 0.8;
-        }
-        .agent-photo-frame::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Share+Tech+Mono&family=Libre+Barcode+128+Text&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/style-mo.css">
+
 </head>
-<body class="text-green-400 min-h-screen p-4 md:p-8 bg-black font-mono">
+<body>
 
-    <div class="max-w-6xl mx-auto border-2 border-green-700/50 shadow-2xl shadow-green-900/50 bg-black/90 backdrop-blur">
-        <header class="font-tech text-lg md:text-xl p-4 bg-green-950/50 border-b-2 border-green-700/50 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md">
-             <span class="tracking-widest">[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3]</span>
-            <span class="text-red-500 animate-pulse flex items-center gap-2">
-                <span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> REC
-            </span>
-        </header>
+    <div class="crt-overlay"></div>
 
-        <div class="p-6 md:p-8 space-y-8">
+    <div id="boot-screen">
+        <div class="boot-text">SEARCHING DATABASE...</div>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+        <div style="margin-top: 10px; font-size: 0.8rem; color: #555;">TARGET: JACKAL // SOURCE: ENCRYPTED</div>
+    </div>
+
+    <div class="terminal-wrapper">
+        <main class="terminal">
             
-            <div class="font-mono text-sm md:text-base">
-                <div><span class="text-green-500">$</span> <span class="text-white">load --dossier=AGENT_LIN_JI</span></div>
-                <div class="text-cyan-400 mt-1">... Tentative de déchiffrement ...</div>
-                <div class="text-green-500 mt-1">Authentification réussie. Affichage des données.</div>
-                <div><span class="text-green-500">$</span> <span class="cursor-blink"></span></div>
-            </div>
+            <header class="header-strip">
+                <div>
+                    <h1>DOSSIER :: <span>LIN JI</span></h1>
+                    <div style="color: var(--primary); font-size: 0.9rem; letter-spacing: 3px;">SHADOW COMPANY // ASSET</div>
+                </div>
+                <div class="meta-data">
+                    <div>SRC: HONG KONG STATION</div>
+                    <div>REQ ID: <span class="blink">_X00-JACKAL</span></div>
+                </div>
+            </header>
 
-            <section class="border border-green-600/30 p-6 rounded bg-black/40 relative overflow-hidden group hover:border-green-500/50 transition-all duration-500">
-                <div class="absolute top-0 right-0 p-2 text-xs text-green-800 font-tech opacity-70">ID_REF: 0xLJ-JACKAL</div>
-                 <h2 class="font-tech text-2xl text-white mb-6 flex items-center">
-                    <span class="text-green-500 mr-2">></span> [SECTION 01 : IDENTIFICATION]
-                </h2>
-                
-                <div class="flex flex-col md:flex-row gap-8">
-                    <div class="flex-grow space-y-4 font-mono">
-                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
-                            <span class="text-slate-500">NOM DE L'AGENT:</span>
-                            <span class="text-xl text-white font-bold tracking-wider">LIN, JI</span>
+            <section class="hero-section">
+                <div class="id-card-container">
+                    <div class="id-card" id="card">
+                        <div class="holo-overlay"></div>
+                        
+                        <div class="card-header">
+                            <div class="card-logo-text">SHADOW CO.</div>
+                            <div class="security-level" style="background: var(--secondary); color: #000;">ACTIVE</div>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
-                            <span class="text-slate-500">ALIAS CONNUS:</span>
-                            <span class="text-white">“JACKAL”, “L’AÎNÉ”</span>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
-                            <span class="text-slate-500">ÂGE:</span>
-                            <span class="text-white">32</span>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-2 border-b border-green-900/30 pb-2">
-                            <span class="text-slate-500">STATUT ACTUEL:</span>
-                            <span class="text-yellow-400 font-bold">[ ACTIF ( OPÉRATEUR SAS ) ]</span>
-                        </div>
-                    </div>
+            
+                        <div class="card-body">
+                            <div class="photo-box">
+                                <img src="https://static.wikia.nocookie.net/callofduty/images/a/a2/Jackal_Operator_Icon_MWII.png" alt="Agent Lin Ji" style="filter: grayscale(1) contrast(1.5);">
+                            </div>
+                            <div class="agent-info">
+                                <div class="card-label">NOM OPÉRATEUR</div>
+                                <div class="card-value">LIN JI</div>
+                                
+                                <div class="card-label">CALLSIGN</div>
+                                <div class="card-value text-danger">JACKAL</div>
 
-                    <div class="flex-shrink-0 flex justify-center md:justify-end">
-                        <div class="border-2 border-green-500/50 p-1 w-40 h-48 bg-green-950/20 relative overflow-hidden agent-photo-frame flex items-center justify-center">
-                            <span class="text-green-800/50 font-tech">[NO_IMAGE_DATA]</span>
-                            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/10 to-transparent animate-scan h-full w-full pointer-events-none"></div>
+                                <div class="card-label">CLEARANCE ID</div>
+                                <div class="card-code">LVL-4-SOG</div>
+                            </div>
+                        </div>
+            
+                        <div class="card-footer">
+                            <div class="barcode" style="font-family: 'Libre Barcode 128 Text', cursive;">LINJI99</div>
+                            <div class="chip"></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="border border-green-600/30 p-6 rounded bg-black/40 relative overflow-hidden hover:border-green-500/50 transition-all duration-500">
-                <h2 class="font-tech text-2xl text-white mb-6 flex items-center">
-                     <span class="text-green-500 mr-2">></span> [SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]
-                </h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-cyan-950/10 p-4 rounded border border-cyan-900/30">
-                        <h3 class="text-lg text-cyan-400 font-tech mb-3 border-b border-cyan-900/50 pb-2">// PHYSIQUE</h3>
-                        <ul class="list-none space-y-2 text-sm">
-                            <li class="flex justify-between"><span class="text-slate-500">TAILLE:</span> <span class="data-glitched-random w-16"></span></li>
-                            <li class="flex justify-between"><span class="text-slate-500">POIDS:</span> <span class="data-glitched-random w-16"></span></li>
-                            <li class="flex justify-between"><span class="text-slate-500">YEUX:</span> <span class="data-glitched-random w-20"></span></li>
-                        </ul>
+            <section class="intel-grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">BIO_METRICS</span>
+                        <div class="audio-viz">
+                            <div class="bar" style="animation-delay:0s"></div>
+                            <div class="bar" style="animation-delay:0.1s"></div>
+                            <div class="bar" style="animation-delay:0.2s"></div>
+                            <div class="bar" style="animation-delay:0.3s"></div>
+                        </div>
                     </div>
-                    <div class="bg-green-950/10 p-4 rounded border border-green-900/30">
-                        <h3 class="text-lg text-green-400 font-tech mb-3 border-b border-green-900/50 pb-2">// QUALITÉS (ASSETS)</h3>
-                         <ul class="space-y-1 text-sm list-disc list-inside text-green-300/80">
-                            <li>Méthodique</li>
-                            <li>Leadership</li>
-                            <li>Calme</li>
-                            <li>Efficace</li>
-                        </ul>
+                    <div class="log-entry">
+                        <span class="label">ORIGINE:</span><br>
+                        <span class="text-danger">TRIADE "BIG CIRCLE"</span>
                     </div>
-                    <div class="bg-yellow-950/10 p-4 rounded border border-yellow-900/30">
-                        <h3 class="text-lg text-yellow-400 font-tech mb-3 border-b border-yellow-900/50 pb-2">// DÉFAUTS (LIABILITIES)</h3>
-                        <ul class="space-y-1 text-sm list-disc list-inside text-yellow-500/80">
-                           <li>Rancunier</li>
-                           <li>Rigide</li>
-                           <li>Sobre</li>
-                        </ul>
+                    <div class="log-entry">
+                        <span class="label">DERNIÈRE POSITION:</span><br>
+                        <span class="redacted" data-real="NEW YORK - EXILE" data-scramble="UNKNOWN"></span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="label">RELATION:</span><br>
+                        <span class="redacted text-warning" data-real="LIN WEI (FRÈRE)" data-scramble="REDACTED"></span>
                     </div>
                 </div>
-            </section>
 
-            <section class="border border-red-800/50 p-6 rounded bg-red-950/10 relative overflow-hidden">
-                 <div class="absolute top-0 right-0 bg-red-900/50 text-red-200 text-xs px-3 py-1 font-tech">NIVEAU 5 REQUIS</div>
-                <h2 class="font-tech text-2xl text-red-500 mb-4 flex items-center">
-                    <span class="mr-2 animate-pulse">🔒</span> [SECTION 03 : HISTORIQUE]
-                </h2>
-                <div class="bg-black/50 p-4 rounded border border-red-900/30 font-mono text-sm text-red-400/80 relative min-h-[150px]">
-                    <div class="mb-4">
-                        <p class="text-green-500/70">[ACCÈS PARTIEL - FICHIER TRIADE]</p>
-                        <p class="opacity-80">Fils de Lin Tao, <span class="data-glitched-random w-16 bg-red-950/50 px-1"></span> de la Triade. Élevé à Hong Kong avec son frère, Lin Wei.</p>
-                        <p class="opacity-80">Âge lors de l'incident : 22 ans.</p>
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">ÉVALUATION</span>
+                        <span style="color:var(--secondary); font-size:0.7rem;">PSY_PROFILE</span>
                     </div>
                     
-                    <div class="mt-4 pt-4 border-t border-red-900/30">
-                         <p class="text-red-500 mb-2">[DONNÉES CLASSIFIÉES - MEURTRE]</p>
-                         <p class="text-yellow-500/70 text-xs mb-2">[ACCÈS VERROUILLÉ – CLÉ DE DÉCHIFFREMENT MANQUANTE]</p>
-                         <p class="blur-[1px] select-none opacity-50 text-xs break-all">
-                            [FICHIER: operations_datahaven.log]... 2f 2f 20 43 6f 6d 70 65 74...
-                            [FICHIER: analyse_psy_cortex.dat]... [DONNÉES CORROMPUES]...
-                            [FICHIER: contacts_actifs.db] (Verrouillé)...
-                            [FICHIER: transactions_crypto.bin] (Verrouillé)... 01 00 00...
+                    <div class="log-entry">
+                         <span class="label">ATOUTS MAJEURS:</span><br>
+                         <span style="color: var(--primary)">[+] 
+                             <span class="redacted" style="color:var(--primary)" data-real="MÉTHODIQUE / CALME" data-scramble="ANALYSING..."></span>
+                         </span>
+                    </div>
+                    
+                    <div class="log-entry">
+                         <span class="label">LEADERSHIP:</span><br>
+                         <span style="color: var(--primary)">[+] 
+                             <span class="redacted" style="color:var(--primary)" data-real="AUTORITÉ NATURELLE" data-scramble="ANALYSING..."></span>
+                         </span>
+                    </div>
+
+                    <div class="log-entry">
+                         <span class="label">FAIBLESSES:</span><br>
+                         <span style="color: var(--danger)">[-] 
+                             <span class="redacted" style="color:var(--danger)" data-real="RANCUNIER / RIGIDE" data-scramble="ANALYSING..."></span>
+                         </span>
+                    </div>
+
+                    <div style="margin-top: 15px; font-size: 0.75rem; color: #666; border-top: 1px dashed #444; padding-top: 10px;">
+                        // NOTE: LOYAUTÉ ENVERS GRAVES CONDITIONNÉE PAR LA PROTECTION DE SON FRÈRE.
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="logs-section" style="margin-top: 1.5rem;">
+                <div class="panel" style="border-color: var(--danger);">
+                    <div class="panel-header">
+                        <span class="panel-title text-danger">ARCHIVES CLASSIFIÉES [TRIADE]</span>
+                        <span style="font-family: var(--font-code); font-size: 0.7rem; color: var(--danger);">LVL-5 EYES ONLY</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 10px; font-family: var(--font-code); font-size: 0.8rem; color: #aaa;">
+                        <p>
+                            SUJET: FILS DE LIN TAO. ÉLEVÉ À HONG KONG. 
+                            INCIDENT MAJEUR À L'ÂGE DE 22 ANS.
                         </p>
+                        <p style="color: #666; word-break: break-all;">
+                            HEX DUMP: 4a 61 76 69 65 72 20 65 73 74 20 75 6e 20 61 67 65 6e 74...
+                        </p>
+                        <div class="log-entry" style="border-left-color: var(--danger);">
+                            <span class="label text-danger">NOTE CRITIQUE:</span><br>
+                            A NÉGOCIÉ AVEC GRAVES POUR EFFACER SON CASIER JUDICIAIRE (MEURTRE) EN ÉCHANGE DE SES SERVICES.
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section class="border border-yellow-700/50 p-6 rounded bg-yellow-950/10 relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-yellow-900/50 text-yellow-200 text-xs px-3 py-1 font-tech">NIVEAU 7 REQUIS</div>
-                <h2 class="font-tech text-2xl text-yellow-500 mb-4 flex items-center">
-                    <span class="mr-2">⚠️</span> [SECTION 04 : RECRUTEMENT SAS]
-                </h2>
-                
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center justify-center z-20 pointer-events-none overflow-hidden">
-                         <div class="border-4 border-red-600/40 text-red-600/40 font-black text-3xl md:text-5xl p-4 -rotate-12 tracking-widest opacity-80 font-tech uppercase backdrop-blur-[1px]">
-                             CONFIDENTIEL
-                         </div>
+            <section class="logs-section">
+                <div class="panel" style="border-top: 2px solid var(--secondary);">
+                    <div class="panel-header">
+                        <span class="panel-title">HISTORIQUE OPÉRATIONNEL</span>
+                        <span style="font-family: var(--font-code); font-size: 0.7rem;">ENCRYPTED</span>
                     </div>
-
-                    <div class="bg-black/50 p-4 rounded border border-yellow-900/30 font-mono text-sm text-yellow-600/80 blur-[2px] select-none transition-all duration-700 hover:blur-[1px]">
-                         <p class="mb-3 text-yellow-500 opacity-70">[ACCÈS PARTIEL - DOSSIER SAS]</p>
-                         <p>ERROR_CODE : Passé non effacé. Exil à New York pendant 10 ans avec son frère.</p>
-                         <p class="mt-2 opacity-60 break-all">6c 65 20 42 69 67 20 43 69 72 63 6c 65 20 6c 65 73 20 63 68 65 72 63 68 65 73 20 70 6f 75 72 20 63 65 20 76 65 6e 67 65 72..</p>
-                         <p class="mt-2">Approché par "Graves" (Directeur, SAS) pour un contrat.</p>
-                         <p class="mt-2 opacity-60 break-all">52 65 63 72 75 74 c3 a9 20 65 6e 20 c3 a9 63 68 61 6e 67 65 20 64 65 20 6c 27 65 66 66 61 63 65 6d 65 6e 74 20 64 65 20 6c 65 75 72 20 70 61 73 73 c3 a9 20 65 74 20 64 27 75 6e 20 6e 6f 75 76 65 61 75 20 62 75 74...</p>
-                    </div>
+                    
+                    <table class="ops-table">
+                        <thead>
+                            <tr>
+                                <th width="15%">DATE</th>
+                                <th width="30%">OPÉRATION</th>
+                                <th width="25%">ZONE</th>
+                                <th width="20%">CIBLE</th>
+                                <th width="10%">RÉSULTAT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2012</td>
+                                <td>INCIDENT ZERO</td>
+                                <td><span class="redacted" data-real="HONG KONG" data-scramble="UNKNOWN"></span></td>
+                                <td>RIVAL TRIAD</td>
+                                <td><span class="status-badge st-fail">EXIL</span></td>
+                            </tr>
+                            <tr>
+                                <td>2012-22</td>
+                                <td>
+                                    <span class="redacted" data-real="UNDERGROUND" data-scramble="SURVIVAL"></span>
+                                </td>
+                                <td><span class="redacted" data-real="NEW YORK" data-scramble="USA-EAST"></span></td>
+                                <td>NONE</td>
+                                <td><span class="status-badge st-pending">HIDDEN</span></td>
+                            </tr>
+                            <tr>
+                                <td>2023</td>
+                                <td>GRAVES CONTACT</td>
+                                <td><span class="redacted" data-real="CLASSIFIED" data-scramble="UNKNOWN"></span></td>
+                                <td>RECRUITMENT</td>
+                                <td><span class="status-badge st-success">ACCORD</span></td>
+                            </tr>
+                            <tr>
+                                <td><span style="color:var(--dim)">----</span></td>
+                                <td>
+                                    <span class="redacted text-danger" data-real="SHADOW SIEGE" data-scramble="OP-JACKAL"></span>
+                                </td>
+                                <td><span class="redacted" data-real="KONNI HQ" data-scramble="UNKNOWN"></span></td>
+                                <td>MAKAROV</td>
+                                <td><span class="status-badge st-pending">EN COURS</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
-             <div class="pt-6 border-t border-green-800/30 flex justify-between items-end">
-                <div class="text-xs text-green-700 font-mono">
-                    SESSION ID: <span class="data-glitched-random w-16"></span><br>
-                    STATUS: ACTIVE_MONITORING
+            <footer class="footer">
+                <div>SECURE TERMINAL V.4.0.2 // USR: GRAVES</div>
+                <div>
+                    <a href="index.html" class="text-secondary" style="text-decoration: none;">[ REVENIR AU DOSSIER MAÎTRE ]</a>
                 </div>
-                <a href="../database.html" class="font-tech text-sm bg-green-950 hover:bg-green-900 text-green-400 px-4 py-2 border border-green-700 rounded transition-all duration-300 hover:shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-                    << RETURN_TO_DATABASE
-                </a>
-            </div>
+            </footer>
 
-        </div>
+        </main>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const glitchElements = document.querySelectorAll('.data-glitched-random');
-            const chars = 'ABCDEF0123456789<>!@#$%^&*()_+[]{}|;:,./?';
+            
+            // 1. BOOT SCREEN
+            const bootScreen = document.getElementById('boot-screen');
+            const bootText = document.querySelector('.boot-text');
+            
+            setTimeout(() => { bootText.textContent = "DECRYPTING BIOMETRICS..."; }, 500);
+            setTimeout(() => { bootText.textContent = "ACCESS GRANTED."; }, 1200);
+            setTimeout(() => {
+                bootScreen.style.opacity = '0';
+                setTimeout(() => bootScreen.remove(), 1000);
+            }, 1500);
 
-            function generateRandomString(length) {
-                let result = '';
-                for (let i = 0; i < length; i++) {
-                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+            // 2. 3D CARD EFFECT
+            const card = document.getElementById('card');
+            const cardContainer = document.querySelector('.id-card-container');
+
+            cardContainer.addEventListener('mousemove', (e) => {
+                const rect = cardContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -10; 
+                const rotateY = ((x - centerX) / centerX) * 10;
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+            cardContainer.addEventListener('mouseleave', () => {
+                card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
+            });
+
+            // 3. HACKER TEXT DECRYPTION
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
+            document.querySelectorAll('.redacted').forEach(element => {
+                element.textContent = element.getAttribute('data-scramble');
+                element.onmouseover = event => {
+                    let iterations = 0;
+                    const targetText = event.target.getAttribute('data-real');
+                    if(!targetText) return;
+                    const interval = setInterval(() => {
+                        event.target.textContent = targetText.split("").map((letter, index) => {
+                            if(index < iterations) return targetText[index];
+                            return letters[Math.floor(Math.random() * 43)]
+                        }).join("");
+                        if(iterations >= targetText.length) clearInterval(interval);
+                        iterations += 1 / 2;
+                    }, 30);
                 }
-                return result;
-            }
-
-            setInterval(() => {
-                glitchElements.forEach(el => {
-                    if (Math.random() > 0.9) { 
-                        let randomLength;
-                        if (el.classList.contains('w-16')) randomLength = 6;
-                        else if (el.classList.contains('w-20')) randomLength = 10;
-                        else randomLength = Math.floor(Math.random() * 10) + 8; 
-                        el.textContent = generateRandomString(randomLength);
-                    }
-                    if (el.textContent === '') {
-                         let randomLength = Math.floor(Math.random() * 10) + 8;
-                         if (el.classList.contains('w-16')) randomLength = 6;
-                         if (el.classList.contains('w-20')) randomLength = 10;
-                         el.textContent = generateRandomString(randomLength);
-                    }
-                });
-            }, 100); 
+                element.onmouseleave = event => {
+                   element.textContent = element.getAttribute('data-scramble');
+                }
+            });
         });
     </script>
-
 </body>
 </html>
