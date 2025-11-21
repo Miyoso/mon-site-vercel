@@ -83,7 +83,7 @@
                     </div>
                     <div class="log-entry">
                         <span class="label">UNITÉ:</span><br>
-                        <span style="color: var(--secondary);">SECTION 77 (SIGINT)</span>
+                        <span style="color: var(--secondary);">SECTION 00 (SIGINT)</span>
                     </div>
                     <div class="log-entry">
                         <span class="label">LOCALISATION:</span><br>
@@ -136,28 +136,32 @@
             </section>
 
             <section class="logs-section" style="margin-top: 1.5rem;">
-                <div class="panel" style="border-color: var(--secondary);">
-                    <div class="panel-header">
-                        <span class="panel-title" style="color: var(--secondary);">PROJET: VALKYRIE</span>
-                        <span style="font-family: var(--font-code); font-size: 0.7rem; color: var(--secondary);">ROOT ACCESS</span>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: 1fr; gap: 10px; font-family: var(--font-code); font-size: 0.8rem; color: #aaa;">
-                        <p>
-                            <span style="color: var(--secondary);">root@nyx:~$</span> ./execute_valkyrie.sh
-                        </p>
-                        <p style="color: #666;">
-                            > Initialisation de l'IA tactique... [OK]<br>
-                            > Surcharge des systèmes de défense Konni... [EN COURS]<br>
-                            > <span class="redacted" data-real="ACCÈS AUX MISSILES" data-scramble="###############"></span>... [REFUSÉ]
-                        </p>
-                        <div class="log-entry" style="border-left-color: var(--secondary);">
-                            <span class="label" style="color: var(--secondary);">ALERTE SYSTÈME:</span><br>
-                            TENTATIVE D'INTRUSION DÉTECTÉE DANS LE SOUS-SYSTÈME GRAVES. KERNEL PANIC ÉVITÉ.
-                        </div>
-                    </div>
-                </div>
-            </section>
+    <div class="panel" style="border-color: var(--secondary);">
+        <div class="panel-header">
+            <span class="panel-title" style="color: var(--secondary);">PROJET: OVERRIDE</span>
+            <span style="font-family: var(--font-code); font-size: 0.7rem; color: var(--secondary);">ROOT ACCESS</span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr; gap: 10px; font-family: var(--font-code); font-size: 0.8rem; color: #aaa;">
+            
+            <p>
+                <span style="color: var(--secondary);">root@nyx:~$</span> ./sudo_inject.py --silent
+            </p>
+
+            <p style="color: #666;">
+                > Scan des vulnérabilités kernel... [TERMINÉ]<br>
+                > Exploitation de la faille Zero-Day... [OK]<br>
+                > Escalade de privilèges administrateur... [EN COURS]<br>
+                > <span style="color: var(--secondary);">ACCÈS ROOT AU SERVEUR CENTRAL</span> ... [ACCORDÉ]
+            </p>
+
+            <div class="log-entry" style="border-left-color: var(--secondary);">
+                <span class="label" style="color: var(--secondary);">ALERTE SYSTÈME:</span><br>
+                L'UTILISATEUR 'ROOT' A PRIS LE CONTRÔLE TOTAL. LES PROTOCOLES DE SÉCURITÉ ONT ÉTÉ DÉSACTIVÉS MANUELLEMENT.
+            </div>
+        </div>
+    </div>
+</section>
 
             <section class="logs-section">
                 <div class="panel" style="border-top: 2px solid var(--secondary);">
