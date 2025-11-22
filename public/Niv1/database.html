@@ -3,160 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW CO. :: HIERARCHY V3</title>
-
+    <title>SHADOW_NET // COMMAND_CHAIN</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="/css/style-mo.css">
-    <link rel="stylesheet" href="/css/style-hierarchy.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Libre+Barcode+128+Text&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="wrapper">
-        
-        <header>
-            <h1>SHADOW_NET // <span style="color:var(--primary)">COMMAND_CHAIN</span></h1>
-            <div class="meta" style="color:var(--dim)">SERVER: ONLINE</div>
-        </header>
+    <div class="crt-overlay"></div>
 
-        <div class="director-container">
-            <div class="node node-director" id="node-graves">
-                <span class="role-label">COMMANDER</span>
-                <div class="agent-name">[CONNEXION...]</div>
-                <a href="#" class="btn-link">DOSSIER MAÎTRE</a>
-            </div>
-        </div>
-
-     
-
-        <div class="ltn-container">
-            <div class="node node-ltn" id="node-javier">
-                <span class="role-label">LIEUTENANT (ARMOR)</span>
-                <div class="agent-name">...</div>
-                <a href="#" class="btn-link">PROFIL ></a>
+    <div class="terminal-wrapper">
+        <div class="terminal">
+            
+            <div class="header-strip">
+                <h1>SHADOW_NET // <span>COMMAND_CHAIN</span></h1>
+                <div class="meta-data">SERVER: ONLINE<br>SECURE_CONNECTION_ESTABLISHED</div>
             </div>
 
-            <div class="node node-ltn" id="node-ji">
-                <span class="role-label">LIEUTENANT (SPEC-OPS)</span>
-                <div class="agent-name">...</div>
-                <a href="#" class="btn-link">PROFIL ></a>
+            <div class="system-status">
+                <span class="secured">ENCRYPTION: AES-256 [ACTIVE]</span> &bull; <span class="encrypted">NODES: 12/12</span>
             </div>
+
+            <div class="org-chart">
+                
+                <div class="director-container">
+                    <div class="chart-node lead">
+                        <div class="role">COMMANDER</div>
+                        <div class="name">Graves</div>
+                        <a href="#" class="action-button">DOSSIER MAÎTRE</a>
+                    </div>
+                </div>
+
+                <div class="ltn-container">
+                    <div class="chart-node subordinate">
+                        <div class="role">LIEUTENANT (ARMOR)</div>
+                        <div class="name">Javier</div>
+                        <a href="#" class="action-button">PROFIL ></a>
+                        <div class="branch-left"></div>
+                        <div class="branch-right"></div>
+                    </div>
+
+                    <div class="chart-node subordinate">
+                        <div class="role">LIEUTENANT (SPEC-OPS)</div>
+                        <div class="name">Jackal</div>
+                        <a href="#" class="action-button">PROFIL ></a>
+                        <div class="branch-left"></div>
+                        <div class="branch-right"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="operators-section">
+                <div class="section-title">// UNITÉS SPÉCIALISÉES & SOUTIEN TACTIQUE</div>
+                
+                <div class="operators-grid">
+                    
+                    <div class="chart-node team-member status-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">LoveLace</div>
+                        <a href="#" class="action-button">VOIR ></a>
+                    </div>
+
+                    <div class="chart-node team-member status-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Adam</div>
+                        <a href="#" class="action-button">VOIR ></a>
+                    </div>
+
+                    <div class="chart-node team-member status-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Blake</div>
+                        <a href="#" class="action-button">VOIR ></a>
+                    </div>
+
+                    <div class="chart-node team-member status-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Roxanne</div>
+                        <a href="#" class="action-button">VOIR ></a>
+                    </div>
+
+                    <div class="chart-node team-member status-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Blitz</div>
+                        <a href="#" class="action-button">VOIR ></a>
+                    </div>
+
+                    <div class="chart-node team-member status-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Recrue</div>
+                        <a href="#" class="action-button">VOIR ></a>
+                    </div>
+
+                    <div class="chart-node team-member status-gray">
+                        <div class="role">RECONNAISSANCE</div>
+                        <div class="name">Dust</div>
+                        <a href="#" class="action-button">VOIR ></a>
+                    </div>
+
+                    <div class="chart-node team-member status-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Lexa</div>
+                        <a href="#" class="action-button">VOIR ></a>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="portal-footer">
+                <a href="#" class="back-link">< CLASSIFIED DATABASE ACCESS ONLY ></a>
+            </div>
+
         </div>
-
-        <div class="tree-line-vert" style="height: 40px;"></div>
-        <div class="squad-label">// UNITÉS SPÉCIALISÉES & SOUTIEN TACTIQUE</div>
-
-        <div class="squad-grid" id="squad-grid">
-            <div style="color:#666; font-size:0.8rem;">CHARGEMENT DE LA BASE DE DONNÉES...</div>
-        </div>
-
-        <div style="text-align: center; margin-top: 60px;">
-             <a href="../index.html" class="btn-link" style="border-color: var(--danger); color: var(--danger);">[ DÉCONNEXION ]</a>
-        </div>
-
     </div>
 
+    <div id="boot-screen" style="display:none;"></div>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const gridContainer = document.getElementById('squad-grid');
-            
-           
-            const boxGraves = document.getElementById('node-graves');
-            const boxJavier = document.getElementById('node-javier');
-            const boxJi = document.getElementById('node-ji');
-
-            try {
-          
-                const response = await fetch('/api/read?resource=agents');
-                const rawData = await response.json();
-                
-          
-                let agents = rawData.agents || rawData.rows || (Array.isArray(rawData) ? rawData : []);
-
-                if (agents.length > 0) {
-                    let gridHTML = '';
-                    
-               
-                    agents.sort((a, b) => a.id - b.id);
-
-                    agents.forEach(agent => {
-                      
-                        let cleanUrl = (agent.profile_url || '#').replace(/^\//, '');
-
-                   
-                        if (agent.id === 1) { 
-                            boxGraves.querySelector('.agent-name').textContent = agent.name;
-                            boxGraves.querySelector('a').href = cleanUrl;
-                            return; 
-                        }
-                     
-                        if (agent.id === 3) { 
-                            boxJavier.querySelector('.agent-name').textContent = agent.name;
-                            boxJavier.querySelector('a').href = cleanUrl;
-                            return;
-                        }
-                
-                        if (agent.id === 18) { 
-                            boxJi.querySelector('.agent-name').textContent = agent.name;
-                            boxJi.querySelector('a').href = cleanUrl;
-                            return;
-                        }  
-                        
-                        let borderClass = ''; 
-                        let roleLabel = 'OPERATOR';
-                        let btnText = 'VOIR >';
-                        let btnStyle = '';
-
-                  
-                        if (agent.css_class === 'decrypted') {
-                            borderClass = 'border-green';
-                            roleLabel = 'ACTIF';
-                        } else if (agent.css_class === 'corrupted' || (agent.status_text && agent.status_text.includes('SCELLÉ'))) {
-                            borderClass = 'border-red';
-                            roleLabel = 'RESTREINT';
-                            btnText = 'HACK >';
-                            btnStyle = 'border-color:var(--danger); color:var(--danger);';
-                        } 
-
-                     
-                        const nameLower = agent.name.toLowerCase();
-                        if(nameLower.includes('cazares')) {
-                            borderClass = 'border-yellow';
-                            roleLabel = 'ADMINISTRATION';
-                        }
-                        if(nameLower.includes('wei') || nameLower.includes('dust')) {
-                            borderClass = 'border-green';
-                            roleLabel = 'RECONNAISSANCE';
-                        }
-                        if(nameLower.includes('nyx')) {
-                            borderClass = 'border-red';
-                            roleLabel = 'CYBER-WARFARE';
-                        }
-
-                    
-                        gridHTML += `
-                            <div class="node node-soldier ${borderClass}">
-                                <span class="role-label">${roleLabel}</span>
-                                <div class="agent-name">${agent.name}</div>
-                                
-                                <a href="${cleanUrl}" class="btn-link" style="${btnStyle}">${btnText}</a>
-                            </div>
-                        `;
-                    });
-
-                    
-                    gridContainer.innerHTML = gridHTML;
-                } else {
-                    gridContainer.innerHTML = '<div style="color:var(--danger)">[ERREUR : AUCUNE DONNÉE]</div>';
-                }
-            } catch (e) {
-                console.error("Erreur DB:", e);
-                gridContainer.innerHTML = '<div style="color:var(--danger)">[ERREUR DE CONNEXION AU SERVEUR]</div>';
+        document.addEventListener('DOMContentLoaded', () => {
+            const boot = document.getElementById('boot-screen');
+            if(boot) {
+                setTimeout(() => {
+                    boot.style.opacity = '0';
+                    setTimeout(() => { boot.style.display = 'none'; }, 1000);
+                }, 2000);
             }
         });
     </script>
-
 </body>
 </html>

@@ -1,18 +1,21 @@
 :root {
     --bg-dark: #050505;
     --panel-bg: rgba(15, 20, 25, 0.90);
-    
     --primary: #00ff9d;
     --secondary: #00f3ff;
     --danger: #ff3333;
     --warning: #eebb00;
     --dim: #445566;
-
     --font-ui: 'Share Tech Mono', monospace;
     --font-code: 'JetBrains Mono', monospace;
     --font-barcode: 'Libre Barcode 128 Text', cursive;
-
     --glass: blur(10px);
+    --terminal-bg: #080a0c;
+    --terminal-green: #00ff9d;
+    --terminal-red: #ff3333;
+    --terminal-dim: #3a4a5a;
+    --terminal-gold: #d4af37;
+    --glass-panel: rgba(10, 15, 20, 0.85);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
@@ -87,6 +90,8 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .header-strip {
@@ -241,23 +246,6 @@ h1 span { color: var(--danger); }
 .text-danger { color: var(--danger) !important; }
 .text-warning { color: var(--warning) !important; }
 
-:root {
-    --terminal-bg: #080a0c;
-    --terminal-green: #00ff9d;
-    --terminal-red: #ff3333;
-    --terminal-dim: #3a4a5a;
-    --terminal-gold: #d4af37;
-    --glass-panel: rgba(10, 15, 20, 0.85);
-}
-
-.terminal {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Share Tech Mono', monospace;
-    color: #eee;
-}
-
 .logo {
     display: block;
     margin: 0 auto 20px;
@@ -285,43 +273,6 @@ h1 span { color: var(--danger); }
     position: relative;
 }
 
-.org-chart::before {
-    content: '';
-    position: absolute;
-    top: 120px;
-    width: 2px;
-    height: 40px;
-    background: var(--terminal-dim);
-    z-index: 0;
-}
-
-.chart-sub {
-    display: flex;
-    gap: 40px;
-    margin-top: 40px;
-    position: relative;
-}
-.chart-sub::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60%;
-    height: 2px;
-    background: var(--terminal-dim);
-}
-.chart-sub::after {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 20px;
-    background: var(--terminal-dim);
-}
-
 .chart-node {
     background: var(--glass-panel);
     border: 1px solid var(--terminal-dim);
@@ -331,7 +282,7 @@ h1 span { color: var(--danger); }
     position: relative;
     transition: all 0.3s ease;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    z-index: 1;
+    z-index: 5;
 }
 
 .chart-node:hover {
@@ -364,6 +315,79 @@ h1 span { color: var(--danger); }
     margin-bottom: 15px;
     color: #fff;
     text-transform: uppercase;
+}
+
+.director-container {
+    position: relative;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+}
+
+.director-container::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    width: 1px;
+    height: 40px;
+    background: var(--secondary);
+    box-shadow: 0 0 5px var(--secondary);
+}
+
+.ltn-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+    margin-bottom: 60px;
+    padding-top: 0;
+}
+
+.ltn-container::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    height: 1px;
+    background: var(--secondary);
+    box-shadow: 0 0 5px var(--secondary);
+}
+
+.ltn-container .chart-node::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    width: 1px;
+    height: 40px;
+    background: var(--secondary);
+}
+
+.branch-left {
+    position: absolute;
+    bottom: -30px;
+    left: 20%;
+    width: 30%;
+    height: 30px;
+    border-left: 1px solid var(--dim);
+    border-bottom: 1px solid transparent;
+    border-bottom-left-radius: 15px;
+    opacity: 0.5;
+}
+
+.branch-right {
+    position: absolute;
+    bottom: -30px;
+    right: 20%;
+    width: 30%;
+    height: 30px;
+    border-right: 1px solid var(--dim);
+    border-bottom: 1px solid transparent;
+    border-bottom-right-radius: 15px;
+    opacity: 0.5;
 }
 
 .operators-section {
@@ -444,114 +468,3 @@ h1 span { color: var(--danger); }
     transition: color 0.3s;
 }
 .back-link:hover { color: var(--terminal-red); }
-/* =========================================
-   MISE À JOUR : ORGANIGRAMME (LIGNES FINES)
-   ========================================= */
-
-/* 1. Le conteneur du Chef (Graves) */
-.director-container {
-    position: relative;
-    margin-bottom: 40px; /* Espace pour la ligne verticale */
-    display: flex;
-    justify-content: center;
-}
-
-/* Ligne verticale sous Graves (1px) */
-.director-container::after {
-    content: '';
-    position: absolute;
-    bottom: -40px; /* Descend jusqu'à la barre horizontale */
-    left: 50%;
-    width: 1px; /* BARRE FINE */
-    height: 40px;
-    background: var(--secondary); /* Cyan pour le style high-tech */
-    box-shadow: 0 0 10px var(--secondary); /* Légère lueur */
-}
-
-/* 2. Le conteneur des Lieutenants */
-.ltn-container {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    gap: 100px; /* Ecartement entre les deux lieutenants */
-    margin-bottom: 60px;
-    padding-top: 0;
-}
-
-/* La grande barre horizontale au-dessus des Lieutenants (1px) */
-.ltn-container::before {
-    content: '';
-    position: absolute;
-    top: -40px; /* Doit toucher le bas de la ligne du chef */
-    left: 50%;
-    transform: translateX(-50%);
-    
-    /* Largeur calculée pour relier les centres des deux boîtes 
-       (220px largeur boite + 100px gap = 320px environ entre centres) */
-    width: 340px; 
-    
-    height: 1px; /* BARRE FINE */
-    background: var(--secondary);
-    box-shadow: 0 0 8px var(--secondary);
-}
-
-/* 3. Les lignes verticales connectant les Lieutenants à la barre du haut */
-.ltn-container .chart-node {
-    position: relative;
-}
-
-.ltn-container .chart-node::before {
-    content: '';
-    position: absolute;
-    top: -40px; /* Monte jusqu'à la barre horizontale */
-    left: 50%;
-    width: 1px; /* BARRE FINE */
-    height: 40px;
-    background: linear-gradient(to bottom, var(--secondary) 50%, rgba(0, 243, 255, 0.1));
-}
-
-/* 4. Les lignes "courbes" vers le bas (Vers les squads) */
-/* On simule les courbes du dessin avec des bordures arrondies */
-
-.ltn-container .chart-node::after {
-    content: '';
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1px;
-    height: 40px;
-    background: linear-gradient(to bottom, var(--dim), transparent);
-}
-
-/* Optionnel : Effet "Branchement" sous les lieutenants (Comme sur le dessin) */
-/* Ajoute deux petites "pattes" sous chaque lieutenant */
-.chart-node.subordinate {
-    overflow: visible; /* Important pour voir les lignes qui sortent */
-}
-
-/* Patte gauche courbe */
-.chart-node.subordinate .branch-left {
-    position: absolute;
-    bottom: -30px;
-    left: 20%;
-    width: 30%;
-    height: 30px;
-    border-left: 1px solid var(--dim);
-    border-bottom: 1px solid transparent;
-    border-bottom-left-radius: 15px;
-    opacity: 0.5;
-}
-
-/* Patte droite courbe */
-.chart-node.subordinate .branch-right {
-    position: absolute;
-    bottom: -30px;
-    right: 20%;
-    width: 30%;
-    height: 30px;
-    border-right: 1px solid var(--dim);
-    border-bottom: 1px solid transparent;
-    border-bottom-right-radius: 15px;
-    opacity: 0.5;
-}
