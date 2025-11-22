@@ -8,8 +8,8 @@
     <script> const REQUIRED_LEVEL = 1; </script>
     <script src="/js/security.js"></script>
 
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/style-database.css">
+    <link rel="stylesheet" href="styles.css">
+
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +50,8 @@
             <h2 class="section-title">//: OPÉRATEURS ACTIFS</h2>
             
             <div class="operators-grid" id="operators-grid-container">
-                </div>
+                <div style="color: #444; font-size: 0.8rem;">[INITIALISATION DU FLUX DE DONNÉES...]</div>
+            </div>
         </div>
 
         <footer class="portal-footer">
@@ -63,44 +64,62 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const gridContainer = document.getElementById('operators-grid-container');
             
+            // Référence aux boites fixes de l'organigramme
             const gravesBox = document.getElementById('agent-box-graves');
             const javierBox = document.getElementById('agent-box-javier');
             const jiBox = document.getElementById('agent-box-ji');
 
             try {
+                // Appel à l'API
                 const response = await fetch('/api/read?resource=agents');
                 const data = await response.json();
 
                 if (data.agents && data.agents.length > 0) {
                     
                     let gridHTML = '';
+                    // Tri par ID pour garder l'ordre logique
                     data.agents.sort((a, b) => a.id - b.id);
 
                     data.agents.forEach(agent => {
                         
-                        // Nettoyer l'URL : utiliser '#' par défaut, et supprimer tout '/' au début
-                        const cleanProfileUrl = (agent.profile_url || '#').replace(/^\//, '');
-                    
+                        // Nettoyage de l'URL pour éviter les doubles slashs ou erreurs
+                        // On s'assure que le chemin est relatif à Niv1/ (ex: "AgentDatabase/agent-x.html")
+                        let cleanProfileUrl = (agent.profile_url || '#').replace(/^\//, '');
+                        
+                        // 1. GESTION DES CHEFS (Affiche dans l'organigramme du haut)
                         if (agent.id === 1 || agent.id === 3 || agent.id === 18) {
                             let box;
                             if (agent.id === 1) box = gravesBox;
                             if (agent.id === 3) box = javierBox;
                             if (agent.id === 18) box = jiBox;
                             
-                            box.querySelector('.name').textContent = agent.name;
-                            // CORRECTION APPLIQUÉE : Utilisation du chemin relatif '../'
-                            box.querySelector('a').href = `${agent.profile_url}`; 
-                            return;
+                            if(box) {
+                                box.querySelector('.name').textContent = agent.name;
+                                box.querySelector('a').href = cleanProfileUrl; 
+                                
+                                // Mise à jour du texte du bouton selon le statut
+                                const btn = box.querySelector('.action-button');
+                                if (agent.status_text && agent.status_text.includes("SCELLÉ")) {
+                                    btn.textContent = "[DOSSIER SCELLÉ]";
+                                    btn.style.color = "var(--terminal-red)";
+                                    btn.style.borderColor = "var(--terminal-red)";
+                                } else {
+                                    btn.textContent = "[ACCÈS AUTORISÉ]";
+                                }
+                            }
+                            return; // On ne l'ajoute pas à la grille du bas
                         }
 
+                        // 2. GESTION DES SOLDATS (Grille du bas)
                         
+                        // Extraction du statut court pour le bouton
+                        const parts = agent.status_text ? agent.status_text.split('::') : ['UNKNOWN'];
+                        let buttonText = parts.length > 1 ? parts[1].trim() : parts[0];
                         
-                        const parts = agent.status_text.split('::').map(part => part.trim());
-                        let buttonText = parts[1] || '[STATUS INCONNU]';
-                        
-                        if (buttonText === 'DOSSIER SCELLÉ') buttonText = 'DOSSIER SCELLÉ';
-                        if (buttonText === 'STATUT NON-SANCTIONNÉ') buttonText = 'NON-SANCTIONNÉ';
+                        if (buttonText === 'DOSSIER SCELLÉ') buttonText = 'SCELLÉ';
+                        if (buttonText === 'STATUT NON-SANCTIONNÉ') buttonText = 'N/A';
 
+                        // Définition de la couleur selon le CSS renvoyé par la DB
                         let colorClass = 'status-gray';
                         if (agent.css_class === 'decrypted') {
                             colorClass = 'status-green';
@@ -108,12 +127,11 @@
                             colorClass = 'status-red';
                         }
                         
-                        
                         gridHTML += `
                             <div class="chart-node team-member ${agent.css_class || ''}">
                                 <div class="role">[AGENT_STD]</div>
                                 <div class="name">${agent.name}</div>
-                                <a href="../${cleanProfileUrl}" class="action-button ${colorClass}" data-id="${agent.id}">
+                                <a href="${cleanProfileUrl}" class="action-button ${colorClass}" data-id="${agent.id}">
                                     [${buttonText}]
                                 </a>
                             </div>
@@ -122,14 +140,12 @@
 
                     gridContainer.innerHTML = gridHTML;
 
-                    
-
                 } else {
-                    gridContainer.innerHTML = '<p>[ERREUR: AUCUN AGENT TROUVÉ]</p>';
+                    gridContainer.innerHTML = '<p style="color:red;">[ERREUR: AUCUNE DONNÉE AGENT]</p>';
                 }
             } catch (error) {
                 console.error('Erreur lors de la récupération des agents:', error);
-                gridContainer.innerHTML = '<p>[ERREUR DE CONNEXION AU MAINFRAME]</p>';
+                gridContainer.innerHTML = '<p style="color:red;">[ERREUR DE CONNEXION AU SERVEUR]</p>';
             }
         });
     </script>
