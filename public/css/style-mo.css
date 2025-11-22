@@ -444,71 +444,114 @@ h1 span { color: var(--danger); }
     transition: color 0.3s;
 }
 .back-link:hover { color: var(--terminal-red); }
+/* =========================================
+   MISE À JOUR : ORGANIGRAMME (LIGNES FINES)
+   ========================================= */
 
-.director-container,
+/* 1. Le conteneur du Chef (Graves) */
+.director-container {
+    position: relative;
+    margin-bottom: 40px; /* Espace pour la ligne verticale */
+    display: flex;
+    justify-content: center;
+}
+
+/* Ligne verticale sous Graves (1px) */
+.director-container::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; /* Descend jusqu'à la barre horizontale */
+    left: 50%;
+    width: 1px; /* BARRE FINE */
+    height: 40px;
+    background: var(--secondary); /* Cyan pour le style high-tech */
+    box-shadow: 0 0 10px var(--secondary); /* Légère lueur */
+}
+
+/* 2. Le conteneur des Lieutenants */
 .ltn-container {
     position: relative;
     display: flex;
     justify-content: center;
-    z-index: 2; 
+    gap: 100px; /* Ecartement entre les deux lieutenants */
+    margin-bottom: 60px;
+    padding-top: 0;
 }
 
-.director-container {
-    margin-bottom: 50px;
-}
-
-.ltn-container {
-    gap: 60px; 
-    margin-bottom: 50px;
-}
-
-.director-container::after {
-    content: '';
-    position: absolute;
-    bottom: -50px; 
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 50px;
-    background-color: var(--dim);
-    z-index: 1;
-}
-
+/* La grande barre horizontale au-dessus des Lieutenants (1px) */
 .ltn-container::before {
     content: '';
     position: absolute;
-    top: -25px; 
+    top: -40px; /* Doit toucher le bas de la ligne du chef */
     left: 50%;
     transform: translateX(-50%);
-    width: 55%; 
-    height: 2px;
-    background-color: var(--dim);
-    z-index: 1;
+    
+    /* Largeur calculée pour relier les centres des deux boîtes 
+       (220px largeur boite + 100px gap = 320px environ entre centres) */
+    width: 340px; 
+    
+    height: 1px; /* BARRE FINE */
+    background: var(--secondary);
+    box-shadow: 0 0 8px var(--secondary);
 }
 
-.ltn-container .node {
+/* 3. Les lignes verticales connectant les Lieutenants à la barre du haut */
+.ltn-container .chart-node {
     position: relative;
 }
 
-.ltn-container .node::before {
+.ltn-container .chart-node::before {
     content: '';
     position: absolute;
-    top: -25px; 
+    top: -40px; /* Monte jusqu'à la barre horizontale */
     left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 25px;
-    background-color: var(--dim);
+    width: 1px; /* BARRE FINE */
+    height: 40px;
+    background: linear-gradient(to bottom, var(--secondary) 50%, rgba(0, 243, 255, 0.1));
 }
 
-.ltn-container::after {
+/* 4. Les lignes "courbes" vers le bas (Vers les squads) */
+/* On simule les courbes du dessin avec des bordures arrondies */
+
+.ltn-container .chart-node::after {
     content: '';
     position: absolute;
-    bottom: -50px;
+    bottom: -40px;
     left: 50%;
     transform: translateX(-50%);
-    width: 2px;
-    height: 50px;
-    background-color: var(--dim);
-    z-index: 1;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--dim), transparent);
+}
+
+/* Optionnel : Effet "Branchement" sous les lieutenants (Comme sur le dessin) */
+/* Ajoute deux petites "pattes" sous chaque lieutenant */
+.chart-node.subordinate {
+    overflow: visible; /* Important pour voir les lignes qui sortent */
+}
+
+/* Patte gauche courbe */
+.chart-node.subordinate .branch-left {
+    position: absolute;
+    bottom: -30px;
+    left: 20%;
+    width: 30%;
+    height: 30px;
+    border-left: 1px solid var(--dim);
+    border-bottom: 1px solid transparent;
+    border-bottom-left-radius: 15px;
+    opacity: 0.5;
+}
+
+/* Patte droite courbe */
+.chart-node.subordinate .branch-right {
+    position: absolute;
+    bottom: -30px;
+    right: 20%;
+    width: 30%;
+    height: 30px;
+    border-right: 1px solid var(--dim);
+    border-bottom: 1px solid transparent;
+    border-bottom-right-radius: 15px;
+    opacity: 0.5;
 }
