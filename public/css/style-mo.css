@@ -266,3 +266,225 @@ h1 span { color: var(--danger); }
 /* UTILS */
 .text-danger { color: var(--danger) !important; }
 .text-warning { color: var(--warning) !important; }
+
+/* =========================================
+   DATABASE TERMINAL STYLES
+   ========================================= */
+
+:root {
+    --terminal-bg: #080a0c;
+    --terminal-green: #00ff9d;
+    --terminal-red: #ff3333;
+    --terminal-dim: #3a4a5a;
+    --terminal-gold: #d4af37;
+    --glass-panel: rgba(10, 15, 20, 0.85);
+}
+
+/* --- LAYOUT PRINCIPAL --- */
+.terminal {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Share Tech Mono', monospace;
+    color: #eee;
+}
+
+.logo {
+    display: block;
+    margin: 0 auto 20px;
+    width: 80px;
+    opacity: 0.8;
+}
+
+.system-status {
+    text-align: center;
+    border-bottom: 1px solid var(--terminal-dim);
+    padding-bottom: 10px;
+    margin-bottom: 40px;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    color: var(--terminal-dim);
+}
+.secured { color: var(--terminal-green); text-shadow: 0 0 10px rgba(0,255,157,0.3); }
+.encrypted { color: var(--terminal-red); }
+
+/* --- ORGANIGRAMME (PARTIE HAUTE) --- */
+.org-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 60px;
+    position: relative;
+}
+
+/* Connecteurs (Lignes) */
+.org-chart::before {
+    content: '';
+    position: absolute;
+    top: 120px; /* Ajuster selon la hauteur de la boite du chef */
+    width: 2px;
+    height: 40px;
+    background: var(--terminal-dim);
+    z-index: 0;
+}
+
+.chart-sub {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    position: relative;
+}
+/* Ligne horizontale connectant les lieutenants */
+.chart-sub::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%; /* Largeur de la ligne horizontale */
+    height: 2px;
+    background: var(--terminal-dim);
+}
+.chart-sub::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 20px;
+    background: var(--terminal-dim);
+}
+
+
+/* --- CARTES AGENTS (NODES) --- */
+.chart-node {
+    background: var(--glass-panel);
+    border: 1px solid var(--terminal-dim);
+    padding: 15px;
+    width: 220px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 1;
+}
+
+.chart-node:hover {
+    transform: translateY(-5px);
+    border-color: var(--terminal-green);
+    box-shadow: 0 8px 20px rgba(0, 255, 157, 0.1);
+}
+
+/* Styles spécifiques par rang */
+.lead {
+    border-top: 3px solid var(--terminal-gold);
+    width: 280px;
+}
+.lead .role { color: var(--terminal-gold); }
+
+.subordinate {
+    border-top: 3px solid var(--terminal-green); /* Ou Cyan pour les Lieutenants */
+}
+.subordinate .role { color: var(--terminal-green); }
+
+
+/* Contenu de la carte */
+.role {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    opacity: 0.7;
+    margin-bottom: 5px;
+}
+
+.name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+/* --- GRILLE DES OPÉRATEURS (BAS) --- */
+.operators-section {
+    margin-top: 60px;
+}
+
+.section-title {
+    border-left: 4px solid var(--terminal-green);
+    padding-left: 15px;
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+.operators-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.team-member {
+    width: 100%; /* S'adapte à la grille */
+    border-left: 2px solid var(--terminal-dim); /* Bordure latérale style militaire */
+    border-top: none;
+    text-align: left;
+}
+.team-member .name { font-size: 1rem; }
+.team-member .role { font-size: 0.65rem; }
+
+
+/* --- BOUTONS D'ACTION --- */
+.action-button {
+    display: block;
+    text-decoration: none;
+    font-size: 0.75rem;
+    padding: 6px;
+    border: 1px solid var(--terminal-dim);
+    color: var(--terminal-dim);
+    margin-top: 10px;
+    transition: 0.2s;
+    text-align: center;
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    border-color: #fff;
+}
+
+/* --- COULEURS DE STATUT (Classes dynamiques JS) --- */
+.status-green {
+    color: var(--terminal-green) !important;
+    border-color: var(--terminal-green) !important;
+    background: rgba(0, 255, 157, 0.05);
+}
+
+.status-red {
+    color: var(--terminal-red) !important;
+    border-color: var(--terminal-red) !important;
+    background: rgba(255, 51, 51, 0.05);
+}
+
+.status-gray {
+    color: #888 !important;
+    border-color: #555 !important;
+}
+
+/* --- FOOTER --- */
+.portal-footer {
+    margin-top: 60px;
+    text-align: center;
+    border-top: 1px solid var(--terminal-dim);
+    padding-top: 20px;
+}
+
+.back-link {
+    color: var(--terminal-dim);
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: color 0.3s;
+}
+.back-link:hover { color: var(--terminal-red); }
