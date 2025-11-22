@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW CO. :: HIERARCHY</title>
+    <title>SHADOW CO. :: HIERARCHY V3</title>
 
-    <link rel="stylesheet" href="/css/style-mo.css">
-    <link rel="stylesheet" href="/css/style-hierarchy.css">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style-mo.css">
+    <link rel="stylesheet" href="/css/style-hierarchy.css">
 </head>
 <body>
 
@@ -24,7 +24,7 @@
         <div class="director-container">
             <div class="node node-director" id="node-graves">
                 <span class="role-label">COMMANDER</span>
-                <div class="agent-name">[CHARGEMENT...]</div>
+                <div class="agent-name">[CONNEXION...]</div>
                 <a href="#" class="btn-link">DOSSIER MAÎTRE</a>
             </div>
         </div>
@@ -35,22 +35,23 @@
         <div class="ltn-container">
             <div class="node node-ltn" id="node-javier">
                 <span class="role-label">LIEUTENANT (ARMOR)</span>
-                <div class="agent-name">[CHARGEMENT...]</div>
+                <div class="agent-name">...</div>
                 <a href="#" class="btn-link">PROFIL ></a>
             </div>
 
             <div class="node node-ltn" id="node-ji">
                 <span class="role-label">LIEUTENANT (SPEC-OPS)</span>
-                <div class="agent-name">[CHARGEMENT...]</div>
+                <div class="agent-name">...</div>
                 <a href="#" class="btn-link">PROFIL ></a>
             </div>
         </div>
 
         <div class="tree-line-vert" style="height: 40px;"></div>
-        <div class="squad-label">// UNITÉS SPÉCIALISÉES & SOUTIEN</div>
+        <div class="squad-label">// UNITÉS SPÉCIALISÉES & SOUTIEN TACTIQUE</div>
 
         <div class="squad-grid" id="squad-grid">
-            </div>
+            <div style="color:#666; font-size:0.8rem;">CHARGEMENT DE LA BASE DE DONNÉES...</div>
+        </div>
 
         <div style="text-align: center; margin-top: 60px;">
              <a href="../index.html" class="btn-link" style="border-color: var(--danger); color: var(--danger);">[ DÉCONNEXION ]</a>
@@ -62,89 +63,102 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const gridContainer = document.getElementById('squad-grid');
             
-            // Références aux boites fixes (Chefs)
+            // Références aux 3 boites fixes du haut
             const boxGraves = document.getElementById('node-graves');
             const boxJavier = document.getElementById('node-javier');
             const boxJi = document.getElementById('node-ji');
 
             try {
+                // Récupération des données API
                 const response = await fetch('/api/read?resource=agents');
                 const rawData = await response.json();
-
-                // Gestion format données
+                
+                // Gestion des différents formats possibles de l'API
                 let agents = rawData.agents || rawData.rows || (Array.isArray(rawData) ? rawData : []);
 
                 if (agents.length > 0) {
                     let gridHTML = '';
+                    
+                    // On trie par ID pour avoir un ordre logique
                     agents.sort((a, b) => a.id - b.id);
 
                     agents.forEach(agent => {
-                        // URL propre
+                        // Nettoyage de l'URL (enlève le slash au début si présent)
                         let cleanUrl = (agent.profile_url || '#').replace(/^\//, '');
 
-                        // --- 1. REMPLIR LES CHEFS (ID FIXES) ---
-                        if (agent.id === 1) { // Graves
+                        // --- 1. REMPLISSAGE DES CHEFS (HAUT DE PAGE) ---
+                        // Si c'est Graves (ID 1)
+                        if (agent.id === 1) { 
                             boxGraves.querySelector('.agent-name').textContent = agent.name;
                             boxGraves.querySelector('a').href = cleanUrl;
-                            return;
+                            return; // On arrête là pour lui, il ne va pas dans la grille
                         }
-                        if (agent.id === 3) { // Javier
+                        // Si c'est Javier (ID 3)
+                        if (agent.id === 3) { 
                             boxJavier.querySelector('.agent-name').textContent = agent.name;
                             boxJavier.querySelector('a').href = cleanUrl;
                             return;
                         }
-                        if (agent.id === 18) { // Ji / Jackal
+                        // Si c'est Ji / Jackal (ID 18)
+                        if (agent.id === 18) { 
                             boxJi.querySelector('.agent-name').textContent = agent.name;
                             boxJi.querySelector('a').href = cleanUrl;
                             return;
                         }
 
-                        // --- 2. REMPLIR LA GRILLE (SOLDATS) ---
+                        // --- 2. GÉNÉRATION DE LA GRILLE (SOLDATS) ---
                         
-                        // Déterminer la couleur de la bordure et le rôle
-                        let borderClass = '';
-                        let roleTitle = 'OPÉRATEUR';
+                        // Définition du style (Couleurs des bordures)
+                        let borderClass = ''; // par défaut gris
+                        let roleLabel = 'OPERATOR';
                         let btnText = 'VOIR >';
                         let btnStyle = '';
 
-                        // Logique de style basée sur la classe CSS de la DB
+                        // Logique de couleur basée sur la classe CSS renvoyée par la DB
                         if (agent.css_class === 'decrypted') {
                             borderClass = 'border-green';
-                            roleTitle = 'ACTIF';
+                            roleLabel = 'ACTIF';
                         } else if (agent.css_class === 'corrupted' || (agent.status_text && agent.status_text.includes('SCELLÉ'))) {
                             borderClass = 'border-red';
-                            roleTitle = 'RESTREINT';
+                            roleLabel = 'RESTREINT';
                             btnText = 'HACK >';
-                            btnStyle = 'color:var(--danger); border-color:var(--danger);';
-                        } else {
-                            // Par défaut (Gris)
-                            roleTitle = 'INFANTERIE';
-                        }
+                            btnStyle = 'border-color:var(--danger); color:var(--danger);';
+                        } 
 
-                        // Cas spéciaux pour simuler l'image (optionnel, basé sur le nom)
-                        if(agent.name.includes("Cazares")) { borderClass = 'border-yellow'; roleTitle = "ADMINISTRATION"; }
-                        if(agent.name.includes("Wei")) { borderClass = 'border-green'; roleTitle = "RECONNAISSANCE"; }
-                        if(agent.name.includes("Nyx")) { borderClass = 'border-red'; roleTitle = "CYBER-WARFARE"; }
+                        // Styles Spéciaux basés sur le nom (Optionnel, pour le look)
+                        const nameLower = agent.name.toLowerCase();
+                        if(nameLower.includes('cazares')) {
+                            borderClass = 'border-yellow';
+                            roleLabel = 'ADMINISTRATION';
+                        }
+                        if(nameLower.includes('wei') || nameLower.includes('dust')) {
+                            borderClass = 'border-green';
+                            roleLabel = 'RECONNAISSANCE';
+                        }
+                        if(nameLower.includes('nyx')) {
+                            borderClass = 'border-red';
+                            roleLabel = 'CYBER-WARFARE';
+                        }
 
                         // Création de la carte HTML
                         gridHTML += `
                             <div class="node node-soldier ${borderClass}">
-                                <span class="role-label">${roleTitle}</span>
+                                <span class="role-label">${roleLabel}</span>
                                 <div class="agent-name">${agent.name}</div>
-                                <div class="sub-info">ID: SC-${agent.id}</div>
+                                
                                 <a href="${cleanUrl}" class="btn-link" style="${btnStyle}">${btnText}</a>
                             </div>
                         `;
                     });
 
+                    // Injection dans la page
                     gridContainer.innerHTML = gridHTML;
                 } else {
-                    gridContainer.innerHTML = '<div style="color:red">AUCUNE DONNÉE</div>';
+                    gridContainer.innerHTML = '<div style="color:var(--danger)">[ERREUR : AUCUNE DONNÉE]</div>';
                 }
-
             } catch (e) {
-                console.error(e);
-                gridContainer.innerHTML = '<div style="color:red">ERREUR CONNEXION</div>';
+                console.error("Erreur DB:", e);
+                gridContainer.innerHTML = '<div style="color:var(--danger)">[ERREUR DE CONNEXION AU SERVEUR]</div>';
             }
         });
     </script>
