@@ -5,7 +5,7 @@
 :root {
     --card-bg: rgba(17, 20, 24, 0.95);
     --gold: #d4af37;
-    --line-color: #445566; /* Couleur des lignes (var(--dim)) */
+    --line-color: #445566; /* Couleur des lignes (gris technique) */
 }
 
 .wrapper {
@@ -24,70 +24,65 @@ header {
 }
 header h1 { font-family: var(--font-code); font-size: 1.6rem; color: #fff; margin: 0; }
 
-/* =========================================
-   LES LIGNES (ARBRE) - LE COEUR DU DESIGN
-   ========================================= */
 
-/* 1. La ligne verticale qui part du Directeur */
+
+
+/* 1. La ligne verticale qui descend du Directeur */
 .tree-line-vert {
     width: 1px;
     background: var(--line-color);
-    height: 40px; /* Longueur de la ligne */
+    height: 40px; /* Espace entre le directeur et la barre horizontale */
     margin: 0 auto;
 }
 
-/* 2. La ligne horizontale qui se sépare */
+/* 2. La ligne horizontale (Le "T" qui se sépare) */
 .tree-line-horiz {
-    width: 54%; /* Ajusté pour tomber pile au milieu des Lieutenants */
+    /* CALCUL PRÉCIS : Distance entre le centre gauche et le centre droit */
+    width: 50%; 
     height: 1px;
     background: var(--line-color);
-    margin: 0 auto; /* Centré */
+    margin: 0 auto; /* Centré parfaitement */
     position: relative;
 }
 
-/* 3. Les deux lignes verticales qui descendent vers les Lieutenants */
+/* 3. Les deux descentes vers les Lieutenants (Jambes) */
 .tree-line-horiz::before,
 .tree-line-horiz::after {
     content: '';
     position: absolute;
     top: 0;
     width: 1px;
-    height: 30px; /* Hauteur de la descente vers les cartes */
+    height: 30px; /* Longueur de la descente vers les cartes */
     background: var(--line-color);
 }
 
-/* Positionnement des descentes aux extrémités de la barre horizontale */
+/* Positionnement aux extrémités de la barre horizontale */
 .tree-line-horiz::before { left: 0; }
 .tree-line-horiz::after { right: 0; }
 
 
-/* =========================================
-   LES CONTAINERS
-   ========================================= */
 
 /* Container Directeur */
 .director-container {
     display: flex;
     justify-content: center;
-    /* Pas de margin-bottom ici, la ligne verticale gère l'espace */
+    position: relative;
+    z-index: 2;
 }
 
 /* Container Lieutenants */
 .ltn-container {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Deux colonnes égales */
-    gap: 40px; /* Espace entre les deux cartes */
-    margin: 0 auto; /* margin-top à 0 car les lignes gèrent l'espace */
-    padding-top: 0; 
-    max-width: 800px;
+    grid-template-columns: 1fr 1fr; /* Deux colonnes de largeur égale */
+    gap: 40px; /* Espace entre les cartes */
+    margin: 0 auto;
+    max-width: 800px; /* Doit correspondre à la largeur visuelle voulue */
     position: relative;
-    top: -1px; /* Petite correction pour coller aux lignes */
+    /* On remonte légèrement pour que la ligne touche la carte */
+    top: -1px; 
 }
 
 
-/* =========================================
-   DESIGN DES CARTES (NODES)
-   ========================================= */
 .node {
     background: var(--card-bg);
     padding: 20px;
@@ -95,12 +90,13 @@ header h1 { font-family: var(--font-code); font-size: 1.6rem; color: #fff; margi
     transition: all 0.3s ease;
     border: 1px solid rgba(255,255,255,0.05);
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    z-index: 2; /* Pour passer au dessus des lignes si besoin */
+    z-index: 2;
 }
 .node:hover {
     background: #1a2026;
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    border-color: rgba(255,255,255,0.1);
 }
 
 .role-label {
@@ -138,8 +134,7 @@ header h1 { font-family: var(--font-code); font-size: 1.6rem; color: #fff; margi
     text-align: center; font-family: var(--font-code);
     font-size: 0.8rem; color: var(--dim);
     margin: 50px 0 20px 0; letter-spacing: 1px;
-    /* Petite ligne de séparation */
-    border-top: 1px dashed #333;
+    border-top: 1px dashed #333; /* Séparateur discret */
     padding-top: 20px;
 }
 
