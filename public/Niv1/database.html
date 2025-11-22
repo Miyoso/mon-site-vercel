@@ -3,161 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS - Agent Database</title>
-    
-    <script> const REQUIRED_LEVEL = 1; </script>
-    <script src="/js/security.js"></script>
+    <title>SHADOW CO. :: HIERARCHY</title>
 
     <link rel="stylesheet" href="/css/style-mo.css">
-
+    <link rel="stylesheet" href="/css/style-hierarchy.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <main class="terminal">
+    <div class="wrapper">
         
-        <img src="/assets/logo-sas.png" alt="Logo SAS" class="logo">
+        <header>
+            <h1>SHADOW_NET // <span style="color:var(--primary)">COMMAND_CHAIN</span></h1>
+            <div class="meta" style="color:var(--dim)">SERVER: ONLINE</div>
+        </header>
 
-        <div class="system-status">
-            SYSTEM STATUS: <span class="secured">SECURED</span> :: ACCESS: <span class="encrypted">[ENCRYPTED]</span>
-        </div>
-
-        <div class="org-chart">
-            <div class="chart-node lead" id="agent-box-graves">
-                <div class="role">[DIR]</div>
-                <div class="name">[CHARGEMENT...]</div>
-                <a href="#" class="action-button">[ACCÈS PROFIL]</a>
-            </div>
-            
-            <div class="chart-sub">
-                <div class="chart-node subordinate" id="agent-box-javier">
-                    <div class="role">[AGENT_LTN]</div>
-                    <div class="name">[CHARGEMENT...]</div>
-                    <a href="#" class="action-button">[FICHIER ENCRYPTÉ]</a>
-                </div>
-                <div class="chart-node subordinate" id="agent-box-ji">
-                    <div class="role">[AGENT_LTN]</div>
-                    <div class="name">[CHARGEMENT...]</div>
-                    <a href="#" class="action-button">[VOIR DOSSIER]</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="operators-section">
-            <h2 class="section-title">//: OPÉRATEURS ACTIFS</h2>
-            
-            <div class="operators-grid" id="operators-grid-container">
-                <div style="color: #444; font-size: 0.8rem;">[INITIALISATION DU FLUX DE DONNÉES...]</div>
+        <div class="director-container">
+            <div class="node node-director" id="node-graves">
+                <span class="role-label">COMMANDER</span>
+                <div class="agent-name">[CHARGEMENT...]</div>
+                <a href="#" class="btn-link">DOSSIER MAÎTRE</a>
             </div>
         </div>
 
-        <footer class="portal-footer">
-            <a href="/index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
-        </footer>
+        <div class="tree-line-vert"></div>
+        <div class="tree-line-horiz"></div>
 
-    </main>
+        <div class="ltn-container">
+            <div class="node node-ltn" id="node-javier">
+                <span class="role-label">LIEUTENANT (ARMOR)</span>
+                <div class="agent-name">[CHARGEMENT...]</div>
+                <a href="#" class="btn-link">PROFIL ></a>
+            </div>
+
+            <div class="node node-ltn" id="node-ji">
+                <span class="role-label">LIEUTENANT (SPEC-OPS)</span>
+                <div class="agent-name">[CHARGEMENT...]</div>
+                <a href="#" class="btn-link">PROFIL ></a>
+            </div>
+        </div>
+
+        <div class="tree-line-vert" style="height: 40px;"></div>
+        <div class="squad-label">// UNITÉS SPÉCIALISÉES & SOUTIEN</div>
+
+        <div class="squad-grid" id="squad-grid">
+            </div>
+
+        <div style="text-align: center; margin-top: 60px;">
+             <a href="../index.html" class="btn-link" style="border-color: var(--danger); color: var(--danger);">[ DÉCONNEXION ]</a>
+        </div>
+
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const gridContainer = document.getElementById('operators-grid-container');
+            const gridContainer = document.getElementById('squad-grid');
             
-            // Références aux boîtes de l'organigramme
-            const boxes = {
-                1: document.getElementById('agent-box-graves'),
-                3: document.getElementById('agent-box-javier'),
-                18: document.getElementById('agent-box-ji')
-            };
+            // Références aux boites fixes (Chefs)
+            const boxGraves = document.getElementById('node-graves');
+            const boxJavier = document.getElementById('node-javier');
+            const boxJi = document.getElementById('node-ji');
 
             try {
-                console.log("Tentative de connexion à l'API...");
                 const response = await fetch('/api/read?resource=agents');
-                
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
-                }
-
                 const rawData = await response.json();
-                console.log("Données reçues (Debug):", rawData);
 
-               
-                let agents = [];
-                if (rawData.agents) {
-                    agents = rawData.agents;
-                } else if (rawData.rows) {
-                    agents = rawData.rows;
-                } else if (Array.isArray(rawData)) {
-                    agents = rawData;
-                }
+                // Gestion format données
+                let agents = rawData.agents || rawData.rows || (Array.isArray(rawData) ? rawData : []);
 
-                if (agents && agents.length > 0) {
-                    
+                if (agents.length > 0) {
                     let gridHTML = '';
-                    agents.sort((a, b) => a.id - b.id); 
+                    agents.sort((a, b) => a.id - b.id);
 
                     agents.forEach(agent => {
-                        
-                        let cleanProfileUrl = (agent.profile_url || '#').replace(/^\//, '');
+                        // URL propre
+                        let cleanUrl = (agent.profile_url || '#').replace(/^\//, '');
 
-                       
-                        if (boxes[agent.id]) {
-                            const box = boxes[agent.id];
-                            box.querySelector('.name').textContent = agent.name;
-                            box.querySelector('a').href = cleanProfileUrl;
-                            
-                           
-                            const btn = box.querySelector('.action-button');
-                            if (agent.status_text && agent.status_text.includes("SCELLÉ")) {
-                                btn.textContent = "[DOSSIER SCELLÉ]";
-                                btn.style.color = "#ff3333"; // Rouge
-                                btn.style.borderColor = "#ff3333";
-                            } else {
-                                btn.textContent = "[ACCÈS AUTORISÉ]";
-                            }
-                           
-                            return; 
+                        // --- 1. REMPLIR LES CHEFS (ID FIXES) ---
+                        if (agent.id === 1) { // Graves
+                            boxGraves.querySelector('.agent-name').textContent = agent.name;
+                            boxGraves.querySelector('a').href = cleanUrl;
+                            return;
+                        }
+                        if (agent.id === 3) { // Javier
+                            boxJavier.querySelector('.agent-name').textContent = agent.name;
+                            boxJavier.querySelector('a').href = cleanUrl;
+                            return;
+                        }
+                        if (agent.id === 18) { // Ji / Jackal
+                            boxJi.querySelector('.agent-name').textContent = agent.name;
+                            boxJi.querySelector('a').href = cleanUrl;
+                            return;
                         }
 
-                       
+                        // --- 2. REMPLIR LA GRILLE (SOLDATS) ---
                         
-                     
-                        const parts = agent.status_text ? agent.status_text.split('::') : ['UNKNOWN'];
-                        let buttonText = parts.length > 1 ? parts[1].trim() : parts[0];
-                        
-                        // Raccourcis visuels
-                        if (buttonText === 'DOSSIER SCELLÉ') buttonText = 'SCELLÉ';
-                        if (buttonText === 'STATUT NON-SANCTIONNÉ') buttonText = 'N/A';
+                        // Déterminer la couleur de la bordure et le rôle
+                        let borderClass = '';
+                        let roleTitle = 'OPÉRATEUR';
+                        let btnText = 'VOIR >';
+                        let btnStyle = '';
 
-                        // Couleurs
-                        let colorClass = 'status-gray';
-                        if (agent.css_class === 'decrypted') colorClass = 'status-green';
-                        else if (agent.css_class === 'corrupted') colorClass = 'status-red';
-                        
+                        // Logique de style basée sur la classe CSS de la DB
+                        if (agent.css_class === 'decrypted') {
+                            borderClass = 'border-green';
+                            roleTitle = 'ACTIF';
+                        } else if (agent.css_class === 'corrupted' || (agent.status_text && agent.status_text.includes('SCELLÉ'))) {
+                            borderClass = 'border-red';
+                            roleTitle = 'RESTREINT';
+                            btnText = 'HACK >';
+                            btnStyle = 'color:var(--danger); border-color:var(--danger);';
+                        } else {
+                            // Par défaut (Gris)
+                            roleTitle = 'INFANTERIE';
+                        }
+
+                        // Cas spéciaux pour simuler l'image (optionnel, basé sur le nom)
+                        if(agent.name.includes("Cazares")) { borderClass = 'border-yellow'; roleTitle = "ADMINISTRATION"; }
+                        if(agent.name.includes("Wei")) { borderClass = 'border-green'; roleTitle = "RECONNAISSANCE"; }
+                        if(agent.name.includes("Nyx")) { borderClass = 'border-red'; roleTitle = "CYBER-WARFARE"; }
+
+                        // Création de la carte HTML
                         gridHTML += `
-                            <div class="chart-node team-member ${agent.css_class || ''}">
-                                <div class="role">[AGENT_STD]</div>
-                                <div class="name">${agent.name}</div>
-                                <a href="${cleanProfileUrl}" class="action-button ${colorClass}">
-                                    [${buttonText}]
-                                </a>
+                            <div class="node node-soldier ${borderClass}">
+                                <span class="role-label">${roleTitle}</span>
+                                <div class="agent-name">${agent.name}</div>
+                                <div class="sub-info">ID: SC-${agent.id}</div>
+                                <a href="${cleanUrl}" class="btn-link" style="${btnStyle}">${btnText}</a>
                             </div>
                         `;
                     });
 
                     gridContainer.innerHTML = gridHTML;
-
                 } else {
-                    console.warn("Tableau 'agents' vide ou introuvable.");
-                    gridContainer.innerHTML = '<p style="color:red;">[ERREUR: AUCUNE DONNÉE AGENT TROUVÉE]</p>';
+                    gridContainer.innerHTML = '<div style="color:red">AUCUNE DONNÉE</div>';
                 }
 
-            } catch (error) {
-                console.error('Erreur critique:', error);
-                gridContainer.innerHTML = `<p style="color:red;">[ERREUR SYSTÈME: ${error.message}]</p>`;
+            } catch (e) {
+                console.error(e);
+                gridContainer.innerHTML = '<div style="color:red">ERREUR CONNEXION</div>';
             }
         });
     </script>
+
 </body>
 </html>
