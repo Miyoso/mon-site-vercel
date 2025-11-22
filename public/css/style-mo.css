@@ -1,16 +1,12 @@
-/* =========================================
-   1. CORE VARIABLES & RESET
-   ========================================= */
 :root {
     --bg-dark: #050505;
     --panel-bg: rgba(15, 20, 25, 0.90);
     
-    /* PALETTE SHADOW COMPANY */
-    --primary: #00ff9d;      /* Vert Système */
-    --secondary: #00f3ff;    /* Cyan HUD */
-    --danger: #ff3333;       /* Rouge Hostile */
-    --warning: #eebb00;      /* Jaune Alerte */
-    --dim: #445566;          /* Gris Technique */
+    --primary: #00ff9d;
+    --secondary: #00f3ff;
+    --danger: #ff3333;
+    --warning: #eebb00;
+    --dim: #445566;
 
     --font-ui: 'Share Tech Mono', monospace;
     --font-code: 'JetBrains Mono', monospace;
@@ -33,7 +29,6 @@ body {
     padding: 2rem 1rem;
 }
 
-/* FOND TACTIQUE */
 body::before {
     content: "";
     position: fixed;
@@ -44,7 +39,6 @@ body::before {
     z-index: -2;
 }
 
-/* EFFET CRT / SCANLINES */
 .crt-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
@@ -56,9 +50,6 @@ body::before {
 }
 @keyframes flicker { 0% {opacity: 0.45;} 50% {opacity: 0.5;} 100% {opacity: 0.45;} }
 
-/* =========================================
-   2. BOOT SCREEN
-   ========================================= */
 #boot-screen {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #000;
@@ -77,9 +68,6 @@ body::before {
 }
 @keyframes loadProgress { 0% {width: 0%;} 40% {width: 30%;} 70% {width: 60%;} 100% {width: 100%;} }
 
-/* =========================================
-   3. MAIN TERMINAL STRUCTURE
-   ========================================= */
 .terminal-wrapper {
     width: 100%; max-width: 900px;
     perspective: 1500px;
@@ -101,7 +89,6 @@ body::before {
     gap: 2rem;
 }
 
-/* Header Strip */
 .header-strip {
     display: flex; justify-content: space-between; align-items: flex-end;
     border-bottom: 2px solid rgba(255,255,255,0.1);
@@ -119,9 +106,6 @@ h1 { font-family: var(--font-code); font-weight: 800; font-size: 2.5rem; letter-
 h1 span { color: var(--danger); }
 .meta-data { font-size: 0.8rem; color: var(--dim); text-align: right; font-family: var(--font-code); }
 
-/* =========================================
-   4. LAYOUT SECTIONS
-   ========================================= */
 .hero-section {
     display: flex; justify-content: center; align-items: center;
     padding: 1rem 0; margin-bottom: 1rem;
@@ -137,9 +121,6 @@ h1 span { color: var(--danger); }
     .intel-grid { grid-template-columns: 1fr; }
 }
 
-/* =========================================
-   5. ID CARD STYLE
-   ========================================= */
 .id-card-container {
     width: 420px; perspective: 1000px; z-index: 10;
 }
@@ -207,9 +188,6 @@ h1 span { color: var(--danger); }
 .chip::before { top: 50%; left: 0; width: 100%; height: 1px; }
 .chip::after { left: 50%; top: 0; height: 100%; width: 1px; }
 
-/* =========================================
-   6. DATA PANELS & DECRYPTION
-   ========================================= */
 .panel {
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.05);
@@ -237,12 +215,10 @@ h1 span { color: var(--danger); }
 }
 .log-entry:hover { border-left-color: var(--primary); color: #ccc; padding-left: 15px; }
 
-/* Audio Viz */
 .audio-viz { display: flex; gap: 2px; height: 20px; align-items: flex-end; }
 .bar { width: 3px; background: var(--danger); animation: equalize 0.5s infinite; }
 @keyframes equalize { 0% {height: 20%;} 50% {height: 100%;} 100% {height: 20%;} }
 
-/* OPS TABLE STYLES */
 .ops-table {
     width: 100%; border-collapse: collapse; font-family: var(--font-code); font-size: 0.85rem; margin-top: 10px;
 }
@@ -258,18 +234,12 @@ h1 span { color: var(--danger); }
 .st-fail { background: rgba(255, 51, 51, 0.15); color: var(--danger); border: 1px solid var(--danger); }
 .st-pending { background: rgba(238, 187, 0, 0.15); color: var(--warning); border: 1px solid var(--warning); }
 
-/* Footer */
 .footer { margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; display: flex; justify-content: space-between; color: var(--dim); font-size: 0.8rem; }
 .blink { animation: blink 1s infinite; }
 @keyframes blink { 50% {opacity: 0;} }
 
-/* UTILS */
 .text-danger { color: var(--danger) !important; }
 .text-warning { color: var(--warning) !important; }
-
-/* =========================================
-   DATABASE TERMINAL STYLES
-   ========================================= */
 
 :root {
     --terminal-bg: #080a0c;
@@ -280,7 +250,6 @@ h1 span { color: var(--danger); }
     --glass-panel: rgba(10, 15, 20, 0.85);
 }
 
-/* --- LAYOUT PRINCIPAL --- */
 .terminal {
     max-width: 1200px;
     margin: 0 auto;
@@ -308,7 +277,6 @@ h1 span { color: var(--danger); }
 .secured { color: var(--terminal-green); text-shadow: 0 0 10px rgba(0,255,157,0.3); }
 .encrypted { color: var(--terminal-red); }
 
-/* --- ORGANIGRAMME (PARTIE HAUTE) --- */
 .org-chart {
     display: flex;
     flex-direction: column;
@@ -317,11 +285,10 @@ h1 span { color: var(--danger); }
     position: relative;
 }
 
-/* Connecteurs (Lignes) */
 .org-chart::before {
     content: '';
     position: absolute;
-    top: 120px; /* Ajuster selon la hauteur de la boite du chef */
+    top: 120px;
     width: 2px;
     height: 40px;
     background: var(--terminal-dim);
@@ -334,14 +301,13 @@ h1 span { color: var(--danger); }
     margin-top: 40px;
     position: relative;
 }
-/* Ligne horizontale connectant les lieutenants */
 .chart-sub::before {
     content: '';
     position: absolute;
     top: -20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 60%; /* Largeur de la ligne horizontale */
+    width: 60%;
     height: 2px;
     background: var(--terminal-dim);
 }
@@ -356,8 +322,6 @@ h1 span { color: var(--danger); }
     background: var(--terminal-dim);
 }
 
-
-/* --- CARTES AGENTS (NODES) --- */
 .chart-node {
     background: var(--glass-panel);
     border: 1px solid var(--terminal-dim);
@@ -376,7 +340,6 @@ h1 span { color: var(--danger); }
     box-shadow: 0 8px 20px rgba(0, 255, 157, 0.1);
 }
 
-/* Styles spécifiques par rang */
 .lead {
     border-top: 3px solid var(--terminal-gold);
     width: 280px;
@@ -384,12 +347,10 @@ h1 span { color: var(--danger); }
 .lead .role { color: var(--terminal-gold); }
 
 .subordinate {
-    border-top: 3px solid var(--terminal-green); /* Ou Cyan pour les Lieutenants */
+    border-top: 3px solid var(--terminal-green);
 }
 .subordinate .role { color: var(--terminal-green); }
 
-
-/* Contenu de la carte */
 .role {
     font-size: 0.7rem;
     letter-spacing: 2px;
@@ -405,7 +366,6 @@ h1 span { color: var(--danger); }
     text-transform: uppercase;
 }
 
-/* --- GRILLE DES OPÉRATEURS (BAS) --- */
 .operators-section {
     margin-top: 60px;
 }
@@ -426,16 +386,14 @@ h1 span { color: var(--danger); }
 }
 
 .team-member {
-    width: 100%; /* S'adapte à la grille */
-    border-left: 2px solid var(--terminal-dim); /* Bordure latérale style militaire */
+    width: 100%;
+    border-left: 2px solid var(--terminal-dim);
     border-top: none;
     text-align: left;
 }
 .team-member .name { font-size: 1rem; }
 .team-member .role { font-size: 0.65rem; }
 
-
-/* --- BOUTONS D'ACTION --- */
 .action-button {
     display: block;
     text-decoration: none;
@@ -455,7 +413,6 @@ h1 span { color: var(--danger); }
     border-color: #fff;
 }
 
-/* --- COULEURS DE STATUT (Classes dynamiques JS) --- */
 .status-green {
     color: var(--terminal-green) !important;
     border-color: var(--terminal-green) !important;
@@ -473,7 +430,6 @@ h1 span { color: var(--danger); }
     border-color: #555 !important;
 }
 
-/* --- FOOTER --- */
 .portal-footer {
     margin-top: 60px;
     text-align: center;
@@ -488,3 +444,71 @@ h1 span { color: var(--danger); }
     transition: color 0.3s;
 }
 .back-link:hover { color: var(--terminal-red); }
+
+.director-container,
+.ltn-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    z-index: 2; 
+}
+
+.director-container {
+    margin-bottom: 50px;
+}
+
+.ltn-container {
+    gap: 60px; 
+    margin-bottom: 50px;
+}
+
+.director-container::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 50px;
+    background-color: var(--dim);
+    z-index: 1;
+}
+
+.ltn-container::before {
+    content: '';
+    position: absolute;
+    top: -25px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 55%; 
+    height: 2px;
+    background-color: var(--dim);
+    z-index: 1;
+}
+
+.ltn-container .node {
+    position: relative;
+}
+
+.ltn-container .node::before {
+    content: '';
+    position: absolute;
+    top: -25px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 25px;
+    background-color: var(--dim);
+}
+
+.ltn-container::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 50px;
+    background-color: var(--dim);
+    z-index: 1;
+}

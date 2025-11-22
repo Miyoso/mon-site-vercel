@@ -29,10 +29,9 @@
             </div>
         </div>
 
-        <div class="tree-line-vert"></div>
-        <div class="tree-line-horiz"></div>
+     
 
-        <div class="ltn-container">
+       
             <div class="node node-ltn" id="node-javier">
                 <span class="role-label">LIEUTENANT (ARMOR)</span>
                 <div class="agent-name">...</div>
@@ -44,9 +43,9 @@
                 <div class="agent-name">...</div>
                 <a href="#" class="btn-link">PROFIL ></a>
             </div>
-        </div>
+    
 
-        <div class="tree-line-vert" style="height: 40px;"></div>
+       
         <div class="squad-label">// UNITÉS SPÉCIALISÉES & SOUTIEN TACTIQUE</div>
 
         <div class="squad-grid" id="squad-grid">
@@ -63,58 +62,54 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const gridContainer = document.getElementById('squad-grid');
             
-            // Références aux 3 boites fixes du haut
+           
             const boxGraves = document.getElementById('node-graves');
             const boxJavier = document.getElementById('node-javier');
             const boxJi = document.getElementById('node-ji');
 
             try {
-                // Récupération des données API
+          
                 const response = await fetch('/api/read?resource=agents');
                 const rawData = await response.json();
                 
-                // Gestion des différents formats possibles de l'API
+          
                 let agents = rawData.agents || rawData.rows || (Array.isArray(rawData) ? rawData : []);
 
                 if (agents.length > 0) {
                     let gridHTML = '';
                     
-                    // On trie par ID pour avoir un ordre logique
+               
                     agents.sort((a, b) => a.id - b.id);
 
                     agents.forEach(agent => {
-                        // Nettoyage de l'URL (enlève le slash au début si présent)
+                      
                         let cleanUrl = (agent.profile_url || '#').replace(/^\//, '');
 
-                        // --- 1. REMPLISSAGE DES CHEFS (HAUT DE PAGE) ---
-                        // Si c'est Graves (ID 1)
+                   
                         if (agent.id === 1) { 
                             boxGraves.querySelector('.agent-name').textContent = agent.name;
                             boxGraves.querySelector('a').href = cleanUrl;
-                            return; // On arrête là pour lui, il ne va pas dans la grille
+                            return; 
                         }
-                        // Si c'est Javier (ID 3)
+                     
                         if (agent.id === 3) { 
                             boxJavier.querySelector('.agent-name').textContent = agent.name;
                             boxJavier.querySelector('a').href = cleanUrl;
                             return;
                         }
-                        // Si c'est Ji / Jackal (ID 18)
+                
                         if (agent.id === 18) { 
                             boxJi.querySelector('.agent-name').textContent = agent.name;
                             boxJi.querySelector('a').href = cleanUrl;
                             return;
-                        }
-
-                        // --- 2. GÉNÉRATION DE LA GRILLE (SOLDATS) ---
+                        }  
                         
-                        // Définition du style (Couleurs des bordures)
-                        let borderClass = ''; // par défaut gris
+                        let borderClass = ''; 
                         let roleLabel = 'OPERATOR';
                         let btnText = 'VOIR >';
                         let btnStyle = '';
 
-                        // Logique de couleur basée sur la classe CSS renvoyée par la DB
+                  
                         if (agent.css_class === 'decrypted') {
                             borderClass = 'border-green';
                             roleLabel = 'ACTIF';
@@ -125,7 +120,7 @@
                             btnStyle = 'border-color:var(--danger); color:var(--danger);';
                         } 
 
-                        // Styles Spéciaux basés sur le nom (Optionnel, pour le look)
+                     
                         const nameLower = agent.name.toLowerCase();
                         if(nameLower.includes('cazares')) {
                             borderClass = 'border-yellow';
@@ -140,7 +135,7 @@
                             roleLabel = 'CYBER-WARFARE';
                         }
 
-                        // Création de la carte HTML
+                    
                         gridHTML += `
                             <div class="node node-soldier ${borderClass}">
                                 <span class="role-label">${roleLabel}</span>
@@ -151,7 +146,7 @@
                         `;
                     });
 
-                    // Injection dans la page
+                    
                     gridContainer.innerHTML = gridHTML;
                 } else {
                     gridContainer.innerHTML = '<div style="color:var(--danger)">[ERREUR : AUCUNE DONNÉE]</div>';
