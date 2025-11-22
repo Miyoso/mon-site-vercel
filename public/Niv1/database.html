@@ -64,71 +64,82 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const gridContainer = document.getElementById('operators-grid-container');
             
-       
-            const gravesBox = document.getElementById('agent-box-graves');
-            const javierBox = document.getElementById('agent-box-javier');
-            const jiBox = document.getElementById('agent-box-ji');
+            // Références aux boîtes de l'organigramme
+            const boxes = {
+                1: document.getElementById('agent-box-graves'),
+                3: document.getElementById('agent-box-javier'),
+                18: document.getElementById('agent-box-ji')
+            };
 
             try {
-    
+                console.log("Tentative de connexion à l'API...");
                 const response = await fetch('/api/read?resource=agents');
-                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
 
-                if (data.agents && data.agents.length > 0) {
+                const rawData = await response.json();
+                console.log("Données reçues (Debug):", rawData);
+
+               
+                let agents = [];
+                if (rawData.agents) {
+                    agents = rawData.agents;
+                } else if (rawData.rows) {
+                    agents = rawData.rows;
+                } else if (Array.isArray(rawData)) {
+                    agents = rawData;
+                }
+
+                if (agents && agents.length > 0) {
                     
                     let gridHTML = '';
-          
-                    data.agents.sort((a, b) => a.id - b.id);
+                    agents.sort((a, b) => a.id - b.id); 
 
-                    data.agents.forEach(agent => {
-                        
+                    agents.forEach(agent => {
                         
                         let cleanProfileUrl = (agent.profile_url || '#').replace(/^\//, '');
-                        
-                      
-                        if (agent.id === 1 || agent.id === 3 || agent.id === 18) {
-                            let box;
-                            if (agent.id === 1) box = gravesBox;
-                            if (agent.id === 3) box = javierBox;
-                            if (agent.id === 18) box = jiBox;
+
+                       
+                        if (boxes[agent.id]) {
+                            const box = boxes[agent.id];
+                            box.querySelector('.name').textContent = agent.name;
+                            box.querySelector('a').href = cleanProfileUrl;
                             
-                            if(box) {
-                                box.querySelector('.name').textContent = agent.name;
-                                box.querySelector('a').href = cleanProfileUrl; 
-                                
-                               
-                                const btn = box.querySelector('.action-button');
-                                if (agent.status_text && agent.status_text.includes("SCELLÉ")) {
-                                    btn.textContent = "[DOSSIER SCELLÉ]";
-                                    btn.style.color = "var(--terminal-red)";
-                                    btn.style.borderColor = "var(--terminal-red)";
-                                } else {
-                                    btn.textContent = "[ACCÈS AUTORISÉ]";
-                                }
+                           
+                            const btn = box.querySelector('.action-button');
+                            if (agent.status_text && agent.status_text.includes("SCELLÉ")) {
+                                btn.textContent = "[DOSSIER SCELLÉ]";
+                                btn.style.color = "#ff3333"; // Rouge
+                                btn.style.borderColor = "#ff3333";
+                            } else {
+                                btn.textContent = "[ACCÈS AUTORISÉ]";
                             }
+                           
                             return; 
                         }
 
+                       
                         
+                     
                         const parts = agent.status_text ? agent.status_text.split('::') : ['UNKNOWN'];
                         let buttonText = parts.length > 1 ? parts[1].trim() : parts[0];
                         
+                        // Raccourcis visuels
                         if (buttonText === 'DOSSIER SCELLÉ') buttonText = 'SCELLÉ';
                         if (buttonText === 'STATUT NON-SANCTIONNÉ') buttonText = 'N/A';
 
-                        // Définition de la couleur selon le CSS renvoyé par la DB
+                        // Couleurs
                         let colorClass = 'status-gray';
-                        if (agent.css_class === 'decrypted') {
-                            colorClass = 'status-green';
-                        } else if (agent.css_class === 'corrupted') {
-                            colorClass = 'status-red';
-                        }
+                        if (agent.css_class === 'decrypted') colorClass = 'status-green';
+                        else if (agent.css_class === 'corrupted') colorClass = 'status-red';
                         
                         gridHTML += `
                             <div class="chart-node team-member ${agent.css_class || ''}">
                                 <div class="role">[AGENT_STD]</div>
                                 <div class="name">${agent.name}</div>
-                                <a href="${cleanProfileUrl}" class="action-button ${colorClass}" data-id="${agent.id}">
+                                <a href="${cleanProfileUrl}" class="action-button ${colorClass}">
                                     [${buttonText}]
                                 </a>
                             </div>
@@ -138,11 +149,13 @@
                     gridContainer.innerHTML = gridHTML;
 
                 } else {
-                    gridContainer.innerHTML = '<p style="color:red;">[ERREUR: AUCUNE DONNÉE AGENT]</p>';
+                    console.warn("Tableau 'agents' vide ou introuvable.");
+                    gridContainer.innerHTML = '<p style="color:red;">[ERREUR: AUCUNE DONNÉE AGENT TROUVÉE]</p>';
                 }
+
             } catch (error) {
-                console.error('Erreur lors de la récupération des agents:', error);
-                gridContainer.innerHTML = '<p style="color:red;">[ERREUR DE CONNEXION AU SERVEUR]</p>';
+                console.error('Erreur critique:', error);
+                gridContainer.innerHTML = `<p style="color:red;">[ERREUR SYSTÈME: ${error.message}]</p>`;
             }
         });
     </script>
