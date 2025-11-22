@@ -3,414 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dossier Agent :: Raphaëlle Arsenault</title>
-
-    <link rel="stylesheet" href="../../css/style-mo.css">
-    <link rel="stylesheet" href="../../css/style-agent.css">
+    <title>SHADOW CO. :: AGENT [ARSENAULT]</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Share+Tech+Mono&family=Libre+Barcode+128+Text&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
 
-    <style>
-        /* =========================================
-           STYLES LOCAUX (Adaptation spécifique)
-           ========================================= */
-        :root {
-            --profile-accent: var(--primary); /* Vert par défaut */
-        }
-
-        body {
-            /* Utilisation du background global mais forcé en noir pour le dossier */
-            background-color: #050505;
-            background-image: 
-                linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 157, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
-            display: block; /* Reset du flex center du body global */
-            padding: 40px 20px;
-        }
-
-        .dossier-wrapper {
-            max-width: 1000px;
-            margin: 0 auto;
-            border: 1px solid var(--dim);
-            background: rgba(10, 12, 15, 0.95);
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
-            padding: 0; /* Le padding est géré par les sections */
-        }
-
-        /* HEADER */
-        .dossier-header {
-            background: rgba(0, 20, 10, 0.8);
-            border-bottom: 1px solid var(--dim);
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: var(--font-ui);
-        }
-        .rec-indicator {
-            color: var(--danger);
-            animation: pulse 2s infinite;
-            font-weight: bold;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .rec-dot { width: 10px; height: 10px; background: var(--danger); border-radius: 50%; display: inline-block; }
-
-        /* TERMINAL LOG */
-        .terminal-log {
-            padding: 20px 25px;
-            font-family: var(--font-code);
-            font-size: 0.85rem;
-            color: #aaa;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .cmd-line { color: var(--primary); }
-        .cursor::after { content: '_'; animation: blink 1s step-start infinite; }
-
-        /* SECTIONS */
-        .section-block {
-            margin: 25px;
-            border: 1px solid var(--dim);
-            background: rgba(20, 25, 30, 0.4);
-            position: relative;
-        }
-        .section-title {
-            background: rgba(255,255,255,0.03);
-            padding: 10px 15px;
-            font-family: var(--font-ui);
-            font-size: 1.1rem;
-            color: #fff;
-            border-bottom: 1px solid var(--dim);
-            display: flex; align-items: center; gap: 10px;
-        }
-
-        /* SECTION 1: ID */
-        .id-layout {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            padding: 20px;
-        }
-        .id-info { flex: 1; min-width: 300px; }
-        .id-row {
-            display: grid;
-            grid-template-columns: 140px 1fr;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-family: var(--font-code);
-            font-size: 0.9rem;
-        }
-        .label { color: var(--dim); text-transform: uppercase; }
-        .value { color: #fff; letter-spacing: 1px; }
-        .status-active { color: var(--warning); font-weight: bold; }
-
-        /* PHOTO FRAME */
-        .photo-container {
-            width: 180px;
-            height: 220px;
-            border: 1px solid var(--primary);
-            padding: 5px;
-            background: rgba(0, 255, 157, 0.05);
-            position: relative;
-        }
-        .photo-inner {
-            width: 100%; height: 100%;
-            background: #000;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
-        .photo-placeholder {
-            color: var(--primary);
-            font-family: var(--font-ui);
-            font-size: 0.8rem;
-            z-index: 2;
-        }
-        /* Scanline effect sur la photo */
-        .photo-scanline {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, rgba(0,255,157,0.2), transparent);
-            animation: scan 3s linear infinite;
-            pointer-events: none;
-        }
-
-        /* SECTION 2: COLUMNS */
-        .cols-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-        .col-box {
-            padding: 15px;
-            border: 1px solid var(--dim);
-            background: rgba(0,0,0,0.3);
-        }
-        .col-title {
-            font-family: var(--font-ui);
-            font-size: 1rem;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid var(--dim);
-            text-transform: uppercase;
-        }
-        .col-list {
-            list-style: none;
-            font-family: var(--font-code);
-            font-size: 0.85rem;
-            line-height: 1.6;
-        }
-        .col-list li { display: flex; justify-content: space-between; }
-        
-        /* Styles spécifiques par colonne */
-        .style-cyan { border-color: var(--secondary); }
-        .style-cyan .col-title { color: var(--secondary); border-color: rgba(0, 243, 255, 0.3); }
-        
-        .style-green { border-color: var(--primary); }
-        .style-green .col-title { color: var(--primary); border-color: rgba(0, 255, 157, 0.3); }
-        
-        .style-yellow { border-color: var(--warning); }
-        .style-yellow .col-title { color: var(--warning); border-color: rgba(238, 187, 0, 0.3); }
-
-        /* SECTION 3: RED / RESTRICTED */
-        .section-danger { border-color: var(--danger); background: rgba(255, 51, 51, 0.05); }
-        .section-danger .section-title { color: var(--danger); border-color: rgba(255, 51, 51, 0.3); }
-        .restricted-badge {
-            position: absolute; top: 0; right: 0;
-            background: var(--danger); color: #000;
-            font-size: 0.7rem; padding: 2px 8px; font-weight: bold;
-        }
-        .text-content {
-            padding: 20px;
-            font-family: var(--font-code);
-            font-size: 0.9rem;
-            color: #ddd;
-            line-height: 1.5;
-        }
-        .sub-header { color: var(--danger); font-size: 0.8rem; margin-bottom: 5px; display: block; opacity: 0.8; }
-
-        /* SECTION 4: YELLOW / CONFIDENTIAL */
-        .section-warning { border-color: var(--warning); background: rgba(238, 187, 0, 0.05); overflow: hidden; }
-        .section-warning .section-title { color: var(--warning); border-color: rgba(238, 187, 0, 0.3); }
-        .confidential-overlay {
-            position: absolute; inset: 0;
-            display: flex; align-items: center; justify-content: center;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .stamp {
-            border: 4px solid rgba(255, 51, 51, 0.2);
-            color: rgba(255, 51, 51, 0.2);
-            font-size: 3rem; font-weight: bold;
-            padding: 10px 40px;
-            transform: rotate(-15deg);
-            font-family: var(--font-ui);
-            text-transform: uppercase;
-        }
-        .blurred-content {
-            filter: blur(1.5px);
-            transition: filter 0.5s;
-        }
-        .blurred-content:hover { filter: blur(0); }
-
-        /* FOOTER */
-        .dossier-footer {
-            padding: 20px;
-            border-top: 1px solid var(--dim);
-            display: flex; justify-content: space-between; align-items: end;
-        }
-        .btn-return {
-            text-decoration: none;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 8px 16px;
-            font-family: var(--font-ui);
-            font-size: 0.8rem;
-            transition: 0.2s;
-            background: rgba(0,255,157,0.05);
-        }
-        .btn-return:hover {
-            background: var(--primary);
-            color: #000;
-            box-shadow: 0 0 15px var(--primary);
-        }
-
-        /* ANIMATIONS */
-        @keyframes scan { 0% { top: -100%; } 100% { top: 100%; } }
-        @keyframes blink { 50% { opacity: 0; } }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-    </style>
 </head>
 <body>
 
-    <div class="dossier-wrapper">
-        
-        <header class="dossier-header">
-            <span class="tracking-widest">[TERMINAL SÉCURISÉ // ACCÈS NIVEAU 3]</span>
-            <div class="rec-indicator">
-                <span class="rec-dot"></span> REC
-            </div>
-        </header>
+    <div class="crt-overlay"></div>
 
-        <div class="terminal-log">
-            <div><span class="cmd-line">$</span> load --dossier=AGENT_ARSENAULT_R</div>
-            <div style="color: var(--secondary); margin-top: 5px;">... Chargement du dossier ...</div>
-            <div style="color: var(--primary); margin-top: 5px;">Authentification réussie. Affichage des données.</div>
-            <div style="margin-top: 5px;"><span class="cmd-line">$</span> <span class="cursor"></span></div>
-        </div>
+    <div id="boot-screen">
+        <div class="boot-text">ACCESSING PERSONNEL FILE...</div>
+        <div class="progress-bar"><div class="progress-fill" style="background: var(--primary);"></div></div>
+        <div style="margin-top: 10px; font-size: 0.8rem; color: #555;">ID: AR-0026 // CLEARANCE: GRANTED</div>
+    </div>
 
-        <section class="section-block">
-            <div class="section-title">
-                <span style="color: var(--primary)">></span> [SECTION 01 : IDENTIFICATION]
-            </div>
-            <div style="position: absolute; top: 10px; right: 10px; font-size: 0.7rem; color: var(--dim);">ID_REF: AR-0026</div>
-
-            <div class="id-layout">
-                <div class="id-info">
-                    <div class="id-row">
-                        <span class="label">NOM DE L'AGENT</span>
-                        <span class="value" style="font-weight: bold; font-size: 1.1rem;">ARSENAULT, RAPHAËLLE</span>
-                    </div>
-                    <div class="id-row">
-                        <span class="label">ÂGE</span>
-                        <span class="value">26 ans</span>
-                    </div>
-                    <div class="id-row">
-                        <span class="label">ORIGINE</span>
-                        <span class="value">Québec, Canada</span>
-                    </div>
-                    <div class="id-row">
-                        <span class="label">RÉSIDENCE</span>
-                        <span class="value">QG SAS (Aile Sud)</span>
-                    </div>
-                    <div class="id-row" style="border-bottom: none;">
-                        <span class="label">STATUT</span>
-                        <span class="value status-active">[ ACTIVE (Protection du Gouverneur) ]</span>
-                    </div>
-                </div>
-
-                <div class="photo-container">
-                    <div class="photo-inner">
-                        <span class="photo-placeholder">[PORTRAIT AR-0026]</span>
-                        <div class="photo-scanline"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section-block">
-            <div class="section-title">
-                <span style="color: var(--primary)">></span> [SECTION 02 : PROFIL PHYSIQUE & PSYCHOLOGIQUE]
-            </div>
+    <div class="terminal-wrapper">
+        <main class="terminal">
             
-            <div class="cols-3">
-                <div class="col-box style-cyan">
-                    <div class="col-title">// PHYSIQUE</div>
-                    <ul class="col-list">
-                        <li><span style="color: var(--dim)">CHEVEUX:</span> <span>Rouge intense</span></li>
-                        <li><span style="color: var(--dim)">YEUX:</span> <span>Vert / Gris</span></li>
-                        <li><span style="color: var(--dim)">SIGNES:</span> <span>Taches de rousseur</span></li>
-                        <li><span style="color: var(--dim)">POSTURE:</span> <span>Militaire, rigide</span></li>
-                    </ul>
+            <header class="header-strip">
+                <div>
+                    <h1>DOSSIER :: <span>ARSENAULT</span></h1>
+                    <div style="color: var(--primary); font-size: 0.9rem; letter-spacing: 3px;">SHADOW COMPANY // PROTECTION</div>
                 </div>
-
-                <div class="col-box style-green">
-                    <div class="col-title">// QUALITÉS (ASSETS)</div>
-                    <ul class="col-list" style="list-style: disc inside; color: rgba(255,255,255,0.8);">
-                        <li>Courageuse</li>
-                        <li>Loyale</li>
-                        <li>Perspicace</li>
-                        <li>Disciplinée</li>
-                        <li>Méthodique</li>
-                        <li>Protectrice</li>
-                        <li>Adaptable</li>
-                    </ul>
+                <div class="meta-data">
+                    <div>SRC: QUEBEC STATION</div>
+                    <div>REQ ID: <span class="blink">_AR-0026</span></div>
                 </div>
+            </header>
 
-                <div class="col-box style-yellow">
-                    <div class="col-title">// DÉFAUTS (LIABILITIES)</div>
-                    <ul class="col-list" style="list-style: disc inside; color: rgba(238, 187, 0, 0.8);">
-                        <li>Méfiance (Paranoïa)</li>
-                        <li>Manipulatrice</li>
-                        <li>Froideur (Défense)</li>
-                        <li>Impulsive (Sujet: Frère)</li>
-                        <li>Culpabilité latente</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+            <section class="hero-section">
+                <div class="id-card-container">
+                    <div class="id-card" id="card">
+                        <div class="holo-overlay"></div>
+                        
+                        <div class="card-header">
+                            <div class="card-logo-text">SHADOW CO.</div>
+                            <div class="security-level" style="background: var(--primary); color: #000;">ACTIVE</div>
+                        </div>
+            
+                        <div class="card-body">
+                            <div class="photo-box">
+                                <div style="width:100%; height:100%; background:#111; display:flex; justify-content:center; align-items:center; color:#555; font-size:0.7rem; text-align:center; border: 1px solid #333;">
+                                    IMAGE<br>REDACTED
+                                </div>
+                            </div>
+                            <div class="agent-info">
+                                <div class="card-label">NOM COMPLET</div>
+                                <div class="card-value">RAPHAËLLE ARSENAULT</div>
+                                
+                                <div class="card-label">UNITÉ</div>
+                                <div class="card-value text-danger">PROTECTION VIP</div>
 
-        <section class="section-block section-danger">
-            <div class="restricted-badge">NIVEAU 5 REQUIS</div>
-            <div class="section-title">
-                <span style="margin-right: 10px;">🔒</span> [SECTION 03 : NOTES DE TERRAIN]
-            </div>
-
-            <div class="text-content">
-                <div style="margin-bottom: 20px;">
-                    <span class="sub-header">// SIGNES DISTINCTIFS</span>
-                    <p>
-                        Le sujet présente une fixation orale marquée, se manifestant par la mastication constante de chewing-gum (menthe) ou l'utilisation d'un cure-dent. On note également un anthropomorphisme prononcé envers son équipement, ayant notamment donné le nom "Charlie" à son arme de service. Porte en permanence une plaque militaire rayée d'origine inconnue, dont la valeur sentimentale semble élevée.
-                    </p>
-                </div>
-                <div style="border-top: 1px solid rgba(255, 51, 51, 0.2); padding-top: 15px;">
-                    <span class="sub-header">// COMPORTEMENT</span>
-                    <p>
-                        Réaction négative immédiate à tout contact physique non sollicité. Insomnies récurrentes signalées, probablement liées à des psychotraumatismes antérieurs non traités. Recherche activement la solitude et l'observation silencieuse. Semble apaisée par les conditions météorologiques pluvieuses.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <section class="section-block section-warning">
-            <div class="restricted-badge" style="background: var(--warning); color: #000;">NIVEAU 7 REQUIS</div>
-            <div class="section-title">
-                <span style="margin-right: 10px;">⚠️</span> [SECTION 04 : ANALYSE & SURVEILLANCE]
-            </div>
-
-            <div style="position: relative; padding: 20px;">
-                <div class="confidential-overlay">
-                    <div class="stamp">CONFIDENTIEL</div>
-                </div>
-
-                <div class="text-content blurred-content" style="color: var(--warning);">
-                    <span class="sub-header" style="color: var(--warning);">// SURVEILLANCE CONTINUE REQUISE</span>
-                    <p style="opacity: 0.9;">
-                        Sujet garde en permanence sur lui un carnet noir dont le contenu reste inconnu à ce jour. Tentatives d'accès infructueuses. Rire rare, souvent déclenché par le sarcasme ou des situations absurdes en mission. Potentiel de volatilité émotionnelle élevé si son cercle proche est menacé.
-                    </p>
-                    <div style="margin-top: 15px; border-top: 1px solid rgba(238,187,0,0.3); padding-top: 10px; font-style: italic; opacity: 0.7;">
-                        [NOTE PSY]: "Sa loyauté est sa plus grande force, mais aussi son point de rupture le plus évident."
+                                <div class="card-label">CLEARANCE ID</div>
+                                <div class="card-code">LVL-4-SEC</div>
+                            </div>
+                        </div>
+            
+                        <div class="card-footer">
+                            <div class="barcode" style="font-family: 'Libre Barcode 128 Text', cursive;">ARSENAULT26</div>
+                            <div class="chip"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <footer class="dossier-footer">
-            <div style="font-family: var(--font-code); font-size: 0.7rem; color: var(--dim);">
-                SESSION ID: <span id="session-id">...</span><br>
-                STATUS: ACTIVE_MONITORING
-            </div>
-            <a href="../database.html" class="btn-return">
-                << RETURN_TO_DATABASE
-            </a>
-        </footer>
+            <section class="intel-grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">BIO_METRICS</span>
+                        <div class="audio-viz">
+                            <div class="bar" style="animation-delay:0s"></div>
+                            <div class="bar" style="animation-delay:0.1s"></div>
+                            <div class="bar" style="animation-delay:0.2s"></div>
+                            <div class="bar" style="animation-delay:0.3s"></div>
+                        </div>
+                    </div>
+                    <div class="log-entry">
+                        <span class="label">ORIGINE:</span><br>
+                        <span>QUÉBEC, CANADA</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="label">ÂGE:</span><br>
+                        <span class="redacted" data-real="26 ANS" data-scramble="XX ANS"></span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="label">SIGNES DISTINCTIFS:</span><br>
+                        <span class="redacted text-warning" data-real="CHEVEUX ROUX / TACHES ROUSSEUR" data-scramble="CLASSIFIED"></span>
+                    </div>
+                </div>
 
+                <div class="panel">
+                    <div class="panel-header">
+                        <span class="panel-title">ÉVALUATION</span>
+                        <span style="color:var(--secondary); font-size:0.7rem;">PSY_PROFILE</span>
+                    </div>
+                    
+                    <div class="log-entry">
+                         <span class="label">ATOUTS MAJEURS:</span><br>
+                         <span style="color: var(--primary)">[+] 
+                             <span class="redacted" style="color:var(--primary)" data-real="LOYALE / PROTECTRICE" data-scramble="ANALYSING..."></span>
+                         </span>
+                    </div>
+                    
+                    <div class="log-entry">
+                         <span class="label">DISCIPLINE:</span><br>
+                         <span style="color: var(--primary)">[+] 
+                             <span class="redacted" style="color:var(--primary)" data-real="MÉTHODIQUE" data-scramble="ANALYSING..."></span>
+                         </span>
+                    </div>
+
+                    <div class="log-entry">
+                         <span class="label">FAIBLESSES:</span><br>
+                         <span style="color: var(--danger)">[-] 
+                             <span class="redacted" style="color:var(--danger)" data-real="MÉFIANTE (PARANO)" data-scramble="ANALYSING..."></span>
+                         </span>
+                    </div>
+
+                    <div class="log-entry">
+                         <span class="label">RISQUE:</span><br>
+                         <span style="color: var(--danger)">[-] 
+                             <span class="redacted" style="color:var(--danger)" data-real="IMPULSIVE (SI PROVOQUÉE)" data-scramble="ANALYSING..."></span>
+                         </span>
+                    </div>
+
+                    <div style="margin-top: 15px; font-size: 0.75rem; color: #666; border-top: 1px dashed #444; padding-top: 10px;">
+                        // NOTE: SA LOYAUTÉ EST SA FORCE, MAIS AUSSI SON POINT DE RUPTURE.
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="logs-section" style="margin-top: 1.5rem;">
+                <div class="panel" style="border-color: var(--danger);">
+                    <div class="panel-header">
+                        <span class="panel-title text-danger">NOTES DE TERRAIN [COMPORTEMENT]</span>
+                        <span style="font-family: var(--font-code); font-size: 0.7rem; color: var(--danger);">RESTRICTED</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 10px; font-family: var(--font-code); font-size: 0.8rem; color: #aaa;">
+                        <div class="log-entry">
+                            <span class="label">FIXATION ORALE:</span><br>
+                            Mastication constante (Chewing-gum menthe) ou cure-dents.
+                        </div>
+                        <div class="log-entry">
+                            <span class="label">ANTHROPOMORPHISME:</span><br>
+                            A nommé son arme de service "CHARLIE". Attachement émotionnel à l'équipement.
+                        </div>
+                        <div class="log-entry">
+                            <span class="label">CONTACT PHYSIQUE:</span><br>
+                            <span class="text-danger">RÉACTION NÉGATIVE IMMÉDIATE</span> à tout contact non sollicité.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="logs-section">
+                <div class="panel" style="border-top: 2px solid var(--warning);">
+                    <div class="panel-header">
+                        <span class="panel-title">SURVEILLANCE CONTINUE</span>
+                        <span style="font-family: var(--font-code); font-size: 0.7rem;">LVL-7 EYES ONLY</span>
+                    </div>
+                    
+                    <table class="ops-table">
+                        <thead>
+                            <tr>
+                                <th width="20%">OBJET</th>
+                                <th width="40%">OBSERVATION</th>
+                                <th width="30%">ANALYSE</th>
+                                <th width="10%">STATUT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CARNET NOIR</td>
+                                <td>Gardé en permanence sur soi.</td>
+                                <td><span class="redacted" data-real="CONTENU INCONNU" data-scramble="SCANNING..."></span></td>
+                                <td><span class="status-badge st-fail">LOCKED</span></td>
+                            </tr>
+                            <tr>
+                                <td>PLAQUE MILITAIRE</td>
+                                <td>Rayée, origine inconnue.</td>
+                                <td><span class="redacted" data-real="VALEUR SENTIMENTALE" data-scramble="HISTORIQUE"></span></td>
+                                <td><span class="status-badge st-pending">UNKNOWN</span></td>
+                            </tr>
+                            <tr>
+                                <td>INSOMNIES</td>
+                                <td>Récurrentes.</td>
+                                <td><span class="redacted" data-real="PSYCHOTRAUMA" data-scramble="FATIGUE"></span></td>
+                                <td><span class="status-badge st-fail">CHRONIQUE</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <footer class="footer">
+                <div>SECURE TERMINAL V.4.0.2 // USR: GRAVES</div>
+                <div>
+                    <a href="index.html" class="text-secondary" style="text-decoration: none;">[ REVENIR AU DOSSIER MAÎTRE ]</a>
+                </div>
+            </footer>
+
+        </main>
     </div>
 
     <script>
-        // Petit script pour l'ID de session aléatoire (Effet visuel)
         document.addEventListener('DOMContentLoaded', () => {
-            const chars = 'ABCDEF0123456789';
-            let result = '';
-            for (let i = 0; i < 8; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            document.getElementById('session-id').textContent = 'ARS-' + result;
+            
+            // 1. BOOT SCREEN
+            const bootScreen = document.getElementById('boot-screen');
+            const bootText = document.querySelector('.boot-text');
+            
+            setTimeout(() => { bootText.textContent = "VERIFYING BIOMETRICS..."; }, 600);
+            setTimeout(() => { bootText.textContent = "ACCESS GRANTED."; }, 1400);
+            setTimeout(() => {
+                bootScreen.style.opacity = '0';
+                setTimeout(() => bootScreen.remove(), 1000);
+            }, 1800);
+
+            // 2. 3D CARD EFFECT
+            const card = document.getElementById('card');
+            const cardContainer = document.querySelector('.id-card-container');
+
+            cardContainer.addEventListener('mousemove', (e) => {
+                const rect = cardContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -10; 
+                const rotateY = ((x - centerX) / centerX) * 10;
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+            cardContainer.addEventListener('mouseleave', () => {
+                card.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
+            });
+
+            // 3. HACKER TEXT DECRYPTION
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
+            document.querySelectorAll('.redacted').forEach(element => {
+                element.textContent = element.getAttribute('data-scramble');
+                element.onmouseover = event => {
+                    let iterations = 0;
+                    const targetText = event.target.getAttribute('data-real');
+                    if(!targetText) return;
+                    const interval = setInterval(() => {
+                        event.target.textContent = targetText.split("").map((letter, index) => {
+                            if(index < iterations) return targetText[index];
+                            return letters[Math.floor(Math.random() * 43)]
+                        }).join("");
+                        if(iterations >= targetText.length) clearInterval(interval);
+                        iterations += 1 / 2;
+                    }, 30);
+                }
+                element.onmouseleave = event => {
+                   element.textContent = element.getAttribute('data-scramble');
+                }
+            });
         });
     </script>
-
 </body>
 </html>
