@@ -1,183 +1,156 @@
 /* =========================================
-   STYLE HIERARCHY (Basé sur style-mo.css)
+   STYLE HIERARCHY (Lignes Connectrices)
    ========================================= */
 
-/* Utilisation des variables globales de style-mo.css */
 :root {
     --card-bg: rgba(17, 20, 24, 0.95);
-    --gold: #d4af37;       /* Couleur unique pour le chef */
-    --line-color: var(--dim);
-}
-
-/* Layout spécifique à la page */
-body {
-    /* Surcharge légère pour centrer le contenu verticalement si besoin */
-    align-items: start; 
-    padding-top: 40px;
+    --gold: #d4af37;
+    --line-color: #445566; /* Couleur des lignes (var(--dim)) */
 }
 
 .wrapper {
     width: 100%;
-    max-width: 1100px;
+    max-width: 1000px;
     margin: 0 auto;
+    padding-bottom: 60px;
 }
 
-/* HEADER */
+/* --- HEADER --- */
 header {
     border-bottom: 1px solid var(--dim);
     padding-bottom: 15px;
-    margin-bottom: 50px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
+    margin-bottom: 40px;
+    display: flex; justify-content: space-between; align-items: flex-end;
 }
-header h1 {
-    font-family: var(--font-code);
-    font-size: 1.8rem;
-    color: #fff;
-    margin: 0;
-}
+header h1 { font-family: var(--font-code); font-size: 1.6rem; color: #fff; margin: 0; }
 
-/* --- LOGIQUE DE L'ARBRE (Connecteurs) --- */
+/* =========================================
+   LES LIGNES (ARBRE) - LE COEUR DU DESIGN
+   ========================================= */
+
+/* 1. La ligne verticale qui part du Directeur */
 .tree-line-vert {
     width: 1px;
     background: var(--line-color);
-    height: 30px;
+    height: 40px; /* Longueur de la ligne */
     margin: 0 auto;
 }
+
+/* 2. La ligne horizontale qui se sépare */
 .tree-line-horiz {
-    width: 50%;
+    width: 54%; /* Ajusté pour tomber pile au milieu des Lieutenants */
     height: 1px;
     background: var(--line-color);
-    margin: 0 auto 30px auto;
+    margin: 0 auto; /* Centré */
     position: relative;
 }
-/* Les petits traits verticaux aux extrémités de la ligne horizontale */
-.tree-line-horiz::before, .tree-line-horiz::after {
+
+/* 3. Les deux lignes verticales qui descendent vers les Lieutenants */
+.tree-line-horiz::before,
+.tree-line-horiz::after {
     content: '';
     position: absolute;
     top: 0;
     width: 1px;
-    height: 15px;
+    height: 30px; /* Hauteur de la descente vers les cartes */
     background: var(--line-color);
 }
+
+/* Positionnement des descentes aux extrémités de la barre horizontale */
 .tree-line-horiz::before { left: 0; }
 .tree-line-horiz::after { right: 0; }
 
 
-/* --- STYLES DES CARTES (NODES) --- */
+/* =========================================
+   LES CONTAINERS
+   ========================================= */
+
+/* Container Directeur */
+.director-container {
+    display: flex;
+    justify-content: center;
+    /* Pas de margin-bottom ici, la ligne verticale gère l'espace */
+}
+
+/* Container Lieutenants */
+.ltn-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Deux colonnes égales */
+    gap: 40px; /* Espace entre les deux cartes */
+    margin: 0 auto; /* margin-top à 0 car les lignes gèrent l'espace */
+    padding-top: 0; 
+    max-width: 800px;
+    position: relative;
+    top: -1px; /* Petite correction pour coller aux lignes */
+}
+
+
+/* =========================================
+   DESIGN DES CARTES (NODES)
+   ========================================= */
 .node {
     background: var(--card-bg);
     padding: 20px;
     position: relative;
     transition: all 0.3s ease;
     border: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 2; /* Pour passer au dessus des lignes si besoin */
 }
 .node:hover {
     background: #1a2026;
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
-/* Textes */
 .role-label {
     font-family: var(--font-ui);
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: block;
-    opacity: 0.8;
+    font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+    margin-bottom: 8px; display: block; opacity: 0.8;
 }
 .agent-name {
-    font-family: var(--font-code);
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: #fff;
-    margin-bottom: 15px;
+    font-family: var(--font-code); font-size: 1.2rem; font-weight: bold; color: #fff; margin-bottom: 10px;
 }
-.sub-info {
-    font-size: 0.8rem;
-    color: #888;
-    margin-bottom: 10px;
-    font-family: var(--font-ui);
-}
+.sub-info { font-size: 0.75rem; color: #666; margin-bottom: 15px; font-family: var(--font-ui); }
 
-/* Boutons */
 .btn-link {
-    text-decoration: none;
-    font-family: var(--font-ui);
-    font-size: 0.7rem;
-    border: 1px solid var(--dim);
-    padding: 6px 12px;
-    color: var(--dim);
-    transition: 0.2s;
-    display: inline-block;
-    letter-spacing: 1px;
+    text-decoration: none; font-family: var(--font-ui); font-size: 0.7rem;
+    border: 1px solid var(--dim); padding: 5px 10px; color: var(--dim);
+    transition: 0.2s; display: inline-block; letter-spacing: 1px;
 }
-.btn-link:hover {
-    border-color: #fff;
-    color: #fff;
-    background: rgba(255,255,255,0.05);
-}
+.btn-link:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
 
-/* --- NIVEAU 1 : LE CHEF (Graves) --- */
-.director-container {
-    display: flex;
-    justify-content: center;
-}
+/* Spécificités des Rangs */
 .node-director {
-    width: 400px;
-    text-align: center;
-    border-top: 3px solid var(--gold); /* Ligne Or */
+    width: 400px; text-align: center;
+    border-top: 3px solid var(--gold);
 }
 .node-director .role-label { color: var(--gold); }
-.node-director .agent-name { font-size: 1.8rem; }
 
-/* --- NIVEAU 2 : LIEUTENANTS (Javier / Ji) --- */
-.ltn-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    margin: 0 auto;
-    max-width: 900px;
-}
 .node-ltn {
     text-align: left;
-    border-top: 3px solid var(--secondary); /* Cyan de style-mo */
+    border-top: 3px solid var(--secondary);
 }
 .node-ltn .role-label { color: var(--secondary); }
 
-/* --- NIVEAU 3 : SOLDATS (Grille) --- */
+/* Grille Soldats (Bas de page) */
 .squad-label {
-    text-align: center;
-    font-family: var(--font-code);
-    font-size: 0.9rem;
-    color: var(--dim);
-    margin: 40px 0 20px 0;
-    letter-spacing: 1px;
+    text-align: center; font-family: var(--font-code);
+    font-size: 0.8rem; color: var(--dim);
+    margin: 50px 0 20px 0; letter-spacing: 1px;
+    /* Petite ligne de séparation */
+    border-top: 1px dashed #333;
+    padding-top: 20px;
 }
 
 .squad-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;
 }
 
-.node-soldier {
-    padding: 15px;
-    border-left: 3px solid var(--dim); /* Bordure GAUCHE par défaut */
-}
-.node-soldier .agent-name { font-size: 1.1rem; margin-bottom: 5px; }
+.node-soldier { padding: 15px; border-left: 3px solid var(--dim); }
+.node-soldier .agent-name { font-size: 1rem; margin-bottom: 5px; }
 
-/* Variantes de couleurs pour les soldats */
-.border-green { border-left-color: var(--primary); }
-.border-green .role-label { color: var(--primary); }
-
-.border-red { border-left-color: var(--danger); }
-.border-red .role-label { color: var(--danger); }
-.border-red .agent-name { color: #ffaAAA; }
-
-.border-yellow { border-left-color: var(--warning); }
-.border-yellow .role-label { color: var(--warning); }
+/* Couleurs dynamiques */
+.border-green { border-left-color: var(--primary); } .border-green .role-label { color: var(--primary); }
+.border-red { border-left-color: var(--danger); } .border-red .role-label { color: var(--danger); }
+.border-yellow { border-left-color: var(--warning); } .border-yellow .role-label { color: var(--warning); }
