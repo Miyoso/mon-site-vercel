@@ -318,125 +318,94 @@ h1 span { color: var(--danger); }
 }
 
 /* =========================================
-   CORRECTION : ORGANIGRAMME (LIGNES NÉON)
+   CORRECTION : ESPACEMENT & ALIGNEMENT
    ========================================= */
 
-/* --- 1. Conteneur du Chef (Graves) --- */
+/* 1. Le Chef (Graves) - On réduit la marge du bas */
 .director-container {
     position: relative;
-    margin-bottom: 40px; 
+    margin-bottom: 30px; /* Réduit de 40 à 30 pour remonter le tout */
     display: flex;
     justify-content: center;
 }
 
-/* Ligne verticale sous Graves */
 .director-container::after {
     content: '';
     position: absolute;
-    bottom: -40px; 
+    bottom: -30px; /* Doit correspondre au margin-bottom ci-dessus */
     left: 50%;
-    transform: translateX(-50%); /* Centrage parfait */
-    width: 2px; /* Un peu plus visible */
-    height: 40px;
-    background: var(--secondary); /* Cyan */
-    box-shadow: 0 0 10px var(--secondary); /* Effet Néon */
-    z-index: 0;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 30px;
+    background: var(--secondary);
+    box-shadow: 0 0 10px var(--secondary);
 }
 
-/* --- 2. Conteneur des Lieutenants --- */
+/* 2. Les Lieutenants - On resserre l'écart latéral */
 .ltn-container {
     position: relative;
     display: flex;
     justify-content: center;
-    gap: 100px; /* Espace entre les boites */
-    margin-bottom: 80px; /* Plus d'espace vers le bas pour les courbes */
-    padding-top: 0;
+    gap: 40px; /* BEAUCOUP plus serré (était 100px) */
+    margin-bottom: 40px; /* Réduit l'espace avec la grille du bas */
 }
 
-/* La barre horizontale au-dessus des Lieutenants */
+/* 3. La barre horizontale - RECALCULÉE pour l'écart de 40px */
 .ltn-container::before {
     content: '';
     position: absolute;
-    top: -40px;
+    top: -30px; /* Doit toucher la ligne du chef */
     left: 50%;
     transform: translateX(-50%);
     
-    /* CALCUL PRÉCIS : 
-       Largeur boite (220) + Ecart (100) = 320px de centre à centre.
-       On ajoute 2px pour l'épaisseur des lignes. */
-    width: 322px; 
+    /* MATHÉMATIQUES :
+       Largeur d'une boite (220px) / 2 = 110px
+       + Ecart (gap) = 40px
+       + Largeur d'une boite (220px) / 2 = 110px
+       TOTAL = 260px.
+       On met 262px pour assurer la jonction. */
+    width: 262px; 
     
     height: 2px;
     background: var(--secondary);
-    box-shadow: 0 0 10px var(--secondary);
-    z-index: 0;
+    box-shadow: 0 0 8px var(--secondary);
 }
 
-/* --- 3. Lignes verticales sur les têtes des Lieutenants --- */
+/* 4. Les petites lignes verticales sur les Lieutenants */
 .ltn-container .chart-node::before {
     content: '';
     position: absolute;
-    top: -40px; /* Doit toucher la barre du haut */
+    top: -30px; /* Monte jusqu'à la barre horizontale */
     left: 50%;
     transform: translateX(-50%);
     width: 2px;
-    height: 40px;
+    height: 30px;
     background: var(--secondary);
     box-shadow: 0 0 5px var(--secondary);
-    z-index: 0;
 }
 
-/* --- 4. Les Courbes du bas (Vers les squads) --- */
-/* On force la visibilité des lignes courbes */
-
-.branch-left {
+/* 5. Les tentacules du bas (Plus subtiles et verticales) */
+.branch-left, .branch-right {
     position: absolute;
-    bottom: -40px; /* Descend plus bas */
-    left: 20%;     /* Part du côté gauche de la boite */
-    width: 30%;    /* Largeur de la courbe */
-    height: 40px;
-    
-    /* STYLE NÉON */
-    border-left: 2px solid var(--secondary);
-    border-bottom: 0; /* Pas de ligne en bas, juste une courbe qui descend */
-    
-    /* Astuce pour faire une courbe style "chemin de fer" ou simple ligne */
-    /* Ici on fait une ligne qui part de la boite et descend vers la gauche */
-    transform: skewX(20deg); /* Donne l'angle */
-    background: linear-gradient(to bottom, var(--secondary), transparent);
-    width: 2px; /* Juste une ligne oblique */
-    box-shadow: 0 0 8px var(--secondary);
-    opacity: 0.8;
-}
-
-.branch-right {
-    position: absolute;
-    bottom: -40px;
-    right: 20%;
+    bottom: -25px; /* Moins long */
     width: 2px;
-    height: 40px;
-    
-    transform: skewX(-20deg); /* Angle opposé */
+    height: 25px;
     background: linear-gradient(to bottom, var(--secondary), transparent);
-    box-shadow: 0 0 8px var(--secondary);
-    opacity: 0.8;
+    box-shadow: 0 0 5px var(--secondary);
+    opacity: 0.6;
 }
 
-/* Pour simuler l'effet "Pieuvre" du dessin bleu (plusieurs lignes) */
-/* On ajoute des pseudo-éléments aux branches pour doubler les lignes */
-.branch-left::after {
-    content: ''; position: absolute; top: 0; left: -15px; width: 100%; height: 80%;
-    background: inherit; box-shadow: inherit;
-}
-.branch-right::after {
-    content: ''; position: absolute; top: 0; right: -15px; width: 100%; height: 80%;
-    background: inherit; box-shadow: inherit;
-}
+/* On les place plus au centre pour éviter l'effet "pattes d'araignée" */
+.branch-left { left: 40%; transform: skewX(10deg); }
+.branch-right { right: 40%; transform: skewX(-10deg); }
 
+
+/* 6. REMONTER LA SECTION DU BAS */
 .operators-section {
-    margin-top: 60px;
+    margin-top: 10px; /* Collé juste en dessous des tentacules */
+    padding-top: 20px;
+    border-top: 1px dashed rgba(0, 243, 255, 0.1); /* Ligne de séparation subtile */
 }
-
 .section-title {
     border-left: 4px solid var(--terminal-green);
     padding-left: 15px;
