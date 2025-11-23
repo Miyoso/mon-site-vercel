@@ -11,6 +11,98 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Libre+Barcode+128+Text&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        /* Surcharge de la largeur du terminal pour qu'il soit assez large pour les deux ailes */
+        .terminal-wrapper {
+            max-width: 1200px !important; /* Force la largeur pour éviter que ça coupe */
+        }
+
+        /* --- STYLES SPÉCIFIQUES HIÉRARCHIE V3 --- */
+        
+        /* Container global */
+        .org-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            padding-top: 10px;
+        }
+
+        /* NIVEAU 1 : COMMANDER */
+        .level-1 {
+            margin-bottom: 60px;
+            position: relative;
+        }
+        .level-1::after {
+            content: ''; position: absolute; bottom: -30px; left: 50%; width: 2px; height: 30px;
+            background: var(--secondary); box-shadow: 0 0 8px var(--secondary);
+        }
+
+        /* BARRE HORIZONTALE DU HAUT */
+        .split-bar-top {
+            position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
+            width: 540px; 
+            height: 2px;
+            background: var(--secondary); box-shadow: 0 0 8px var(--secondary);
+        }
+        .split-bar-top::before { content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 30px; background: var(--secondary); }
+        .split-bar-top::after { content: ''; position: absolute; right: 0; top: 0; width: 2px; height: 30px; background: var(--secondary); }
+
+        /* NIVEAU 2 : LES AILES (WINGS) */
+        .wings-wrapper {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .wing {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 480px; /* Largeur fixe pour la grille */
+        }
+
+        /* Connecteurs Lieutenant */
+        .lt-connector {
+            height: 30px; width: 2px; background: var(--secondary);
+            box-shadow: 0 0 5px var(--secondary);
+            margin-bottom: 0;
+        }
+
+        /* La Fourche (Fork) */
+        .squad-fork {
+            width: 260px; 
+            height: 2px; background: var(--secondary);
+            position: relative;
+            margin-bottom: 30px;
+            box-shadow: 0 0 5px var(--secondary);
+        }
+        .squad-fork::before { content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 30px; background: var(--secondary); }
+        .squad-fork::after { content: ''; position: absolute; right: 0; top: 0; width: 2px; height: 30px; background: var(--secondary); }
+
+        /* NIVEAU 3 : GRILLES SQUADS (2x2) */
+        .squad-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 40px;
+            width: 100%;
+            justify-items: center;
+        }
+
+        /* Ajustement des cartes pour la grille */
+        .team-member { width: 100% !important; }
+
+        /* RESPONSIVE : Si l'écran est petit, on passe en colonne */
+        @media (max-width: 1100px) {
+            .wings-wrapper { flex-direction: column; gap: 50px; }
+            .split-bar-top { display: none; }
+            .level-1::after { display: none; }
+            .wing { width: 100%; border-top: 1px dashed var(--dim); padding-top: 20px; }
+            .squad-fork { display: none; }
+        }
+    </style>
 </head>
 <body>
 
@@ -79,94 +171,77 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-        
             const gravesBox = document.getElementById('node-graves');
             const javierBox = document.getElementById('node-javier');
             const jackalBox = document.getElementById('node-jackal');
-            
             const gridJavier = document.getElementById('grid-javier');
             const gridJackal = document.getElementById('grid-jackal');
 
-            
+            // Listes pour le tri automatique
             const teamJavier = ['Lovelace', 'Adam', 'Blitz', 'Dust'];
             const teamJackal = ['Recrue', 'Roxanne', 'Blake', 'Lexa'];
 
             try {
-              
+                // Simulation d'appel API (A adapter avec ton vrai endpoint)
                 const response = await fetch('/api/read?resource=agents');
                 const data = await response.json();
 
                 if (data.agents && data.agents.length > 0) {
-                    
                     let htmlJavier = '';
                     let htmlJackal = '';
 
                     data.agents.forEach(agent => {
-                        
-                       
                         const cleanProfileUrl = (agent.profile_url || '#').replace(/^\//, '');
-                        
-                     
-                        if (agent.id === 1) { 
+
+                        // Remplissage des chefs
+                        if (agent.id === 1) { // Graves
                             gravesBox.querySelector('.name').textContent = agent.name;
-                            gravesBox.querySelector('a').href = `/Niv1/${cleanProfileUrl}`;
+                            gravesBox.querySelector('a').href = `../${cleanProfileUrl}`;
                             return; 
                         }
-                        if (agent.id === 3) { 
+                        if (agent.id === 3) { // Javier
                             javierBox.querySelector('.name').textContent = agent.name;
-                            javierBox.querySelector('a').href = `/Niv1/${cleanProfileUrl}`;
+                            javierBox.querySelector('a').href = `../${cleanProfileUrl}`;
                             return;
                         }
-                        if (agent.id === 18) { 
+                        if (agent.id === 18) { // Jackal
                             jackalBox.querySelector('.name').textContent = agent.name;
-                            jackalBox.querySelector('a').href = `/Niv1/${cleanProfileUrl}`;
+                            jackalBox.querySelector('a').href = `../${cleanProfileUrl}`;
                             return;
                         }
 
-
-                        
-                      
+                        // Création du HTML Agent
                         let statusText = 'VOIR >';
-                        let colorClass = 'status-green'; 
-
-                       
-                        if (agent.name === 'Recrue') { statusText = 'ACCÈS >'; }
-                        if (agent.name === 'Dust') { colorClass = 'status-gray'; } 
-                        
-                        
+                        let colorClass = 'status-green';
+                        if (agent.name === 'Recrue') statusText = 'ACCÈS >';
+                        if (agent.name === 'Dust') colorClass = 'status-gray';
                         if (agent.css_class === 'corrupted') colorClass = 'status-red';
 
-                   
                         const agentHTML = `
                             <div class="chart-node team-member ${colorClass}">
                                 <div class="role">${agent.role || 'ACTIF'}</div>
                                 <div class="name">${agent.name}</div>
-                                <a href="/Niv1/${cleanProfileUrl}" class="action-button">${statusText}</a>
+                                <a href="../${cleanProfileUrl}" class="action-button">${statusText}</a>
                             </div>
                         `;
 
-                       
+                        // Tri dans les colonnes
                         if (teamJavier.includes(agent.name)) {
                             htmlJavier += agentHTML;
                         } else if (teamJackal.includes(agent.name)) {
                             htmlJackal += agentHTML;
                         } else {
-                          
-                            htmlJavier += agentHTML; 
+                            htmlJavier += agentHTML; // Par défaut
                         }
                     });
 
-                 
                     gridJavier.innerHTML = htmlJavier;
                     gridJackal.innerHTML = htmlJackal;
-
-                } else {
-                    console.error("Aucun agent trouvé dans la DB");
                 }
             } catch (error) {
                 console.error('Erreur API:', error);
-                gridJavier.innerHTML = '<p style="color:var(--danger)">[ERREUR DE CONNEXION]</p>';
-                gridJackal.innerHTML = '<p style="color:var(--danger)">[ERREUR DE CONNEXION]</p>';
+                gridJavier.innerHTML = '<p style="color:var(--danger)">[ERREUR]</p>';
+                gridJackal.innerHTML = '<p style="color:var(--danger)">[ERREUR]</p>';
             }
         });
     </script>

@@ -1365,9 +1365,6 @@ h1 span { color: var(--danger); }
 
 
 
-/* --- 4. La ligne finale vers les UNITÉS SPÉCIALISÉES (Bas de page) --- */
-
-/* On utilise le conteneur des lieutenants pour dessiner une ligne qui descend */
 
 
 .ltn-container::after {
