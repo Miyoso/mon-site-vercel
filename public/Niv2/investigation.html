@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS :: INVESTIGATION WALL</title>
+    <title>SAS :: INVESTIGATION WALL v2.4</title>
     
     <script> const REQUIRED_LEVEL = 2; </script>
     <script>if(typeof checkSecurity === 'undefined') { window.checkSecurity = function() { console.log("Sec Check Bypass"); } }</script>
@@ -83,13 +83,20 @@
         /* --- LIENS SVG --- */
         #connections-layer { overflow: visible; position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
         #connections-layer path {
-            stroke-width: 2; fill: none; transition: stroke-width 0.2s; pointer-events: visibleStroke; cursor: pointer;
+            stroke-width: 3; fill: none; transition: stroke-width 0.2s, stroke 0.2s; 
+            pointer-events: visibleStroke; cursor: pointer; opacity: 0.8;
         }
-        #connections-layer path:hover { stroke-width: 4; filter: drop-shadow(0 0 4px currentColor); }
+        #connections-layer path:hover { stroke-width: 6; filter: drop-shadow(0 0 5px currentColor); opacity: 1; }
+        
+        /* Couleurs des liens */
         .link-red { stroke: var(--danger); }
         .link-green { stroke: var(--primary); }
         .link-blue { stroke: var(--secondary); }
-        .link-temp { stroke: #fff; stroke-dasharray: 5,5; opacity: 0.5; }
+        .link-warning { stroke: var(--warning); }
+        .link-purple { stroke: var(--purple); }
+        .link-white { stroke: var(--white); }
+        
+        .link-temp { stroke: #fff; stroke-dasharray: 5,5; opacity: 0.5; stroke-width: 2 !important; }
 
         /* --- UI / HUD --- */
         .hud-overlay { position: fixed; pointer-events: none; width: 100%; height: 100%; z-index: 500; }
@@ -154,7 +161,7 @@
             <button class="tool-btn" onclick="resetView()">RESET VUE</button>
         </div>
         <div class="help-indicator">
-            [ GAUCHE : BOUGER | MOLETTE : ZOOM | CLIC DROIT : COULEURS | SHIFT+DRAG : LIER ]
+            [ CLIC GAUCHE: BOUGER | CLIC DROIT: COULEUR (ITEM/LIEN) | SHIFT+GLISSER: LIER ]
         </div>
     </div>
 
@@ -213,7 +220,10 @@
         let dragOffset = { x: 0, y: 0 };
         let linkStartItem = null;
         let tempLinkPath = null;
+        
+        // Context Logic
         let contextTargetId = null;
+        let contextTargetType = 'item'; // 'item' ou 'link'
 
         const world = document.getElementById('world-layer');
         const itemsLayer = document.getElementById('items-layer');
@@ -221,7 +231,7 @@
         const ctxMenu = document.getElementById('context-menu');
         const editModal = document.getElementById('editModal');
 
-        // --- REAL API CALLS ---
+        // --- API ---
         const API = {
             async read() {
                 try {
@@ -247,7 +257,7 @@
             items = data.items || [];
             links = data.links || [];
             renderBoard();
-            if(view.scale === 1 && view.x === 0) centerView(); // Centre seulement au premier load
+            if(view.scale === 1 && view.x === 0) centerView();
         }
 
         // --- RENDER ---
@@ -262,7 +272,6 @@
                 el.dataset.id = item.id;
                 el.style.left = item.x + 'px';
                 el.style.top = item.y + 'px';
-                
                 if(item.color) el.style.borderTopColor = item.color;
 
                 let html = `<div class="item-header"><span>#${item.id}</span><span>${item.type}</span></div>`;
@@ -272,7 +281,7 @@
 
                 el.onmousedown = (e) => onMouseDownItem(e, item);
                 el.ondblclick = (e) => { e.stopPropagation(); openEditModal('edit', item.type, item); };
-                el.oncontextmenu = (e) => openContextMenu(e, item.id);
+                el.oncontextmenu = (e) => openContextMenu(e, item.id, 'item');
 
                 itemsLayer.appendChild(el);
             });
@@ -286,17 +295,22 @@
 
         function drawLink(link, item1, item2) {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.setAttribute("class", `link-${link.type}`);
+            path.setAttribute("class", `link-${link.type || 'red'}`); // Défaut rouge
             path.dataset.id = link.id;
             path.setAttribute("d", getPathD(item1, item2));
             
+            // Double clic = supprimer
             path.ondblclick = async (e) => {
                 e.stopPropagation();
-                if(confirm("Supprimer ce lien ?")) {
+                if(confirm("Couper ce lien ?")) {
                     await API.exec({ action: 'del_inv_link', id: link.id });
                     init();
                 }
             };
+            
+            // Clic droit = menu couleur
+            path.oncontextmenu = (e) => openContextMenu(e, link.id, 'link');
+
             svgLayer.appendChild(path);
         }
 
@@ -329,7 +343,6 @@
                 const worldY = (e.clientY - view.y) / view.scale;
                 dragItem.x = worldX - dragOffset.x;
                 dragItem.y = worldY - dragOffset.y;
-                
                 const el = document.getElementById(`item-${dragItem.id}`);
                 if(el) { el.style.left = dragItem.x + 'px'; el.style.top = dragItem.y + 'px'; }
                 refreshLinks(dragItem);
@@ -341,23 +354,16 @@
         });
 
         document.addEventListener('mouseup', async (e) => {
-            if(isPanning) {
-                isPanning = false;
-                document.body.style.cursor = 'crosshair';
-            }
+            if(isPanning) { isPanning = false; document.body.style.cursor = 'crosshair'; }
             if(isDragging && dragItem) {
                 dragItem.x = Math.round(dragItem.x / 20) * 20;
                 dragItem.y = Math.round(dragItem.y / 20) * 20;
-                
                 const el = document.getElementById(`item-${dragItem.id}`);
                 if(el) { el.style.zIndex = ''; el.style.left = dragItem.x + 'px'; el.style.top = dragItem.y + 'px'; }
-                
                 refreshLinks(dragItem);
                 await API.exec({ action: 'move_inv_item', id: dragItem.id, x: dragItem.x, y: dragItem.y });
                 isDragging = false; dragItem = null;
             }
-            
-            // LOGIQUE DE VALIDATION DU LIEN
             if(isLinking) {
                 const targetEl = e.target.closest('.board-item');
                 if(targetEl) {
@@ -371,34 +377,21 @@
             }
         });
 
-        // --- ITEM EVENTS ---
         function onMouseDownItem(e, item) {
-            e.stopPropagation();
-            ctxMenu.style.display = 'none';
-
+            e.stopPropagation(); ctxMenu.style.display = 'none';
             if(e.shiftKey) {
-                isLinking = true;
-                linkStartItem = item;
+                isLinking = true; linkStartItem = item;
                 tempLinkPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 tempLinkPath.setAttribute("class", "link-temp");
                 svgLayer.appendChild(tempLinkPath);
             } else if(e.button === 0) {
-                isDragging = true;
-                dragItem = item;
-                const worldX = (e.clientX - view.x) / view.scale;
-                const worldY = (e.clientY - view.y) / view.scale;
-                dragOffset.x = worldX - item.x;
-                dragOffset.y = worldY - item.y;
+                isDragging = true; dragItem = item;
+                const worldX = (e.clientX - view.x) / view.scale; const worldY = (e.clientY - view.y) / view.scale;
+                dragOffset.x = worldX - item.x; dragOffset.y = worldY - item.y;
                 document.getElementById(`item-${item.id}`).style.zIndex = 1000;
             }
         }
-
-        function cancelLink() {
-            isLinking = false;
-            linkStartItem = null;
-            if(tempLinkPath) { tempLinkPath.remove(); tempLinkPath = null; }
-        }
-
+        function cancelLink() { isLinking = false; linkStartItem = null; if(tempLinkPath) { tempLinkPath.remove(); tempLinkPath = null; } }
         function refreshLinks(movedItem) {
             links.filter(l => l.from_id === movedItem.id || l.to_id === movedItem.id).forEach(l => {
                 const path = document.querySelector(`path[data-id="${l.id}"]`);
@@ -407,28 +400,22 @@
                 if(path && i1 && i2) path.setAttribute("d", getPathD(i1, i2));
             });
         }
-
-        // --- VIEW ---
         document.addEventListener('wheel', (e) => {
-            if(e.target.closest('.edit-modal')) return;
-            e.preventDefault();
-            const delta = -Math.sign(e.deltaY) * 0.1;
-            const newScale = Math.min(Math.max(0.2, view.scale + delta), 4);
-            const mouseX = (e.clientX - view.x) / view.scale;
-            const mouseY = (e.clientY - view.y) / view.scale;
-            view.x = e.clientX - mouseX * newScale;
-            view.y = e.clientY - mouseY * newScale;
-            view.scale = newScale;
+            if(e.target.closest('.edit-modal')) return; e.preventDefault();
+            const delta = -Math.sign(e.deltaY) * 0.1; const newScale = Math.min(Math.max(0.2, view.scale + delta), 4);
+            const mouseX = (e.clientX - view.x) / view.scale; const mouseY = (e.clientY - view.y) / view.scale;
+            view.x = e.clientX - mouseX * newScale; view.y = e.clientY - mouseY * newScale; view.scale = newScale;
             updateView();
         }, { passive: false });
-
         function updateView() { world.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`; }
         function centerView() { view.x = window.innerWidth/2 - 500; view.y = window.innerHeight/2 - 400; updateView(); }
         function resetView() { view = {x:0,y:0,scale:1}; updateView(); }
 
-        // --- ACTIONS ---
-        function openContextMenu(e, id) {
-            e.preventDefault(); contextTargetId = id;
+        // --- CONTEXT & COLOR ---
+        function openContextMenu(e, id, type) {
+            e.preventDefault(); e.stopPropagation();
+            contextTargetId = id;
+            contextTargetType = type; // On stocke si c'est un ITEM ou un LINK
             ctxMenu.style.display = 'flex';
             ctxMenu.style.left = e.clientX + 'px';
             ctxMenu.style.top = e.clientY + 'px';
@@ -437,27 +424,60 @@
         async function applyColor(color) {
             ctxMenu.style.display = 'none';
             if(!contextTargetId) return;
-            const item = items.find(i => i.id === contextTargetId);
-            if(item) {
-                item.color = color;
-                const el = document.getElementById(`item-${item.id}`);
-                if(el) el.style.borderTopColor = color;
-                await API.exec({ action: 'update_inv_item_text', id: item.id, color: color });
+
+            if(contextTargetType === 'item') {
+                // UPDATE ITEM
+                const item = items.find(i => i.id === contextTargetId);
+                if(item) {
+                    item.color = color;
+                    const el = document.getElementById(`item-${item.id}`);
+                    if(el) el.style.borderTopColor = color;
+                    await API.exec({ action: 'update_inv_item_text', id: item.id, color: color });
+                }
+            } else if (contextTargetType === 'link') {
+                // UPDATE LINK (Convert Hex -> Class Name)
+                let typeName = 'red';
+                if(color === '#00ff9d') typeName = 'green';
+                if(color === '#00f3ff') typeName = 'blue';
+                if(color === '#eebb00') typeName = 'warning';
+                if(color === '#b026ff') typeName = 'purple';
+                if(color === '#eeeeee') typeName = 'white';
+
+                const path = document.querySelector(`path[data-id="${contextTargetId}"]`);
+                if(path) path.setAttribute('class', `link-${typeName}`);
+                
+                // On met à jour le lien dans la BDD (on utilise une commande d'update lien simulée si besoin ou existante)
+                // Comme 'update_inv_link' n'était pas dans la liste initiale, on suppose qu'il faut recréer ou utiliser une commande custom.
+                // Pour simplifier ici: on va appeler update_inv_link (à implémenter côté serveur si inexistant, ou recréer).
+                // Solution robuste: Supprimer + Recréer (car API souvent limitée) ou Update si supporté.
+                // Ici je tente un update direct.
+                await API.exec({ action: 'update_inv_link', id: contextTargetId, type: typeName });
             }
         }
 
         async function contextAction(action) {
             ctxMenu.style.display = 'none';
             if(!contextTargetId) return;
-            const item = items.find(i => i.id === contextTargetId);
+
             if(action === 'delete') {
-                if(confirm("Supprimer ?")) {
-                    await API.exec({ action: 'del_inv_item', id: contextTargetId });
-                    init();
+                if(contextTargetType === 'item') {
+                    if(confirm("Supprimer dossier ?")) {
+                        await API.exec({ action: 'del_inv_item', id: contextTargetId });
+                        init();
+                    }
+                } else if(contextTargetType === 'link') {
+                    if(confirm("Supprimer lien ?")) {
+                        await API.exec({ action: 'del_inv_link', id: contextTargetId });
+                        init();
+                    }
                 }
-            } else if(action === 'edit') openEditModal('edit', item.type, item);
+            } else if(action === 'edit' && contextTargetType === 'item') {
+                const item = items.find(i => i.id === contextTargetId);
+                openEditModal('edit', item.type, item);
+            }
         }
 
+        // --- MODAL ---
         function openEditModal(mode, type, data=null) {
             editModal.style.display = 'flex';
             document.getElementById('modal-mode').value = mode;
