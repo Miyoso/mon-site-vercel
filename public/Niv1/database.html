@@ -109,17 +109,17 @@
                      
                         if (agent.id === 1) { 
                             gravesBox.querySelector('.name').textContent = agent.name;
-                            gravesBox.querySelector('a').href = `/niv1/${cleanProfileUrl}`;
+                            gravesBox.querySelector('a').href = `/Niv1/${cleanProfileUrl}`;
                             return; 
                         }
                         if (agent.id === 3) { 
                             javierBox.querySelector('.name').textContent = agent.name;
-                            javierBox.querySelector('a').href = `/niv1/${cleanProfileUrl}`;
+                            javierBox.querySelector('a').href = `/Niv1/${cleanProfileUrl}`;
                             return;
                         }
                         if (agent.id === 18) { 
                             jackalBox.querySelector('.name').textContent = agent.name;
-                            jackalBox.querySelector('a').href = `/niv1/${cleanProfileUrl}`;
+                            jackalBox.querySelector('a').href = `/Niv1/${cleanProfileUrl}`;
                             return;
                         }
 
@@ -141,7 +141,7 @@
                             <div class="chart-node team-member ${colorClass}">
                                 <div class="role">${agent.role || 'ACTIF'}</div>
                                 <div class="name">${agent.name}</div>
-                                <a href="/niv1/${cleanProfileUrl}" class="action-button">${statusText}</a>
+                                <a href="/Niv1/${cleanProfileUrl}" class="action-button">${statusText}</a>
                             </div>
                         `;
 
