@@ -23,12 +23,8 @@
             --corner-size: 15px;
         }
 
-        /* 1. RESET LISTES (CORRECTION DU PROBLÈME DES POINTS) */
-        ul, li { 
-            list-style: none !important; /* Force la suppression des puces par défaut */
-            padding: 0;
-            margin: 0;
-        }
+        /* 1. RESET LISTES */
+        ul, li { list-style: none !important; padding: 0; margin: 0; }
 
         /* 2. SCROLLBAR TACTIQUE */
         ::-webkit-scrollbar { width: 8px; }
@@ -36,20 +32,22 @@
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 0; }
         ::-webkit-scrollbar-thumb:hover { background: #fff; box-shadow: 0 0 10px #fff; }
 
-        /* 3. OVERRIDES LAYOUT */
+        /* 3. OVERRIDES LAYOUT (PLEIN ÉCRAN & PROPRE) */
         body { 
             background: #020202; 
             overflow-y: auto !important; 
             height: auto !important;
             min-height: 100vh;
+            padding: 10px; /* Petit padding pour ne pas coller aux bords */
         }
         
         .terminal-wrapper.mode-large {
-            max-width: 96vw !important; 
-            width: 96vw !important; 
+            /* FORCE 98% DE LA LARGEUR */
+            max-width: 98vw !important; 
+            width: 98vw !important; 
             height: auto !important;
-            min-height: 96vh;
-            margin-bottom: 50px;
+            min-height: 95vh;
+            margin: 0 auto 20px auto; /* Centré avec marge en bas */
         }
         
         .terminal { height: auto !important; }
@@ -59,99 +57,47 @@
         .rule-card {
             background: linear-gradient(135deg, rgba(16, 20, 24, 0.9) 0%, rgba(8, 10, 12, 0.95) 100%);
             border: 1px solid var(--hud-border);
-            padding: 25px;
+            padding: 30px; /* Padding augmenté pour l'espace */
             position: relative;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--corner-size)), calc(100% - var(--corner-size)) 100%, 0 100%);
         }
-
-        .rule-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 20px;
-            background: var(--dim); transition: 0.3s;
-        }
-
-        .rule-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 0 30px rgba(0, 255, 157, 0.05);
-            transform: translateY(-2px);
-        }
+        .rule-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 25px; background: var(--dim); transition: 0.3s; }
+        .rule-card:hover { border-color: var(--primary); box-shadow: 0 0 30px rgba(0, 255, 157, 0.05); transform: translateY(-2px); }
         .rule-card:hover::before { background: var(--primary); height: 100%; }
 
         /* 5. TYPOGRAPHIE */
-        .category-header {
-            display: flex; align-items: center; gap: 10px;
-            border-bottom: 1px solid var(--hud-border);
-            padding-bottom: 10px; margin-bottom: 20px;
-        }
-
-        .cat-icon { font-size: 1.2rem; color: var(--secondary); opacity: 0.8; }
-        
-        .category-title {
-            color: #fff; margin: 0; font-family: 'Rajdhani', sans-serif;
-            font-weight: 700; font-size: 1.6rem; text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
-        }
-
+        .category-header { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--hud-border); padding-bottom: 15px; margin-bottom: 25px; }
+        .cat-icon { font-size: 1.4rem; color: var(--secondary); opacity: 0.8; }
+        .category-title { color: #fff; margin: 0; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0, 243, 255, 0.1); }
         .category-id { font-family: 'Share Tech Mono'; color: var(--dim); font-size: 0.9rem; margin-left: auto; }
 
         /* 6. LISTES ET PUCES PERSONNALISÉES */
-        .inventory-list > <li> {
-            /* Plus de background ni border par défaut pour éviter le bruit visuel */
-            margin-bottom: 25px;
-            border-left: 2px solid rgba(255,255,255,0.05);
-            padding-left: 20px;
-            transition: 0.3s;
-        }
-        .inventory-list > <li>:hover { border-left-color: var(--secondary); padding-left: 25px; }
-
-        .item-name {
-            color: var(--primary); font-family: 'JetBrains Mono'; font-weight: 800;
-            font-size: 1.1rem; margin-bottom: 8px; display: inline-block;
-            background: rgba(0, 255, 157, 0.05); padding: 2px 8px; border-radius: 2px;
-        }
-
-        /* Sous-éléments : C'est ici qu'on gère le petit carré cyan */
-        .item-details { padding-left: 5px; } /* Petit alignement */
-        
-        .item-details li {
-            color: #aaa; margin-bottom: 8px; position: relative; padding-left: 20px;
-            font-size: 1rem; line-height: 1.5; font-family: 'Rajdhani'; font-weight: 500;
-            list-style: none !important; /* Double sécurité */
-        }
-        
-        /* Le carré cyan personnalisé */
-        .item-details li::before {
-            content: ''; position: absolute; left: 0; top: 8px;
-            width: 4px; height: 4px; background: var(--secondary);
-            box-shadow: 0 0 5px var(--secondary);
-        }
+        .inventory-list > <li> { margin-bottom: 30px; border-left: 2px solid rgba(255,255,255,0.05); padding-left: 25px; transition: 0.3s; }
+        .inventory-list > <li>:hover { border-left-color: var(--secondary); padding-left: 30px; }
+        .item-name { color: var(--primary); font-family: 'JetBrains Mono'; font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; display: inline-block; background: rgba(0, 255, 157, 0.05); padding: 4px 10px; border-radius: 2px; }
+        .item-details { padding-left: 5px; }
+        .item-details li { color: #aaa; margin-bottom: 10px; position: relative; padding-left: 25px; font-size: 1.1rem; line-height: 1.6; font-family: 'Rajdhani'; font-weight: 500; list-style: none !important; }
+        .item-details li::before { content: ''; position: absolute; left: 0; top: 10px; width: 5px; height: 5px; background: var(--secondary); box-shadow: 0 0 5px var(--secondary); }
 
         /* 7. ALERTE */
         .hazard-box {
             background: repeating-linear-gradient(45deg, rgba(60, 10, 10, 0.6), rgba(60, 10, 10, 0.6) 10px, rgba(30, 5, 5, 0.6) 10px, rgba(30, 5, 5, 0.6) 20px);
             border: 1px solid var(--danger);
-            color: #ff5555; padding: 30px; text-align: center;
+            color: #ff5555; padding: 40px; text-align: center;
             font-family: 'JetBrains Mono'; position: relative; overflow: hidden;
             box-shadow: inset 0 0 50px rgba(255,0,0,0.1);
         }
-        .hazard-box strong { font-size: 1.3rem; letter-spacing: 2px; text-shadow: 0 0 10px red; }
+        .hazard-box strong { font-size: 1.5rem; letter-spacing: 2px; text-shadow: 0 0 10px red; }
         
         /* 8. HEADER */
-        .main-title {
-            font-size: 4rem; font-family: 'Rajdhani', sans-serif; font-weight: 800;
-            line-height: 0.9; text-transform: uppercase;
-            background: linear-gradient(180deg, #fff 0%, #aaa 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .sub-title { font-family: 'Share Tech Mono'; color: var(--primary); letter-spacing: 4px; margin-top: 5px; }
+        .main-title { font-size: 5rem; font-family: 'Rajdhani', sans-serif; font-weight: 800; line-height: 0.9; text-transform: uppercase; background: linear-gradient(180deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sub-title { font-family: 'Share Tech Mono'; color: var(--primary); letter-spacing: 4px; margin-top: 5px; font-size: 1.1rem; }
 
     </style>
 </head>
 <body>
-
-    <div class="crt-overlay"></div>
 
     <div class="terminal-wrapper mode-large">
         <main class="terminal">
@@ -172,14 +118,14 @@
             <div class="rules-grid-layout">
                 
                 <div style="grid-column: 1 / -1;">
-                    <div class="hazard-box rule-card" style="margin-bottom: 30px; clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);">
+                    <div class="hazard-box rule-card" style="margin-bottom: 40px; clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);">
                         <strong>// PROTOCOLE DE SÉCURITÉ ACTIVE //</strong><br><br>
-                        <span style="font-size: 0.9rem; opacity: 0.8;">
+                        <span style="font-size: 1rem; opacity: 0.8;">
                             CE DOCUMENT EST STRICTEMENT CONFIDENTIEL.<br>
                             TOUTE DIFFUSION NON-AUTORISÉE EST PASSIBLE DE COUR MARTIALE.
                         </span>
                     </div>
-                    <p style="color: var(--secondary); border-left: 3px solid var(--secondary); padding-left: 20px; font-family: 'Share Tech Mono'; opacity: 0.8; margin-bottom: 40px;">
+                    <p style="color: var(--secondary); border-left: 4px solid var(--secondary); padding-left: 25px; font-family: 'Share Tech Mono'; opacity: 0.8; margin-bottom: 50px; font-size: 1.2rem; background: rgba(0, 243, 255, 0.05); padding: 20px;">
                         >> "La discipline est l'arme principale du S.A.S." - Veuillez prendre connaissance des directives ci-dessous.
                     </p>
                 </div>
@@ -273,7 +219,7 @@
                     </div>
                 </div>
 
-                <div style="grid-column: 1 / -1; margin-top: 20px; border-top: 1px dashed var(--dim); padding-top: 20px; display: flex; justify-content: space-between; font-family: 'Share Tech Mono'; color: var(--dim); font-size: 0.8rem;">
+                <div style="grid-column: 1 / -1; margin-top: 30px; border-top: 1px dashed var(--dim); padding-top: 30px; display: flex; justify-content: space-between; font-family: 'Share Tech Mono'; color: var(--dim); font-size: 0.9rem;">
                     <span>SYSTEM_ID: TERMINAL_42</span>
                     <span>SERVER_STATUS: <span style="color:var(--primary)">ONLINE</span></span>
                     <span>LAST_UPDATE: 04:22:19</span>
@@ -282,7 +228,7 @@
             </div>
 
             <footer class="portal-footer">
-                <a href="/index.html" class="back-link action-button" style="width: 200px; margin: 0 auto;">[ REVENIR AU DASHBOARD ]</a>
+                <a href="/index.html" class="back-link action-button" style="width: 250px; margin: 0 auto; font-size: 0.9rem;">[ REVENIR AU DASHBOARD ]</a>
             </footer>
 
         </main>
