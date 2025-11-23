@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS :: INVESTIGATION WALL v2.0</title>
+    <title>SAS :: INVESTIGATION WALL v2.1</title>
     
     <script> const REQUIRED_LEVEL = 2; </script>
     <script>if(typeof checkSecurity === 'undefined') { window.checkSecurity = function() { console.log("Sec Check Bypass"); } }</script>
@@ -18,6 +18,8 @@
             --secondary: #00f3ff;
             --danger: #ff3333;
             --warning: #eebb00;
+            --purple: #b026ff;
+            --white: #eeeeee;
             --dim: #445566;
             --bg: #050505;
             --panel: rgba(10, 15, 20, 0.95);
@@ -46,7 +48,7 @@
         /* --- COUCHE MONDE --- */
         #world-layer {
             position: absolute; top: 0; left: 0;
-            transform-origin: 0 0; /* Important pour le calcul manuel du zoom */
+            transform-origin: 0 0;
             width: 100%; height: 100%;
         }
 
@@ -58,21 +60,21 @@
             padding: 10px;
             width: 220px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            transition: box-shadow 0.2s, border-color 0.2s; /* Pas de transition sur top/left pour la fluidité du drag */
+            transition: box-shadow 0.2s, border-color 0.2s;
             user-select: none;
+            /* Bordure supérieure épaisse pour la couleur */
+            border-top: 3px solid var(--dim); 
             clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
         }
 
         .board-item:hover {
-            border-color: var(--primary);
+            border-color: var(--primary); /* La bordure fine change */
             box-shadow: 0 0 15px rgba(0, 255, 157, 0.15);
             z-index: 100;
         }
 
-        /* Types d'items */
-        .item-suspect { border-top: 3px solid var(--danger); }
         .item-suspect img { width: 100%; height: 140px; object-fit: cover; border: 1px solid #333; margin-bottom: 8px; filter: sepia(0.2) contrast(1.1); pointer-events: none; }
-        .item-note { border-top: 3px solid var(--warning); background: rgba(255, 200, 0, 0.02); }
+        .item-note { background: rgba(255, 255, 255, 0.02); }
 
         .item-content { font-size: 0.85rem; line-height: 1.3; white-space: pre-wrap; }
         .item-header {
@@ -119,14 +121,28 @@
         .tool-btn:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: #555; }
         .separator { width: 1px; background: #333; margin: 0 4px; }
 
-        /* Context Menu & Modal (Style simplifié) */
+        /* --- MENUS & PALETTES (NOUVEAU) --- */
         #context-menu {
-            position: fixed; background: #0f1419; border: 1px solid var(--primary);
-            z-index: 1000; display: none; flex-direction: column; min-width: 160px;
+            position: fixed; background: #0f1419; border: 1px solid var(--dim);
+            z-index: 1000; display: none; flex-direction: column; min-width: 180px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.8);
         }
-        .ctx-item { padding: 10px 15px; cursor: pointer; font-size: 0.8rem; color: #ccc; border-bottom: 1px solid #222; }
-        .ctx-item:hover { background: var(--primary); color: #000; }
+        
+        /* Palette de couleurs tactique */
+        .ctx-palette {
+            display: flex; gap: 8px; padding: 12px 10px; 
+            border-bottom: 1px solid #222; justify-content: center;
+            background: rgba(0,0,0,0.3);
+        }
+        .color-swatch {
+            width: 18px; height: 18px; border-radius: 50%; cursor: pointer;
+            border: 1px solid #444; transition: transform 0.2s, border-color 0.2s;
+        }
+        .color-swatch:hover { transform: scale(1.3); border-color: #fff; box-shadow: 0 0 10px currentColor; }
+
+        .ctx-item { padding: 10px 15px; cursor: pointer; font-size: 0.8rem; color: #ccc; border-bottom: 1px solid #222; transition: 0.1s; }
+        .ctx-item:hover { background: rgba(255,255,255,0.1); color: #fff; padding-left: 20px;}
+        .ctx-item.delete:hover { background: var(--danger); color: #fff; }
 
         .edit-modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -160,7 +176,7 @@
         </div>
 
         <div class="help-indicator">
-            [ GAUCHE : BOUGER | MOLETTE : ZOOM CURSEUR | SHIFT+DRAG : LIER | DOUBLE-CLIC : ÉDITER ]
+            [ GAUCHE : BOUGER | MOLETTE : ZOOM | CLIC DROIT : COULEUR/ÉDIT | SHIFT+GLISSER : LIER ]
         </div>
     </div>
 
@@ -170,9 +186,16 @@
     </div>
 
     <div id="context-menu">
-        <div class="ctx-item" onclick="contextAction('edit')">ÉDITER</div>
-        <div class="ctx-item" onclick="contextAction('color')">CHANGER COULEUR</div>
-        <div class="ctx-item" onclick="contextAction('delete')" style="color:var(--danger)">SUPPRIMER</div>
+        <div class="ctx-palette">
+            <div class="color-swatch" style="background:var(--danger); box-shadow:0 0 5px var(--danger)" onclick="applyColor('#ff3333')"></div>
+            <div class="color-swatch" style="background:var(--warning); box-shadow:0 0 5px var(--warning)" onclick="applyColor('#eebb00')"></div>
+            <div class="color-swatch" style="background:var(--primary); box-shadow:0 0 5px var(--primary)" onclick="applyColor('#00ff9d')"></div>
+            <div class="color-swatch" style="background:var(--secondary); box-shadow:0 0 5px var(--secondary)" onclick="applyColor('#00f3ff')"></div>
+            <div class="color-swatch" style="background:var(--purple); box-shadow:0 0 5px var(--purple)" onclick="applyColor('#b026ff')"></div>
+            <div class="color-swatch" style="background:var(--white); box-shadow:0 0 5px var(--white)" onclick="applyColor('#eeeeee')"></div>
+        </div>
+        <div class="ctx-item" onclick="contextAction('edit')">ÉDITER DONNÉES</div>
+        <div class="ctx-item delete" onclick="contextAction('delete')">SUPPRIMER DOSSIER</div>
     </div>
 
     <div class="edit-modal-overlay" id="editModal">
@@ -201,35 +224,23 @@
         // --- ÉTAT DU SYSTÈME ---
         let items = [];
         let links = [];
-        
-        // Navigation
         let view = { x: 0, y: 0, scale: 1 };
-        let isPanning = false;
-        let lastMouse = { x: 0, y: 0 };
+        let isPanning = false; let lastMouse = { x: 0, y: 0 };
+        let dragItem = null; let dragOffset = { x: 0, y: 0 }; let isDragging = false;
+        let isLinking = false; let linkStartItem = null; let tempLinkPath = null;
+        let contextTargetId = null;
 
-        // Interaction Items
-        let dragItem = null;
-        let dragOffset = { x: 0, y: 0 };
-        let isDragging = false;
-
-        // Interaction Links (Nouveau: Shift+Drag)
-        let isLinking = false;
-        let linkStartItem = null;
-        let tempLinkPath = null;
-
-        // DOM Cache
         const world = document.getElementById('world-layer');
         const itemsLayer = document.getElementById('items-layer');
         const svgLayer = document.getElementById('connections-layer');
         const ctxMenu = document.getElementById('context-menu');
         const editModal = document.getElementById('editModal');
 
-        // --- MOCK API (Pour que ça marche sans backend) ---
-        // Dans la version réelle, remplacez par vos fetch()
+        // --- MOCK API ---
         const API = {
             data: {
                 items: [
-                    { id: 1, type: 'suspect', x: 400, y: 300, label: 'Cible Alpha', image_url: 'https://placehold.co/200x150/111/FFF?text=ALPHA' },
+                    { id: 1, type: 'suspect', x: 400, y: 300, label: 'Cible Alpha', image_url: 'https://placehold.co/200x150/111/FFF?text=ALPHA', color: '#ff3333' },
                     { id: 2, type: 'note', x: 700, y: 400, label: 'Vu au port à 22h', color: '#eebb00' }
                 ],
                 links: [{ id: 101, from_id: 1, to_id: 2, type: 'red' }]
@@ -242,19 +253,17 @@
                     const i = this.data.items.find(x => x.id === cmd.id);
                     if(i) { i.x = cmd.x; i.y = cmd.y; }
                 }
-                if(cmd.action === 'add_link') {
-                    this.data.links.push({ id: Date.now(), from_id: cmd.from_id, to_id: cmd.to_id, type: cmd.type });
-                }
-                if(cmd.action === 'del_link') {
-                    this.data.links = this.data.links.filter(l => l.id !== cmd.id);
-                }
+                if(cmd.action === 'add_link') this.data.links.push({ id: Date.now(), from_id: cmd.from_id, to_id: cmd.to_id, type: cmd.type });
+                if(cmd.action === 'del_link') this.data.links = this.data.links.filter(l => l.id !== cmd.id);
                 if(cmd.action === 'update_text') {
                     const i = this.data.items.find(x => x.id === cmd.id);
-                    if(i) { i.label = cmd.label; i.image_url = cmd.image_url; if(cmd.color) i.color = cmd.color; }
+                    if(i) { 
+                        if(cmd.label) i.label = cmd.label; 
+                        if(cmd.image_url !== undefined) i.image_url = cmd.image_url; 
+                        if(cmd.color) i.color = cmd.color; 
+                    }
                 }
-                if(cmd.action === 'add_item') {
-                    this.data.items.push({ id: Date.now(), type: cmd.type, label: cmd.label, image_url: cmd.image_url, x: cmd.x, y: cmd.y, color: cmd.color });
-                }
+                if(cmd.action === 'add_item') this.data.items.push({ id: Date.now(), type: cmd.type, label: cmd.label, image_url: cmd.image_url, x: cmd.x, y: cmd.y, color: cmd.color });
                 if(cmd.action === 'del_item') {
                     this.data.items = this.data.items.filter(x => x.id !== cmd.id);
                     this.data.links = this.data.links.filter(l => l.from_id !== cmd.id && l.to_id !== cmd.id);
@@ -274,37 +283,32 @@
 
         function renderAll() {
             itemsLayer.innerHTML = '';
-            svgLayer.innerHTML = ''; // Nettoyage total
+            svgLayer.innerHTML = '';
             
-            // 1. Rendu Items
             items.forEach(item => {
                 const el = document.createElement('div');
                 el.className = `board-item item-${item.type}`;
                 el.id = `item-${item.id}`;
                 el.dataset.id = item.id;
-                // Positionnement initial
                 updateItemDOMPosition(el, item.x, item.y);
 
-                if(item.type === 'note' && item.color) el.style.borderTopColor = item.color;
+                // Application de la couleur (Bordure supérieure)
+                if(item.color) el.style.borderTopColor = item.color;
+                else if(item.type === 'suspect') el.style.borderTopColor = '#ff3333'; // Défaut rouge
 
                 let html = `<div class="item-header"><span>#${item.id}</span><span>${item.type}</span></div>`;
                 if(item.type === 'suspect') html += `<img src="${item.image_url || ''}" draggable="false">`;
                 html += `<div class="item-content">${item.label}</div>`;
-                
                 el.innerHTML = html;
 
-                // EVENTS ITEM
                 el.onmousedown = (e) => handleItemMouseDown(e, item);
                 el.ondblclick = (e) => { e.stopPropagation(); openEditModal('edit', item.type, item); };
                 el.oncontextmenu = (e) => openContextMenu(e, item.id);
-                
-                // Pour le Shift+Drag Link (Drop target)
                 el.onmouseup = (e) => handleLinkDrop(e, item);
 
                 itemsLayer.appendChild(el);
             });
 
-            // 2. Rendu Liens
             links.forEach(link => createSvgLink(link));
         }
 
@@ -315,13 +319,8 @@
 
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             path.setAttribute("class", `link-${link.type}`);
-            path.dataset.id = link.id;
-            path.dataset.from = link.from_id;
-            path.dataset.to = link.to_id;
-            
-            // Calcul initial
-            const d = calculatePathD(from, to);
-            path.setAttribute("d", d);
+            path.dataset.id = link.id; path.dataset.from = link.from_id; path.dataset.to = link.to_id;
+            path.setAttribute("d", calculatePathD(from, to));
 
             path.ondblclick = async (e) => {
                 e.stopPropagation();
@@ -330,247 +329,128 @@
                     init();
                 }
             };
-
             svgLayer.appendChild(path);
         }
 
-        function updateItemDOMPosition(el, x, y) {
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-        }
+        function updateItemDOMPosition(el, x, y) { el.style.left = x + 'px'; el.style.top = y + 'px'; }
 
-        // --- GESTION VUE (ZOOM/PAN) ---
-        
-        // Pan
+        // --- NAVIGATION ---
         document.addEventListener('mousedown', (e) => {
             if(e.target.closest('.board-item') || e.target.closest('.toolbar') || e.target.closest('.edit-modal')) return;
-            // Si pas sur un item, on pan
-            if(e.button === 0 || e.button === 1) { // Click gauche (sur fond) ou molette
-                isPanning = true;
-                lastMouse = { x: e.clientX, y: e.clientY };
-                document.body.style.cursor = 'grabbing';
-                ctxMenu.style.display = 'none';
+            if(e.button === 0 || e.button === 1) {
+                isPanning = true; lastMouse = { x: e.clientX, y: e.clientY };
+                document.body.style.cursor = 'grabbing'; ctxMenu.style.display = 'none';
             }
         });
-
         document.addEventListener('mousemove', (e) => {
-            // Pan Logic
             if(isPanning) {
-                const dx = e.clientX - lastMouse.x;
-                const dy = e.clientY - lastMouse.y;
-                view.x += dx;
-                view.y += dy;
-                lastMouse = { x: e.clientX, y: e.clientY };
-                updateTransform();
+                view.x += e.clientX - lastMouse.x; view.y += e.clientY - lastMouse.y;
+                lastMouse = { x: e.clientX, y: e.clientY }; updateTransform();
             }
-            
-            // Drag Item Logic
-            if(isDragging && dragItem) {
-                handleDragMove(e);
-            }
-
-            // Link Creation Logic
-            if(isLinking) {
-                handleLinkMove(e);
-            }
+            if(isDragging && dragItem) handleDragMove(e);
+            if(isLinking) handleLinkMove(e);
         });
-
         document.addEventListener('mouseup', async () => {
-            if(isPanning) {
-                isPanning = false;
-                document.body.style.cursor = 'crosshair';
-            }
-            if(isDragging) {
-                await stopItemDrag();
-            }
-            if(isLinking) {
-                stopLinking(); // Annulation si relâché dans le vide
-            }
+            if(isPanning) { isPanning = false; document.body.style.cursor = 'crosshair'; }
+            if(isDragging) await stopItemDrag();
+            if(isLinking) stopLinking();
         });
-
-        // Zoom au curseur (Ergonomie moderne)
         document.addEventListener('wheel', (e) => {
-            if (e.target.closest('.edit-modal')) return; // Scroll dans modale
-            e.preventDefault();
-
-            const zoomIntensity = 0.1;
-            const delta = -Math.sign(e.deltaY) * zoomIntensity;
+            if (e.target.closest('.edit-modal')) return; e.preventDefault();
+            const delta = -Math.sign(e.deltaY) * 0.1;
             const newScale = Math.min(Math.max(0.2, view.scale + delta), 4);
-
-            // Calcul pour zoomer vers la souris
-            const mouseX = (e.clientX - view.x) / view.scale;
-            const mouseY = (e.clientY - view.y) / view.scale;
-
-            view.x = e.clientX - mouseX * newScale;
-            view.y = e.clientY - mouseY * newScale;
-            view.scale = newScale;
-
+            const mouseX = (e.clientX - view.x) / view.scale; const mouseY = (e.clientY - view.y) / view.scale;
+            view.x = e.clientX - mouseX * newScale; view.y = e.clientY - mouseY * newScale; view.scale = newScale;
             updateTransform();
         }, { passive: false });
 
-        function updateTransform() {
-            world.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
-        }
-
-        function centerView() {
-            view.x = window.innerWidth/2 - 500;
-            view.y = window.innerHeight/2 - 400;
-            updateTransform();
-        }
+        function updateTransform() { world.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`; }
+        function centerView() { view.x = window.innerWidth/2 - 500; view.y = window.innerHeight/2 - 400; updateTransform(); }
         function resetView() { view = {x:0, y:0, scale:1}; updateTransform(); }
 
-        // --- DRAG & DROP ITEMS (Amélioré) ---
-        
+        // --- DRAG ---
         function handleItemMouseDown(e, item) {
-            e.stopPropagation();
-            ctxMenu.style.display = 'none';
-
-            // Feature: SHIFT + Click = Créer Lien
-            if(e.shiftKey) {
-                startLinking(e, item);
-                return;
-            }
-
+            e.stopPropagation(); ctxMenu.style.display = 'none';
+            if(e.shiftKey) { startLinking(e, item); return; }
             if(e.button === 0) {
-                isDragging = true;
-                dragItem = item;
-                
-                // Position souris dans le monde
-                const worldX = (e.clientX - view.x) / view.scale;
-                const worldY = (e.clientY - view.y) / view.scale;
-                
-                dragOffset.x = worldX - item.x;
-                dragOffset.y = worldY - item.y;
-                
-                // Z-Index up
+                isDragging = true; dragItem = item;
+                const worldX = (e.clientX - view.x) / view.scale; const worldY = (e.clientY - view.y) / view.scale;
+                dragOffset.x = worldX - item.x; dragOffset.y = worldY - item.y;
                 const el = document.getElementById(`item-${item.id}`);
-                el.style.zIndex = 1000;
-                el.style.transition = 'none'; // Désactive transition pour réactivité immédiate
+                el.style.zIndex = 1000; el.style.transition = 'none';
             }
         }
-
         function handleDragMove(e) {
-            const worldX = (e.clientX - view.x) / view.scale;
-            const worldY = (e.clientY - view.y) / view.scale;
-            
-            // Raw movement
-            dragItem.x = worldX - dragOffset.x;
-            dragItem.y = worldY - dragOffset.y;
-
-            // Update Item DOM
+            const worldX = (e.clientX - view.x) / view.scale; const worldY = (e.clientY - view.y) / view.scale;
+            dragItem.x = worldX - dragOffset.x; dragItem.y = worldY - dragOffset.y;
             const el = document.getElementById(`item-${dragItem.id}`);
             updateItemDOMPosition(el, dragItem.x, dragItem.y);
-
-            // LIVE LINK UPDATE (Performance)
             updateRelatedLinks(dragItem);
         }
-
         async function stopItemDrag() {
             if(!dragItem) return;
-            
-            // SNAP TO GRID (Ergonomie: Alignement automatique)
-            const gridSize = 20;
-            dragItem.x = Math.round(dragItem.x / gridSize) * gridSize;
-            dragItem.y = Math.round(dragItem.y / gridSize) * gridSize;
-            
-            // Final DOM update + Animation restore
+            dragItem.x = Math.round(dragItem.x / 20) * 20; dragItem.y = Math.round(dragItem.y / 20) * 20;
             const el = document.getElementById(`item-${dragItem.id}`);
-            el.style.transition = ''; 
-            el.style.zIndex = '';
+            el.style.transition = ''; el.style.zIndex = '';
             updateItemDOMPosition(el, dragItem.x, dragItem.y);
-            
-            updateRelatedLinks(dragItem); // Final link snap
-
-            // Save
+            updateRelatedLinks(dragItem);
             await API.exec({ action: 'move', id: dragItem.id, x: dragItem.x, y: dragItem.y });
-            
             isDragging = false; dragItem = null;
         }
 
-        // --- LOGIQUE DES LIENS ---
-
+        // --- LINKS ---
         function calculatePathD(item1, item2) {
-            // Centre des boites (largeur 220, hauteur variable ~100-200)
-            // On approxime le centre Y à +60px
-            const x1 = item1.x + 110; 
-            const y1 = item1.y + 60; 
-            const x2 = item2.x + 110; 
-            const y2 = item2.y + 60;
-
-            const cx = (x1 + x2) / 2;
-            const cy = Math.min(y1, y2) - 50; // Courbure légère
+            const x1 = item1.x + 110; const y1 = item1.y + 60; const x2 = item2.x + 110; const y2 = item2.y + 60;
+            const cx = (x1 + x2) / 2; const cy = Math.min(y1, y2) - 50;
             return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
         }
-
         function updateRelatedLinks(item) {
-            // On cherche tous les paths SVG qui sont liés à cet ID
-            const relatedPaths = document.querySelectorAll(`path[data-from="${item.id}"], path[data-to="${item.id}"]`);
-            relatedPaths.forEach(path => {
-                const fid = parseInt(path.dataset.from);
-                const tid = parseInt(path.dataset.to);
-                const fItem = items.find(i => i.id === fid);
-                const tItem = items.find(i => i.id === tid);
-                if(fItem && tItem) {
-                    path.setAttribute('d', calculatePathD(fItem, tItem));
-                }
+            document.querySelectorAll(`path[data-from="${item.id}"], path[data-to="${item.id}"]`).forEach(path => {
+                const fItem = items.find(i => i.id === parseInt(path.dataset.from));
+                const tItem = items.find(i => i.id === parseInt(path.dataset.to));
+                if(fItem && tItem) path.setAttribute('d', calculatePathD(fItem, tItem));
             });
         }
-
-        // --- SYSTEME SHIFT+DRAG LINK ---
         function startLinking(e, item) {
-            isLinking = true;
-            linkStartItem = item;
-            
-            // Créer ligne temporaire
+            isLinking = true; linkStartItem = item;
             tempLinkPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            tempLinkPath.setAttribute("class", "link-temp");
-            svgLayer.appendChild(tempLinkPath);
+            tempLinkPath.setAttribute("class", "link-temp"); svgLayer.appendChild(tempLinkPath);
         }
-
         function handleLinkMove(e) {
             if(!linkStartItem) return;
-            const worldX = (e.clientX - view.x) / view.scale;
-            const worldY = (e.clientY - view.y) / view.scale;
-
-            const startX = linkStartItem.x + 110;
-            const startY = linkStartItem.y + 60;
-
-            // Ligne droite simple pour la visu temporaire
-            tempLinkPath.setAttribute("d", `M ${startX} ${startY} L ${worldX} ${worldY}`);
+            const worldX = (e.clientX - view.x) / view.scale; const worldY = (e.clientY - view.y) / view.scale;
+            tempLinkPath.setAttribute("d", `M ${linkStartItem.x + 110} ${linkStartItem.y + 60} L ${worldX} ${worldY}`);
         }
-
         async function handleLinkDrop(e, targetItem) {
             if(isLinking && linkStartItem && targetItem.id !== linkStartItem.id) {
-                // Création du lien !
-                await API.exec({ 
-                    action: 'add_link', 
-                    from_id: linkStartItem.id, 
-                    to_id: targetItem.id, 
-                    type: 'red' // Défaut rouge
-                });
-                stopLinking();
-                init(); // Reload propre
+                await API.exec({ action: 'add_link', from_id: linkStartItem.id, to_id: targetItem.id, type: 'red' });
+                stopLinking(); init();
             }
         }
+        function stopLinking() { isLinking = false; linkStartItem = null; if(tempLinkPath) { tempLinkPath.remove(); tempLinkPath = null; } }
 
-        function stopLinking() {
-            isLinking = false;
-            linkStartItem = null;
-            if(tempLinkPath) {
-                tempLinkPath.remove();
-                tempLinkPath = null;
-            }
-        }
-
-        // --- UI & MENUS ---
-        let contextTargetId = null;
-
+        // --- MENU & ACTIONS (MODIFIÉ POUR COULEUR FACILE) ---
         function openContextMenu(e, id) {
-            e.preventDefault();
-            contextTargetId = id;
+            e.preventDefault(); contextTargetId = id;
             ctxMenu.style.display = 'flex';
-            ctxMenu.style.left = e.clientX + 'px';
-            ctxMenu.style.top = e.clientY + 'px';
+            ctxMenu.style.left = e.clientX + 'px'; ctxMenu.style.top = e.clientY + 'px';
+        }
+
+        // Nouvelle fonction pour appliquer la couleur instantanément
+        async function applyColor(color) {
+            ctxMenu.style.display = 'none';
+            if(!contextTargetId) return;
+            const item = items.find(i => i.id === contextTargetId);
+            
+            // Mise à jour visuelle immédiate (Optimistic UI)
+            const el = document.getElementById(`item-${item.id}`);
+            el.style.borderTopColor = color;
+            
+            // Sauvegarde API
+            await API.exec({ action: 'update_text', id: item.id, color: color });
+            
+            // Mise à jour donnée locale
+            item.color = color;
         }
 
         async function contextAction(action) {
@@ -585,12 +465,6 @@
                 }
             } else if(action === 'edit') {
                 openEditModal('edit', item.type, item);
-            } else if(action === 'color') {
-                const c = prompt("Couleur Hex ?", "#00ff9d");
-                if(c) {
-                    await API.exec({ action: 'update_text', id: item.id, label: item.label, color: c });
-                    init();
-                }
             }
         }
 
@@ -599,7 +473,6 @@
             document.getElementById('modal-mode').value = mode;
             document.getElementById('modal-type').value = type;
             const grp = document.getElementById('modal-image-group');
-            
             if(mode === 'edit' && data) {
                 document.getElementById('modal-id').value = data.id;
                 document.getElementById('modal-label').value = data.label;
@@ -611,20 +484,15 @@
                 grp.style.display = (type === 'suspect') ? 'block' : 'none';
             }
         }
-
         function closeModal() { editModal.style.display = 'none'; }
-
         async function saveModalData() {
             const mode = document.getElementById('modal-mode').value;
             const type = document.getElementById('modal-type').value;
             const label = document.getElementById('modal-label').value;
             const img = document.getElementById('modal-image').value;
             const id = parseInt(document.getElementById('modal-id').value);
-
             closeModal();
-
             if(mode === 'new') {
-                // Centre de l'écran par défaut
                 const cx = (window.innerWidth/2 - view.x)/view.scale - 110;
                 const cy = (window.innerHeight/2 - view.y)/view.scale - 100;
                 await API.exec({ action: 'add_item', type, label, image_url: img, x: parseInt(cx), y: parseInt(cy), color: '#eebb00' });
@@ -633,16 +501,12 @@
             }
             init();
         }
-
-        // Fermer les menus au clic ailleurs
         document.addEventListener('click', (e) => {
             if(!e.target.closest('#context-menu')) ctxMenu.style.display = 'none';
             if(e.target === editModal) closeModal();
         });
 
-        // Start
         init();
-
     </script>
 </body>
 </html>
