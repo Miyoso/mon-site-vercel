@@ -196,17 +196,17 @@
                         // Remplissage des chefs
                         if (agent.id === 1) { // Graves
                             gravesBox.querySelector('.name').textContent = agent.name;
-                            gravesBox.querySelector('a').href = `../${cleanProfileUrl}`;
+                            gravesBox.querySelector('a').href = `/Niv1/${cleanProfileUrl}`;
                             return; 
                         }
                         if (agent.id === 3) { // Javier
                             javierBox.querySelector('.name').textContent = agent.name;
-                            javierBox.querySelector('a').href = `../${cleanProfileUrl}`;
+                            javierBox.querySelector('a').href = `/Niv1/${cleanProfileUrl}`;
                             return;
                         }
                         if (agent.id === 18) { // Jackal
                             jackalBox.querySelector('.name').textContent = agent.name;
-                            jackalBox.querySelector('a').href = `../${cleanProfileUrl}`;
+                            jackalBox.querySelector('a').href = `/Niv1/${cleanProfileUrl}`;
                             return;
                         }
 
@@ -221,7 +221,7 @@
                             <div class="chart-node team-member ${colorClass}">
                                 <div class="role">${agent.role || 'ACTIF'}</div>
                                 <div class="name">${agent.name}</div>
-                                <a href="../${cleanProfileUrl}" class="action-button">${statusText}</a>
+                                <a href="/Niv1/${cleanProfileUrl}" class="action-button">${statusText}</a>
                             </div>
                         `;
 
