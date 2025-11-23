@@ -79,7 +79,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            // 1. Sélection des conteneurs
+        
             const gravesBox = document.getElementById('node-graves');
             const javierBox = document.getElementById('node-javier');
             const jackalBox = document.getElementById('node-jackal');
@@ -87,13 +87,12 @@
             const gridJavier = document.getElementById('grid-javier');
             const gridJackal = document.getElementById('grid-jackal');
 
-            // 2. Définition des équipes (Pour trier qui va où)
-            // Vous pouvez ajouter des noms ici si vous créez de nouveaux agents
+            
             const teamJavier = ['Lovelace', 'Adam', 'Blitz', 'Dust'];
             const teamJackal = ['Recrue', 'Roxanne', 'Blake', 'Lexa'];
 
             try {
-                // 3. Appel API (Simulé ou Réel)
+              
                 const response = await fetch('/api/read?resource=agents');
                 const data = await response.json();
 
@@ -104,60 +103,60 @@
 
                     data.agents.forEach(agent => {
                         
-                        // Nettoyage URL
+                       
                         const cleanProfileUrl = (agent.profile_url || '#').replace(/^\//, '');
                         
-                        // --- GESTION DES CHEFS (ID FIXES) ---
-                        if (agent.id === 1) { // Graves
+                     
+                        if (agent.id === 1) { 
                             gravesBox.querySelector('.name').textContent = agent.name;
-                            gravesBox.querySelector('a').href = `../${cleanProfileUrl}`;
+                            gravesBox.querySelector('a').href = `/niv1/${cleanProfileUrl}`;
                             return; 
                         }
-                        if (agent.id === 3) { // Javier
+                        if (agent.id === 3) { 
                             javierBox.querySelector('.name').textContent = agent.name;
-                            javierBox.querySelector('a').href = `../${cleanProfileUrl}`;
+                            javierBox.querySelector('a').href = `/niv1/${cleanProfileUrl}`;
                             return;
                         }
-                        if (agent.id === 18) { // Jackal (ex-Ji)
+                        if (agent.id === 18) { 
                             jackalBox.querySelector('.name').textContent = agent.name;
-                            jackalBox.querySelector('a').href = `../${cleanProfileUrl}`;
+                            jackalBox.querySelector('a').href = `/niv1/${cleanProfileUrl}`;
                             return;
                         }
 
-                        // --- GESTION DES AGENTS (SQUADS) ---
-                        
-                        // Déterminer la couleur et le texte du bouton
-                        let statusText = 'VOIR >';
-                        let colorClass = 'status-green'; // Par défaut (Actif)
 
-                        // Logique pour status spécifiques
+                        
+                      
+                        let statusText = 'VOIR >';
+                        let colorClass = 'status-green'; 
+
+                       
                         if (agent.name === 'Recrue') { statusText = 'ACCÈS >'; }
                         if (agent.name === 'Dust') { colorClass = 'status-gray'; } 
                         
-                        // Si l'API renvoie des classes CSS spécifiques
+                        
                         if (agent.css_class === 'corrupted') colorClass = 'status-red';
 
-                        // Création du bloc HTML pour un agent
+                   
                         const agentHTML = `
                             <div class="chart-node team-member ${colorClass}">
                                 <div class="role">${agent.role || 'ACTIF'}</div>
                                 <div class="name">${agent.name}</div>
-                                <a href="../${cleanProfileUrl}" class="action-button">${statusText}</a>
+                                <a href="/niv1/${cleanProfileUrl}" class="action-button">${statusText}</a>
                             </div>
                         `;
 
-                        // --- TRI DANS LES BONNES GRILLES ---
+                       
                         if (teamJavier.includes(agent.name)) {
                             htmlJavier += agentHTML;
                         } else if (teamJackal.includes(agent.name)) {
                             htmlJackal += agentHTML;
                         } else {
-                            // Si un agent n'est pas dans les listes, on le met chez Javier par défaut (ou ailleurs)
+                          
                             htmlJavier += agentHTML; 
                         }
                     });
 
-                    // Injection du HTML final
+                 
                     gridJavier.innerHTML = htmlJavier;
                     gridJackal.innerHTML = htmlJackal;
 
