@@ -1,21 +1,23 @@
+/* =========================================
+   1. VARIABLES & RESET
+   ========================================= */
 :root {
     --bg-dark: #050505;
-    --panel-bg: rgba(15, 20, 25, 0.90);
-    --primary: #00ff9d;
-    --secondary: #00f3ff;
-    --danger: #ff3333;
-    --warning: #eebb00;
-    --dim: #445566;
+    --panel-bg: rgba(15, 20, 25, 0.95); /* Opacité augmentée légèrement pour lisibilité */
+    
+    /* PALETTE SHADOW COMPANY */
+    --primary: #00ff9d;      /* Vert Système */
+    --secondary: #00f3ff;    /* Cyan HUD */
+    --danger: #ff3333;       /* Rouge Hostile */
+    --warning: #eebb00;      /* Jaune Alerte */
+    --dim: #445566;          /* Gris Technique */
+    --gold: #d4af37;         /* Commander Gold */
+
     --font-ui: 'Share Tech Mono', monospace;
     --font-code: 'JetBrains Mono', monospace;
     --font-barcode: 'Libre Barcode 128 Text', cursive;
+
     --glass: blur(10px);
-    --terminal-bg: #080a0c;
-    --terminal-green: #00ff9d;
-    --terminal-red: #ff3333;
-    --terminal-dim: #3a4a5a;
-    --terminal-gold: #d4af37;
-    --glass-panel: rgba(10, 15, 20, 0.85);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
@@ -32,6 +34,7 @@ body {
     padding: 2rem 1rem;
 }
 
+/* FOND TACTIQUE */
 body::before {
     content: "";
     position: fixed;
@@ -42,6 +45,7 @@ body::before {
     z-index: -2;
 }
 
+/* EFFET CRT / SCANLINES */
 .crt-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
@@ -53,29 +57,14 @@ body::before {
 }
 @keyframes flicker { 0% {opacity: 0.45;} 50% {opacity: 0.5;} 100% {opacity: 0.45;} }
 
-#boot-screen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #000;
-    z-index: 10000;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    font-family: var(--font-code);
-    color: var(--primary);
-    transition: opacity 1s ease-out;
-}
-.boot-text { font-size: 1.2rem; margin-bottom: 1rem; text-shadow: 0 0 10px var(--primary); }
-.progress-bar { width: 300px; height: 4px; background: #222; position: relative; overflow: hidden; }
-.progress-fill { 
-    height: 100%; background: var(--primary); width: 0%; 
-    box-shadow: 0 0 15px var(--primary);
-    animation: loadProgress 2.5s cubic-bezier(0.2, 0.6, 0.8, 1) forwards; 
-}
-@keyframes loadProgress { 0% {width: 0%;} 40% {width: 30%;} 70% {width: 60%;} 100% {width: 100%;} }
-
+/* =========================================
+   2. TERMINAL STRUCTURE
+   ========================================= */
 .terminal-wrapper {
-    width: 100%; max-width: 900px;
+    width: 100%; max-width: 1100px; /* Agrandi pour tenir les deux ailes */
     perspective: 1500px;
     opacity: 0; transform: scale(0.95);
-    animation: terminalEntry 0.5s 2.6s forwards ease-out;
+    animation: terminalEntry 0.5s 0.5s forwards ease-out;
 }
 @keyframes terminalEntry { to { opacity: 1; transform: scale(1); } }
 
@@ -86,14 +75,12 @@ body::before {
     box-shadow: 0 20px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(0, 255, 157, 0.1);
     padding: 2.5rem;
     position: relative;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
 }
 
+/* Header Strip */
 .header-strip {
     display: flex; justify-content: space-between; align-items: flex-end;
     border-bottom: 2px solid rgba(255,255,255,0.1);
@@ -111,378 +98,178 @@ h1 { font-family: var(--font-code); font-weight: 800; font-size: 2.5rem; letter-
 h1 span { color: var(--danger); }
 .meta-data { font-size: 0.8rem; color: var(--dim); text-align: right; font-family: var(--font-code); }
 
-.hero-section {
-    display: flex; justify-content: center; align-items: center;
-    padding: 1rem 0; margin-bottom: 1rem;
-}
+/* =========================================
+   3. ORGANIGRAMME LAYOUT (V3 WINGS)
+   ========================================= */
 
-.intel-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
-}
-
-.logs-section { width: 100%; }
-
-@media (max-width: 768px) {
-    .intel-grid { grid-template-columns: 1fr; }
-}
-
-.id-card-container {
-    width: 420px; perspective: 1000px; z-index: 10;
-}
-
-.id-card {
-    width: 100%; height: 250px;
-    background: rgba(13, 17, 23, 0.95);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 20px rgba(0, 255, 157, 0.05);
-    overflow: hidden;
-    transition: transform 0.1s;
-    transform-style: preserve-3d;
-    background-image: 
-        linear-gradient(135deg, transparent 0%, transparent 40%, rgba(0, 255, 157, 0.05) 40%, rgba(0, 255, 157, 0.05) 60%, transparent 60%),
-        repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 20px);
-}
-
-.holo-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.1) 40%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 60%, transparent 80%);
-    z-index: 10; opacity: 0.4; pointer-events: none; mix-blend-mode: overlay;
-    transform: translateX(-100%); animation: shimmer 6s infinite;
-}
-@keyframes shimmer { 0% { transform: translateX(-150%); } 20%, 100% { transform: translateX(150%); } }
-
-.card-header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 15px 20px; border-bottom: 1px solid rgba(0, 255, 157, 0.3);
-}
-.card-logo-text { font-weight: bold; color: var(--primary); font-size: 1.2rem; letter-spacing: 2px; text-shadow: 0 0 10px rgba(0, 255, 157, 0.5); }
-.security-level { background: var(--danger); color: #fff; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; border-radius: 4px; box-shadow: 0 0 10px var(--danger); }
-
-.card-body { display: flex; padding: 20px; gap: 20px; position: relative; }
-
-.photo-box {
-    width: 85px; height: 105px;
-    border: 2px solid var(--secondary);
-    border-radius: 4px; overflow: hidden; position: relative;
-    box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
-}
-.photo-box img {
-    width: 100%; height: 100%; object-fit: cover;
-    filter: grayscale(1) contrast(1.2) brightness(0.8);
-}
-
-.agent-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.card-label { font-size: 0.7rem; color: var(--secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
-.card-value { font-size: 1.1rem; color: #fff; margin-bottom: 8px; text-transform: uppercase; font-weight: bold; }
-.card-code { font-family: var(--font-code); color: var(--primary); font-size: 0.9rem; letter-spacing: 1px; }
-
-.card-footer {
-    position: absolute; bottom: 12px; left: 20px; right: 20px;
-    display: flex; justify-content: space-between; align-items: flex-end;
-}
-.barcode { font-family: var(--font-barcode); font-size: 2.5rem; color: #fff; opacity: 0.8; line-height: 0.8; }
-.chip {
-    width: 35px; height: 25px;
-    background: linear-gradient(135deg, #d4af37, #f7ef8a);
-    border-radius: 4px; border: 1px solid #997b18;
-    position: relative;
-}
-.chip::before, .chip::after { content: ''; position: absolute; background: #997b18; }
-.chip::before { top: 50%; left: 0; width: 100%; height: 1px; }
-.chip::after { left: 50%; top: 0; height: 100%; width: 1px; }
-
-.panel {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.05);
-    padding: 1.5rem; position: relative; transition: 0.3s;
-    height: 100%;
-}
-.panel:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
-
-.panel-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 1rem; border-bottom: 1px dashed #333; padding-bottom: 0.5rem;
-}
-.panel-title { font-size: 0.9rem; color: var(--primary); letter-spacing: 2px; font-weight: bold; }
-
-.redacted {
-    background: rgba(255, 51, 51, 0.1); color: var(--danger);
-    font-family: var(--font-code); padding: 0 4px; cursor: help;
-    transition: all 0.2s; position: relative; overflow: hidden; white-space: nowrap;
-}
-.redacted:hover { background: rgba(0, 255, 157, 0.1); color: var(--primary); box-shadow: 0 0 15px rgba(0, 255, 157, 0.2); }
-
-.log-entry { 
-    font-size: 0.85rem; color: #888; margin-bottom: 8px; padding-left: 10px; border-left: 2px solid #333; 
-    transition: 0.2s; 
-}
-.log-entry:hover { border-left-color: var(--primary); color: #ccc; padding-left: 15px; }
-
-.audio-viz { display: flex; gap: 2px; height: 20px; align-items: flex-end; }
-.bar { width: 3px; background: var(--danger); animation: equalize 0.5s infinite; }
-@keyframes equalize { 0% {height: 20%;} 50% {height: 100%;} 100% {height: 20%;} }
-
-.ops-table {
-    width: 100%; border-collapse: collapse; font-family: var(--font-code); font-size: 0.85rem; margin-top: 10px;
-}
-.ops-table th {
-    text-align: left; color: var(--secondary); padding: 12px 8px; border-bottom: 1px solid var(--primary);
-    font-weight: normal; letter-spacing: 1px; opacity: 0.8;
-}
-.ops-table td { padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--dim); }
-.ops-table tr { transition: 0.2s; }
-.ops-table tr:hover td { color: #eee; background: rgba(0, 255, 157, 0.05); }
-.status-badge { padding: 2px 6px; border-radius: 2px; font-size: 0.7rem; font-weight: bold; }
-.st-success { background: rgba(0, 255, 157, 0.15); color: var(--primary); border: 1px solid var(--primary); }
-.st-fail { background: rgba(255, 51, 51, 0.15); color: var(--danger); border: 1px solid var(--danger); }
-.st-pending { background: rgba(238, 187, 0, 0.15); color: var(--warning); border: 1px solid var(--warning); }
-
-.footer { margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; display: flex; justify-content: space-between; color: var(--dim); font-size: 0.8rem; }
-.blink { animation: blink 1s infinite; }
-@keyframes blink { 50% {opacity: 0;} }
-
-.text-danger { color: var(--danger) !important; }
-.text-warning { color: var(--warning) !important; }
-
-.logo {
-    display: block;
-    margin: 0 auto 20px;
-    width: 80px;
-    opacity: 0.8;
-}
-
-.system-status {
-    text-align: center;
-    border-bottom: 1px solid var(--terminal-dim);
-    padding-bottom: 10px;
-    margin-bottom: 40px;
-    letter-spacing: 2px;
-    font-size: 0.9rem;
-    color: var(--terminal-dim);
-}
-.secured { color: var(--terminal-green); text-shadow: 0 0 10px rgba(0,255,157,0.3); }
-.encrypted { color: var(--terminal-red); }
-
-.org-chart {
+/* Container global */
+.org-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 60px;
     position: relative;
+    padding-top: 10px;
 }
 
+/* --- STYLES DES NOEUDS (CARTES) --- */
 .chart-node {
-    background: var(--glass-panel);
-    border: 1px solid var(--terminal-dim);
+    background: rgba(10, 15, 20, 0.6);
+    border: 1px solid var(--dim);
     padding: 15px;
     width: 220px;
     text-align: center;
     position: relative;
+    z-index: 10;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    z-index: 5;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
 }
-
 .chart-node:hover {
-    transform: translateY(-5px);
-    border-color: var(--terminal-green);
-    box-shadow: 0 8px 20px rgba(0, 255, 157, 0.1);
+    transform: translateY(-3px);
+    border-color: var(--secondary);
+    box-shadow: 0 10px 30px rgba(0, 243, 255, 0.15);
+    background: rgba(10, 15, 20, 0.9);
 }
-
-.lead {
-    border-top: 3px solid var(--terminal-gold);
-    width: 280px;
-}
-.lead .role { color: var(--terminal-gold); }
-
-.subordinate {
-    border-top: 3px solid var(--terminal-green);
-}
-.subordinate .role { color: var(--terminal-green); }
 
 .role {
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    opacity: 0.7;
-    margin-bottom: 5px;
+    font-size: 0.7rem; letter-spacing: 2px; opacity: 0.9; margin-bottom: 5px;
+    color: var(--secondary);
 }
-
 .name {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color: #fff;
-    text-transform: uppercase;
+    font-size: 1.2rem; font-weight: bold; color: #fff; 
+    text-transform: uppercase; font-family: var(--font-code); margin-bottom: 10px;
 }
 
-/* =========================================
-   CORRECTION : ESPACEMENT & ALIGNEMENT
-   ========================================= */
+/* RANGS SPECIFIQUES */
+.lead { 
+    border-top: 3px solid var(--gold); 
+    width: 260px; /* Commander plus large */
+}
+.lead .role { color: var(--gold); }
 
-/* 1. Le Chef (Graves) - On réduit la marge du bas */
-.director-container {
-    position: relative;
-    margin-bottom: 30px; /* Réduit de 40 à 30 pour remonter le tout */
-    display: flex;
-    justify-content: center;
+.subordinate { 
+    border-top: 3px solid var(--secondary); 
 }
 
-.director-container::after {
-    content: '';
-    position: absolute;
-    bottom: -30px; /* Doit correspondre au margin-bottom ci-dessus */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 30px;
-    background: var(--secondary);
-    box-shadow: 0 0 10px var(--secondary);
-}
+/* Status Colors */
+.status-green { border-left: 2px solid var(--primary); }
+.status-green .role { color: var(--primary); }
 
-/* --- MISE A JOUR CSS POUR ORGANIGRAMME COMPLET --- */
+.status-gray { border-left: 2px solid var(--dim); }
+.status-gray .role { color: var(--dim); }
 
-/* Conteneur principal des deux branches */
-.ltn-container {
-    display: flex;
-    justify-content: center;
-    gap: 40px; /* Espace entre l'équipe Javier et l'équipe Jackal */
-    margin-top: 0;
-    position: relative;
-}
-
-/* La grande ligne horizontale du haut (connecte les lieutenants) */
-.ltn-container::before {
-    content: '';
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50%; /* Ajustez la largeur selon vos besoins */
-    height: 1px;
-    background: var(--secondary);
-    box-shadow: 0 0 5px var(--secondary);
-    z-index: 0;
-}
-
-/* Connecteur vertical au dessus de chaque Lieutenant */
-.wing-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    min-width: 300px; /* Largeur min pour que les squads aient de la place */
-}
-
-.wing-container::before {
-    content: '';
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    width: 1px;
-    height: 40px;
-    background: var(--secondary);
-}
-
-/* Style du noeud Lieutenant */
-.subordinate {
-    margin-bottom: 40px; /* Espace entre Lieutenant et ses agents */
-    z-index: 2;
-}
-
-/* Petit connecteur sous le lieutenant vers sa squad */
-.connector-down {
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    width: 1px;
-    height: 40px;
-    background: linear-gradient(to bottom, var(--secondary), var(--dim));
-}
-
-/* --- GRILLE DES AGENTS (SQUAD) --- */
-.squad-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 colonnes d'agents */
-    gap: 15px;
-    width: 100%;
-    position: relative;
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Ligne subtile au dessus du groupe */
-}
-
-/* Petit trait vertical reliant la ligne du groupe aux agents */
-.squad-grid::before {
-    content: '';
-    position: absolute;
-    top: -20px; /* Remonte vers le connecteur du lieutenant */
-    left: 50%;
-    width: 1px;
-    height: 20px;
-    background: var(--dim);
-}
-
-/* Style des cartes agents (plus petit pour rentrer) */
-.team-member {
-    width: 100% !important; /* Force la largeur de la colonne */
-    font-size: 0.8rem;
-    padding: 10px;
-}
-
-.team-member .name {
-    font-size: 1rem;
-    margin-bottom: 5px;
-}
-.team-member .role { font-size: 0.65rem; }
-
+/* Boutons */
 .action-button {
     display: block;
     text-decoration: none;
     font-size: 0.75rem;
     padding: 6px;
-    border: 1px solid var(--terminal-dim);
-    color: var(--terminal-dim);
-    margin-top: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--dim);
     transition: 0.2s;
     text-align: center;
-    cursor: pointer;
 }
-
 .action-button:hover {
     background: rgba(255,255,255,0.05);
     color: #fff;
-    border-color: #fff;
+    border-color: var(--secondary);
 }
 
-.status-green {
-    color: var(--terminal-green) !important;
-    border-color: var(--terminal-green) !important;
-    background: rgba(0, 255, 157, 0.05);
+
+/* --- STRUCTURE HIERARCHIQUE --- */
+
+/* NIVEAU 1 : COMMANDER */
+.level-1 {
+    margin-bottom: 60px;
+    position: relative;
+}
+/* Ligne verticale sous Graves */
+.level-1::after {
+    content: ''; position: absolute; bottom: -30px; left: 50%; width: 2px; height: 30px;
+    background: var(--secondary); box-shadow: 0 0 8px var(--secondary);
 }
 
-.status-red {
-    color: var(--terminal-red) !important;
-    border-color: var(--terminal-red) !important;
-    background: rgba(255, 51, 51, 0.05);
+/* BARRE HORIZONTALE DE SEPARATION */
+.split-bar-top {
+    position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
+    width: 540px; /* Largeur calculée pour atteindre les deux ailes */
+    height: 2px;
+    background: var(--secondary); box-shadow: 0 0 8px var(--secondary);
+}
+/* Les petites descentes vers les ailes */
+.split-bar-top::before { content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 30px; background: var(--secondary); }
+.split-bar-top::after { content: ''; position: absolute; right: 0; top: 0; width: 2px; height: 30px; background: var(--secondary); }
+
+
+/* NIVEAU 2 : LES AILES (WINGS) */
+.wings-wrapper {
+    display: flex;
+    gap: 60px; /* Ecart entre les deux groupes */
+    align-items: flex-start;
 }
 
-.status-gray {
-    color: #888 !important;
-    border-color: #555 !important;
+.wing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 480px; /* Largeur fixe pour contenir la grille proprement */
 }
 
+/* Connecteur sous Lieutenant */
+.lt-connector {
+    height: 30px; width: 2px; background: var(--secondary);
+    box-shadow: 0 0 5px var(--secondary);
+    margin-bottom: 0;
+}
+
+/* La "Fourche" (Fork) sous le lieutenant */
+.squad-fork {
+    width: 260px; /* Connecte le milieu de col 1 au milieu de col 2 */
+    height: 2px; background: var(--secondary);
+    position: relative;
+    margin-bottom: 30px;
+    box-shadow: 0 0 5px var(--secondary);
+}
+.squad-fork::before { content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 30px; background: var(--secondary); }
+.squad-fork::after { content: ''; position: absolute; right: 0; top: 0; width: 2px; height: 30px; background: var(--secondary); }
+
+
+/* NIVEAU 3 : GRILLES SQUADS (2x2) */
+.squad-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 40px; /* Ecart vertical / horizontal */
+    width: 100%;
+    justify-items: center;
+}
+
+/* Styles spécifiques pour les cartes squad (un peu plus petites si besoin) */
+.team-member {
+    width: 100% !important;
+}
+
+/* =========================================
+   4. FOOTER
+   ========================================= */
 .portal-footer {
-    margin-top: 60px;
-    text-align: center;
-    border-top: 1px solid var(--terminal-dim);
-    padding-top: 20px;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 1rem;
+    display: flex;
+    justify-content: center;
 }
-
 .back-link {
-    color: var(--terminal-dim);
+    color: var(--dim);
     text-decoration: none;
     font-size: 0.8rem;
     transition: color 0.3s;
 }
-.back-link:hover { color: var(--terminal-red); }
+.back-link:hover { color: var(--danger); }
+
+/* MEDIA QUERY POUR MOBILE */
+@media (max-width: 1100px) {
+    .wings-wrapper { flex-direction: column; gap: 50px; }
+    .split-bar-top { display: none; } /* On cache les connecteurs complexes sur mobile */
+    .level-1::after { display: none; }
+    .wing { width: 100%; border-top: 1px dashed var(--dim); padding-top: 20px; }
+    .squad-fork { display: none; }
+}
