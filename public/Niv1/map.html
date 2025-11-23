@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS - Carte Tactique</title>
+    <title>SAS :: TACTICAL MAP</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Rajdhani:wght@500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
@@ -13,110 +15,119 @@
     <link rel="stylesheet" href="/css/style-mo.css"> 
 
     <style>
-        /* Ajustements de layout pour la carte */
-        .terminal {
-            max-width: 95vw; /* Plus large pour la carte */
-            height: 90vh;
-            padding: 1.5rem;
+        /* --- CONFIGURATION GLOBALE --- */
+        body {
+            background-color: #020202;
+            color: #eee;
+            margin: 0;
+            padding: 10px;
+            height: 100vh;
+            overflow: hidden; /* Pas de scroll sur la page map */
         }
 
-        #map-container {
-            flex-grow: 1;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            /* Filtre global sur la carte pour l'assombrir et la teinter */
-            filter: sepia(20%) hue-rotate(180deg) contrast(110%) saturate(80%); 
-        }
-
-        /* --- STYLES DES CONTRÔLES (INPUTS) --- */
-        #intel-controls {
-            background: rgba(10, 15, 20, 0.8);
-            border: 1px solid var(--dim);
-            padding: 1rem;
+        /* Wrapper Pleine Largeur */
+        .terminal-wrapper.mode-large {
+            width: 98vw;
+            height: 96vh;
+            max-width: none;
+            margin: 0 auto;
             display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: flex-end;
-            backdrop-filter: blur(5px);
+            flex-direction: column;
         }
 
+        .terminal {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 20px;
+            background: rgba(10, 15, 20, 0.4); /* Fond très léger */
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* --- HEADER --- */
+        .header-strip {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px; margin-bottom: 20px; flex-shrink: 0;
+        }
+        .main-title {
+            font-size: 3rem; font-family: 'Rajdhani', sans-serif; font-weight: 800;
+            line-height: 0.9; text-transform: uppercase; margin: 0;
+            background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .meta-data { font-family: 'JetBrains Mono'; color: var(--dim); text-align: right; }
+
+        /* --- BARRE D'OUTILS (HUD) --- */
+        #intel-controls {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--dim);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
         .control-group label {
-            color: var(--secondary);
-            font-size: 0.8rem;
-            font-family: var(--font-code);
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-            display: block;
+            color: var(--secondary); font-family: 'Rajdhani'; font-weight: bold; font-size: 0.9rem; letter-spacing: 1px;
         }
 
         .intel-input, .intel-select {
-            font-family: var(--font-ui);
-            background: rgba(0,0,0,0.5); 
-            color: #fff; 
-            border: 1px solid var(--dim); 
-            padding: 0.5rem; 
+            font-family: 'Share Tech Mono';
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid var(--dim);
+            padding: 8px 12px;
             font-size: 1rem;
+            min-width: 250px;
+        }
+        .intel-input:focus, .intel-select:focus {
+            outline: none; border-color: var(--primary); background: rgba(0, 255, 157, 0.05);
+        }
+
+        #current-agent-display {
+            font-family: 'JetBrains Mono'; font-weight: bold; color: var(--primary);
+            border: 1px solid var(--primary); padding: 8px 15px;
+            background: rgba(0, 255, 157, 0.1); align-self: flex-end;
+            height: 40px; display: flex; align-items: center;
+        }
+
+        /* --- CARTE --- */
+        #map-container {
+            flex-grow: 1; /* Prend tout l'espace restant */
             width: 100%;
-            transition: all 0.3s ease;
+            border: 1px solid var(--dim);
+            position: relative;
+            background: #050505;
+            /* Filtre "Tactical Night Vision" léger */
+            filter: contrast(1.1) saturate(0.8);
         }
 
-        .intel-input:focus, .intel-select:focus { 
-            outline: none; 
-            border-color: var(--primary);
-            box-shadow: 0 0 10px rgba(0, 255, 157, 0.2); 
-        }
-
-        /* Indicateur de mode */
-        #add-mode-indicator { 
-            color: var(--dim); 
-            font-family: var(--font-code);
-            font-size: 0.8rem;
-            margin: 0.5rem 0;
-            border-left: 2px solid var(--dim);
-            padding-left: 10px;
-            transition: color 0.3s;
-        }
-        #add-mode-indicator.active { 
-            color: var(--primary); 
-            border-color: var(--primary);
-            text-shadow: 0 0 8px var(--primary);
-            animation: blink 1.5s infinite; 
-        }
-
-        /* --- OVERRIDE LEAFLET (Thème Dark) --- */
-        
-        /* Popups */
-        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-            background: rgba(15, 20, 25, 0.95);
-            border: 1px solid var(--primary);
-            color: #eee;
-            border-radius: 0;
-            font-family: var(--font-ui);
-            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
-        }
-        .leaflet-popup-content h4 {
-            font-family: var(--font-code);
-            color: var(--secondary);
-            border-bottom-color: var(--dim) !important;
-        }
-        .leaflet-container a.leaflet-popup-close-button {
-            color: var(--danger);
-        }
-
-        /* Boutons de Zoom et Draw */
-        .leaflet-bar { border: none; box-shadow: none; }
+        /* --- LEAFLET OVERRIDES --- */
         .leaflet-bar a {
-            background-color: rgba(10, 15, 20, 0.9) !important;
-            border: 1px solid var(--dim) !important;
+            background-color: rgba(0,0,0,0.8) !important;
+            border-color: var(--dim) !important;
             color: var(--primary) !important;
             border-radius: 0 !important;
         }
-        .leaflet-bar a:hover {
-            border-color: var(--secondary) !important;
-            color: #fff !important;
-            background-color: rgba(255,255,255,0.1) !important;
-        }
+        .leaflet-bar a:hover { background-color: var(--primary) !important; color: #000 !important; }
         
+        .leaflet-popup-content-wrapper {
+            background: rgba(10, 15, 20, 0.95);
+            border: 1px solid var(--primary);
+            border-radius: 0; color: #eee;
+            font-family: 'Share Tech Mono';
+        }
+        .leaflet-popup-tip { background: var(--primary); }
+        .leaflet-popup-content h4 {
+            font-family: 'Rajdhani'; font-weight: bold; font-size: 1.2rem;
+            color: #fff; border-bottom: 1px solid var(--dim); padding-bottom: 5px;
+        }
+
         /* Custom Markers */
         .custom-marker {
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
@@ -126,78 +137,54 @@
         .imp-2 { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
         .imp-3 { background: #ff9900; box-shadow: 0 0 10px #ff9900; }
         .imp-4 { background: var(--danger); box-shadow: 0 0 15px var(--danger); animation: pulse-red 2s infinite; }
-
         @keyframes pulse-red { 0% {box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7);} 70% {box-shadow: 0 0 0 10px rgba(255, 51, 51, 0);} 100% {box-shadow: 0 0 0 0 rgba(255, 51, 51, 0);} }
 
-        /* Agent Info */
-        .current-agent-info { 
-            color: var(--secondary); 
-            font-family: var(--font-code);
-            border: 1px solid var(--secondary); 
-            padding: 0.5rem 1rem; 
-            background: rgba(0, 243, 255, 0.05);
-        }
+        /* Toolbar Draw */
+        .leaflet-draw-toolbar a { filter: invert(1) hue-rotate(90deg); }
+        .leaflet-draw-actions li a { background-color: #000 !important; color: var(--primary) !important; border-left: 1px solid var(--dim) !important; }
 
-        /* Boutons Actions */
+        /* Footer */
+        .portal-footer { margin-top: 10px; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
         .delete-btn {
-            background: rgba(255, 51, 51, 0.1);
-            border: 1px solid var(--danger);
-            color: var(--danger);
-            padding: 8px;
-            margin-top: 10px;
-            width: 100%;
-            font-family: var(--font-code);
-            cursor: pointer;
-            transition: all 0.2s;
+            background: transparent; border: 1px solid var(--danger); color: var(--danger);
+            padding: 5px 10px; width: 100%; margin-top: 10px; cursor: pointer; font-family: 'JetBrains Mono';
         }
-        .delete-btn:hover {
-            background: var(--danger);
-            color: #000;
-            box-shadow: 0 0 10px var(--danger);
-        }
-
-        /* Toolbar Draw Icons - Inversion couleur pour matcher le thème */
-        .leaflet-draw-toolbar a {
-            filter: invert(1) hue-rotate(90deg); /* Tente de rendre les icones noires un peu vertes/cyan */
-        }
+        .delete-btn:hover { background: var(--danger); color: #000; }
         
-        .leaflet-draw-actions { left: 35px !important; }
-        .leaflet-draw-actions li a { 
-            background-color: var(--bg-dark) !important; 
-            color: var(--primary) !important;
-            border-left: 1px solid var(--dim) !important;
+        #add-mode-indicator {
+            color: var(--dim); font-family: 'JetBrains Mono'; font-size: 0.9rem; margin-top: 10px;
         }
+        #add-mode-indicator.active { color: var(--primary); animation: blink 1s infinite; }
+        
     </style>
 </head>
 <body>
 
-    <div class="crt-overlay"></div>
-
-    <div class="terminal-wrapper">
+    <div class="terminal-wrapper mode-large">
         <div class="terminal">
             
             <div class="header-strip">
                 <div>
-                    <h1>RENSEIGNEMENT <span>TACTIQUE</span></h1>
-                    <div style="color: var(--primary); font-size: 0.9rem; letter-spacing: 2px;">VUE SATELLITE - SECTEUR 04</div>
+                    <h1 class="main-title">TACTICAL <span style="-webkit-text-fill-color: var(--danger);">MAP</span></h1>
+                    <div style="color: var(--primary); font-size: 1rem; letter-spacing: 4px; margin-top: 5px;">SATELLITE VIEW - SECTOR 04</div>
                 </div>
                 <div class="meta-data">
-                    <div id="clock">00:00:00</div>
-                    <div style="color: var(--danger)">[CRYPTAGE: ACTIF]</div>
+                    <div id="clock" style="font-size: 1.5rem; font-weight: bold;">00:00:00</div>
+                    <div style="color: var(--warning)">[ CONNECTION SECURE ]</div>
                 </div>
             </div>
 
             <div id="intel-controls">
-                <div class="current-agent-info" id="current-agent-display">[IDENTIFICATION...]</div>
+                <div class="current-agent-info" id="current-agent-display">[ SCANNING ID... ]</div>
                 
-                <div class="control-group" style="flex-grow: 2;">
+                <div class="control-group" style="flex-grow: 1;">
                     <label>DONNÉES INTEL (DESCRIPTION)</label>
                     <input type="text" id="point-desc" class="intel-input" placeholder="Entrez description pour activer les outils..." autocomplete="off">
                 </div>
                 
-                <div class="control-group" style="min-width: 150px;">
+                <div class="control-group">
                     <label>NIVEAU DE MENACE</label>
-                    <select id="point-importance" class="intel-select">
+                    <select id="point-importance" class="intel-select" style="min-width: 150px;">
                         <option value="1" style="color:var(--primary)">NIV 1 - INFO</option>
                         <option value="2" style="color:var(--warning)">NIV 2 - ATTENTION</option>
                         <option value="3" style="color:#ff9900">NIV 3 - DANGER</option>
@@ -206,14 +193,15 @@
                 </div>
             </div>
 
-            <div id="add-mode-indicator">EN ATTENTE... ENTREZ UNE DESCRIPTION POUR DÉVERROUILLER L'INTERFACE DESSIN.</div>
-            
             <div id="map-container"></div>
             
-            <div class="portal-footer">
-                <a href="/index.html" class="back-link">[ < REVENIR AU DASHBOARD ]</a>
-                <span style="color: var(--dim); font-size: 0.8rem; margin-left: 20px;">SAS-INTEL-V3.6 (SECURE)</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div id="add-mode-indicator">EN ATTENTE... ENTREZ UNE DESCRIPTION POUR DÉVERROUILLER L'INTERFACE.</div>
+                <div class="portal-footer">
+                    <a href="/index.html" class="back-link action-button" style="padding: 5px 20px; border: 1px solid var(--dim); color: var(--dim); text-decoration: none;">[ RETOUR DASHBOARD ]</a>
+                </div>
             </div>
+
         </div>
     </div>
 
@@ -221,7 +209,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 
     <script>
-        // --- PETIT SCRIPT POUR L'HORLOGE ---
+        // --- HORLOGE ---
         function updateClock() {
             const now = new Date();
             document.getElementById('clock').textContent = now.toLocaleTimeString('fr-FR');
@@ -229,7 +217,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // --- CONFIGURATION CARTE EXISTANTE ---
+        // --- CONFIG LEAFLET ---
         const mapExtent = [0, 0, 8192, 8192];
         const mapMaxZoom = 5;
         const crs = L.CRS.Simple;
@@ -239,8 +227,6 @@
 
         const imageBounds = [[0, 0], [8192, 8192]];
 
-        // Fond de carte noir par défaut (couleur du container)
-        
         const map = L.map('map-container', {
             maxZoom: mapMaxZoom, 
             minZoom: 1, 
@@ -249,14 +235,14 @@
             zoomControl: false, 
             doubleClickZoom: false,
             center: [4096, 4096],
-            zoom: 2
+            zoom: 2,
+            zoomSnap: 0.5 
         });
 
         L.control.zoom({ position: 'topright' }).addTo(map);
         
-        // Note: Assurez-vous que l'image existe. Sinon le fond sera noir tactique.
+        // Image de fond (Carte GTA)
         L.imageOverlay('/assets/carte-satellite-gta-5.jpg', imageBounds).addTo(map);
-        
         map.setMaxBounds([[-8000, -8000], [16000, 16000]]); 
 
         let pointsLayer = L.layerGroup().addTo(map);
@@ -265,12 +251,12 @@
 
         let currentAgent = null;
 
-        // Configuration des couleurs de dessin pour matcher le thème
+        // Configuration Draw
         const drawControl = new L.Control.Draw({
             draw: {
-                polyline: { shapeOptions: { color: '#00ff9d', weight: 3 } }, // var(--primary)
+                polyline: { shapeOptions: { color: '#00ff9d', weight: 3 } },
                 polygon: { shapeOptions: { color: '#00ff9d' }, allowIntersection: false, showArea: true },
-                rectangle: { shapeOptions: { color: '#eebb00', weight: 2 } }, // var(--warning)
+                rectangle: { shapeOptions: { color: '#eebb00', weight: 2 } },
                 circle: false, marker: false, circlemarker: false
             },
             edit: false
@@ -278,9 +264,6 @@
 
         async function init() {
             const username = localStorage.getItem('sas_user');
-            // Simulation pour le test si pas de login
-            // const username = "Ghost"; 
-            
             if (!username) { window.location.href = '/login.html'; return; }
             
             try {
@@ -293,6 +276,7 @@
                     display.innerHTML = `[AGENT: <span style="color:#fff">${currentAgent.name.toUpperCase()}</span>]`;
                     display.style.borderColor = 'var(--primary)';
                     display.style.color = 'var(--primary)';
+                    display.style.boxShadow = '0 0 10px rgba(0,255,157,0.2)';
                 } else {
                      display.textContent = `[ERREUR IDENTIFICATION]`;
                      display.style.borderColor = 'var(--danger)';
@@ -314,23 +298,19 @@
                     const imp = point.importance_level || 1;
                     const icon = L.divIcon({ className: `custom-marker imp-${imp}`, html: imp, iconSize: [20+(imp*2), 20+(imp*2)], iconAnchor: [10+imp, 10+imp] });
                     
-                    // Contenu Popup Stylisé
                     const popupContent = `
                         <div style="min-width: 200px">
-                            <h4 style="margin: 0 0 10px 0; padding-bottom: 5px; border-bottom: 1px dashed #555;">
-                                INTEL #${point.id}
-                            </h4>
+                            <h4 style="margin: 0 0 10px 0;">INTEL #${point.id}</h4>
                             <p style="margin: 5px 0; font-size: 0.85rem;"><b>SOURCE:</b> <span style="color:var(--primary)">${point.creator_name || 'Inconnu'}</span></p>
-                            <div style="background:rgba(0,0,0,0.3); padding: 8px; margin-top: 5px; border-left: 2px solid var(--primary); color: #ccc; font-size: 0.9rem;">
+                            <div style="background:rgba(0,0,0,0.3); padding: 8px; margin-top: 5px; border-left: 2px solid var(--primary); color: #ccc;">
                                 ${point.description}
                             </div>
                             <div style="text-align:right; font-size:0.7em; color:var(--dim); margin-top:5px;">
                                 ${new Date(point.created_at).toLocaleString()}
                             </div>
-                            <button onclick="deletePoint(${point.id})" class="delete-btn">SUPPRIMER MARQUEUR</button>
+                            <button onclick="deletePoint(${point.id})" class="delete-btn">SUPPRIMER</button>
                         </div>
                     `;
-
                     L.marker([y, x], {icon: icon}).addTo(pointsLayer).bindPopup(popupContent);
                 });
             } catch (e) { console.error("Erreur points:", e); }
@@ -342,11 +322,11 @@
                 const data = await response.json();
                 drawnItems.clearLayers();
                 data.drawings.forEach(drawing => {
-                    let color = '#00ff9d'; // primary
+                    let color = '#00ff9d';
                     const imp = drawing.importance_level || 1;
-                    if (imp === 2) color = '#eebb00'; // warning
+                    if (imp === 2) color = '#eebb00';
                     if (imp === 3) color = '#ff9900';
-                    if (imp === 4) color = '#ff3333'; // danger
+                    if (imp === 4) color = '#ff3333';
 
                     const layer = L.geoJSON(drawing.geojson, {
                         style: function (feature) { return { color: color, weight: 3 }; }
@@ -354,14 +334,12 @@
                     layer.eachLayer(function (l) {
                         l.bindPopup(`
                             <div style="min-width: 200px;">
-                                <h4 style="margin: 0 0 10px 0; border-bottom: 1px dashed ${color};">
-                                    ZONE TACTIQUE #${drawing.id}
-                                </h4>
-                                <p style="font-size: 0.85rem;"><b>OPÉRATEUR:</b> <span style="color:var(--primary)">${drawing.creator_name || 'Inconnu'}</span></p>
+                                <h4 style="margin: 0 0 10px 0; border-bottom: 1px dashed ${color};">ZONE #${drawing.id}</h4>
+                                <p style="font-size: 0.85rem;"><b>OP:</b> <span style="color:var(--primary)">${drawing.creator_name || 'Inconnu'}</span></p>
                                 <div style="background:rgba(0,0,0,0.3); padding: 8px; margin-top: 5px; border-left: 2px solid ${color}; color: #ccc;">
                                     ${drawing.description || 'Aucune description'}
                                 </div>
-                                <button onclick="deleteDrawing(${drawing.id})" class="delete-btn">EFFACER ZONE</button>
+                                <button onclick="deleteDrawing(${drawing.id})" class="delete-btn">EFFACER</button>
                             </div>
                         `);
                         drawnItems.addLayer(l);
@@ -371,27 +349,27 @@
         }
 
         window.deletePoint = async function(id) {
-            if (!confirm("CONFIRMER SUPPRESSION DU POINT ?")) return;
+            if (!confirm("CONFIRMER SUPPRESSION ?")) return;
             try {
-                const response = await fetch('/api/execute-action', {
+                await fetch('/api/execute-action', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'delete_point', point_id: id })
                 });
-                if (response.ok) loadPoints();
-            } catch (error) { console.error("Erreur delete point:", error); }
+                loadPoints();
+            } catch (error) { console.error(error); }
         };
 
         window.deleteDrawing = async function(id) {
-            if (!confirm("CONFIRMER SUPPRESSION DE LA ZONE ?")) return;
+            if (!confirm("CONFIRMER SUPPRESSION ?")) return;
             try {
-                const response = await fetch('/api/execute-action', {
+                await fetch('/api/execute-action', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'delete_drawing', drawing_id: id })
                 });
-                if (response.ok) loadDrawings();
-            } catch (error) { console.error("Erreur delete drawing:", error); }
+                loadDrawings();
+            } catch (error) { console.error(error); }
         };
 
         map.on(L.Draw.Event.CREATED, async function (e) {
@@ -420,7 +398,7 @@
                 document.getElementById('point-desc').value = '';
                 updateMode();
                 loadDrawings();
-            } catch (error) { console.error("Erreur sauvegarde dessin:", error); }
+            } catch (error) { console.error(error); }
         });
 
         document.getElementById('point-desc').addEventListener('input', updateMode);
@@ -431,14 +409,14 @@
             const indicator = document.getElementById('add-mode-indicator');
             
             if (desc && currentAgent) {
-                indicator.textContent = ">> MODE AJOUT ACTIF : CLIQUEZ OU DESSINEZ SUR LA CARTE <<";
+                indicator.innerHTML = "<span style='color:var(--primary)'>[ MODE ÉDITION ACTIF ]</span> CLIQUEZ SUR LA CARTE OU UTILISEZ LES OUTILS DE DESSIN";
                 indicator.classList.add('active');
                 if (!drawControlAdded) {
                     map.addControl(drawControl);
                     drawControlAdded = true;
                 }
             } else {
-                indicator.textContent = "EN ATTENTE... ENTREZ UNE DESCRIPTION POUR DÉVERROUILLER L'INTERFACE.";
+                indicator.innerHTML = "EN ATTENTE... ENTREZ UNE DESCRIPTION POUR DÉVERROUILLER L'INTERFACE.";
                 indicator.classList.remove('active');
                 if (drawControlAdded) {
                     map.removeControl(drawControl);
@@ -449,7 +427,6 @@
 
         map.on('click', async function(e) {
             if (drawControl._toolbars.draw._activeMode) return;
-
             const description = document.getElementById('point-desc').value;
             if (!description || !currentAgent) return;
             const importance_level = document.getElementById('point-importance').value;
@@ -466,7 +443,7 @@
                     updateMode();
                     loadPoints();
                 }
-            } catch (error) { console.error("Erreur ajout point:", error); }
+            } catch (error) { console.error(error); }
         });
 
         init();
