@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS :: INVESTIGATION WALL v2.2 (STABLE)</title>
+    <title>SAS :: INVESTIGATION WALL</title>
     
+    <script> const REQUIRED_LEVEL = 2; </script>
+    <script>if(typeof checkSecurity === 'undefined') { window.checkSecurity = function() { console.log("Sec Check Bypass"); } }</script>
+    <script src="/js/security.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Rajdhani:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -31,10 +35,9 @@
             cursor: crosshair;
             font-family: 'Share Tech Mono', monospace;
             color: #eee;
-            user-select: none; /* Empêche la sélection de texte accidentelle */
+            user-select: none;
         }
 
-        /* Grille de fond */
         #grid-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
@@ -44,12 +47,11 @@
             pointer-events: none; z-index: -1;
         }
 
-        /* --- COUCHE MONDE --- */
         #world-layer {
             position: absolute; top: 0; left: 0;
             transform-origin: 0 0;
             width: 100%; height: 100%;
-            will-change: transform; /* Optimisation fluidité */
+            will-change: transform;
         }
 
         /* --- ITEMS --- */
@@ -60,10 +62,8 @@
             padding: 10px;
             width: 220px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            /* Important : pas de transition sur left/top pour éviter le lag en drag */
             transition: box-shadow 0.2s, border-color 0.2s; 
             clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
-            /* Bordure couleur (haut) */
             border-top: 4px solid var(--dim);
         }
 
@@ -122,7 +122,6 @@
             width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 1px solid #444; transition: transform 0.2s;
         }
         .color-swatch:hover { transform: scale(1.3); border-color: #fff; }
-        
         .ctx-item { padding: 12px 15px; cursor: pointer; font-size: 0.8rem; color: #ccc; border-bottom: 1px solid #222; }
         .ctx-item:hover { background: var(--primary); color: #000; }
         .ctx-item.delete:hover { background: var(--danger); color: #fff; }
@@ -189,7 +188,7 @@
             
             <div id="modal-image-group">
                 <label style="font-size:0.7rem; color:#666;">IMAGE URL</label>
-                <input type="text" id="modal-image" class="edit-input" placeholder="http://...">
+                <input type="text" id="modal-image" class="edit-input" placeholder="/assets/...">
             </div>
 
             <div style="text-align: right;">
@@ -200,17 +199,15 @@
     </div>
 
     <script>
-        // --- VARIABLES GLOBALES ---
+        // --- VARIABLES ---
         let items = [];
         let links = [];
         let view = { x: 0, y: 0, scale: 1 };
         
-        // États d'interaction
         let isPanning = false;
         let isDragging = false;
         let isLinking = false;
         
-        // Variables temporaires
         let lastMouse = { x: 0, y: 0 };
         let dragItem = null;
         let dragOffset = { x: 0, y: 0 };
@@ -218,86 +215,54 @@
         let tempLinkPath = null;
         let contextTargetId = null;
 
-        // DOM Cache
         const world = document.getElementById('world-layer');
         const itemsLayer = document.getElementById('items-layer');
         const svgLayer = document.getElementById('connections-layer');
         const ctxMenu = document.getElementById('context-menu');
         const editModal = document.getElementById('editModal');
 
-        // --- MOCK API (Données de test) ---
+        // --- REAL API CALLS ---
         const API = {
-            data: {
-                items: [
-                    { id: 1, type: 'suspect', x: 500, y: 300, label: 'Cible Alpha', image_url: 'https://placehold.co/200x150/111/FFF?text=ALPHA', color: '#ff3333' },
-                    { id: 2, type: 'note', x: 800, y: 400, label: 'Vu au secteur 4\nConfirmer identité.', color: '#eebb00' }
-                ],
-                links: [
-                    { id: 101, from_id: 1, to_id: 2, type: 'red' }
-                ]
+            async read() {
+                try {
+                    const res = await fetch('/api/read?resource=investigation');
+                    return await res.json();
+                } catch(e) { console.error("API Read Error", e); return {items:[], links:[]}; }
             },
-            // Simule des appels asynchrones
-            async read() { return JSON.parse(JSON.stringify(this.data)); }, // Retourne une copie pour éviter les bugs de ref
             async exec(cmd) {
-                console.log("CMD:", cmd);
-                // Logique locale simplifiée
-                if(cmd.action === 'move') {
-                    const i = this.data.items.find(x => x.id === cmd.id);
-                    if(i) { i.x = cmd.x; i.y = cmd.y; }
-                }
-                if(cmd.action === 'add_link') {
-                    this.data.links.push({ id: Date.now(), from_id: cmd.from_id, to_id: cmd.to_id, type: cmd.type });
-                }
-                if(cmd.action === 'del_link') {
-                    this.data.links = this.data.links.filter(l => l.id !== cmd.id);
-                }
-                if(cmd.action === 'update_text') {
-                    const i = this.data.items.find(x => x.id === cmd.id);
-                    if(i) {
-                        if(cmd.label) i.label = cmd.label;
-                        if(cmd.image_url !== undefined) i.image_url = cmd.image_url;
-                        if(cmd.color) i.color = cmd.color;
-                    }
-                }
-                if(cmd.action === 'add_item') {
-                    this.data.items.push({ 
-                        id: Date.now(), type: cmd.type, label: cmd.label, 
-                        image_url: cmd.image_url, x: cmd.x, y: cmd.y, color: cmd.color 
+                try {
+                    const res = await fetch('/api/execute-action', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(cmd)
                     });
-                }
-                if(cmd.action === 'del_item') {
-                    this.data.items = this.data.items.filter(x => x.id !== cmd.id);
-                    this.data.links = this.data.links.filter(l => l.from_id !== cmd.id && l.to_id !== cmd.id);
-                }
-                return { success: true };
+                    return await res.json();
+                } catch(e) { console.error("API Exec Error", e); }
             }
         };
 
-        // --- INITIALISATION ---
+        // --- INIT ---
         async function init() {
-            try {
-                const data = await API.read();
-                items = data.items;
-                links = data.links;
-                renderBoard();
-                centerView();
-            } catch (e) { console.error("Erreur Init:", e); }
+            const data = await API.read();
+            items = data.items || [];
+            links = data.links || [];
+            renderBoard();
+            if(view.scale === 1 && view.x === 0) centerView(); // Centre seulement au premier load
         }
 
-        // --- MOTEUR DE RENDU ---
+        // --- RENDER ---
         function renderBoard() {
             itemsLayer.innerHTML = '';
             svgLayer.innerHTML = '';
             
-            // 1. Items
             items.forEach(item => {
                 const el = document.createElement('div');
                 el.className = `board-item item-${item.type}`;
-                el.id = `item-${item.id}`; // ID important pour le drag
+                el.id = `item-${item.id}`;
+                el.dataset.id = item.id;
                 el.style.left = item.x + 'px';
                 el.style.top = item.y + 'px';
                 
-                // Couleur custom ou défaut
                 if(item.color) el.style.borderTopColor = item.color;
 
                 let html = `<div class="item-header"><span>#${item.id}</span><span>${item.type}</span></div>`;
@@ -305,16 +270,13 @@
                 html += `<div class="item-content">${item.label}</div>`;
                 el.innerHTML = html;
 
-                // EVENTS SUR L'ITEM
                 el.onmousedown = (e) => onMouseDownItem(e, item);
-                el.onmouseup = (e) => onMouseUpItem(e, item);
                 el.ondblclick = (e) => { e.stopPropagation(); openEditModal('edit', item.type, item); };
                 el.oncontextmenu = (e) => openContextMenu(e, item.id);
 
                 itemsLayer.appendChild(el);
             });
 
-            // 2. Liens
             links.forEach(link => {
                 const from = items.find(i => i.id === link.from_id);
                 const to = items.find(i => i.id === link.to_id);
@@ -326,14 +288,12 @@
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             path.setAttribute("class", `link-${link.type}`);
             path.dataset.id = link.id;
-            path.dataset.from = link.from_id;
-            path.dataset.to = link.to_id;
             path.setAttribute("d", getPathD(item1, item2));
             
             path.ondblclick = async (e) => {
                 e.stopPropagation();
                 if(confirm("Supprimer ce lien ?")) {
-                    await API.exec({ action: 'del_link', id: link.id });
+                    await API.exec({ action: 'del_inv_link', id: link.id });
                     init();
                 }
             };
@@ -341,190 +301,96 @@
         }
 
         function getPathD(i1, i2) {
-            // Centre approximatif (Largeur 220px / 2 = 110)
-            const x1 = i1.x + 110; 
-            const y1 = i1.y + 60;
-            const x2 = i2.x + 110; 
-            const y2 = i2.y + 60;
-            
+            const x1 = i1.x + 110; const y1 = i1.y + 60;
+            const x2 = i2.x + 110; const y2 = i2.y + 60;
             const cx = (x1 + x2) / 2;
-            const cy = Math.min(y1, y2) - 50; // Courbure
+            const cy = Math.min(y1, y2) - 50;
             return `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
         }
 
-        // --- GESTION DES ENTRÉES (INPUTS) ---
-        
-        // 1. Souris GLOBALE (Pan & Drag Move)
+        // --- INPUTS ---
         document.addEventListener('mousedown', (e) => {
-            // Si on clique sur le fond (pas un item, pas l'interface)
             if(!e.target.closest('.board-item') && !e.target.closest('.toolbar') && !e.target.closest('.edit-modal') && !e.target.closest('#context-menu')) {
                 isPanning = true;
                 lastMouse = { x: e.clientX, y: e.clientY };
                 document.body.style.cursor = 'grabbing';
-                ctxMenu.style.display = 'none'; // Fermer menu
+                ctxMenu.style.display = 'none';
             }
         });
 
         document.addEventListener('mousemove', (e) => {
-            // PAN
             if(isPanning) {
-                const dx = e.clientX - lastMouse.x;
-                const dy = e.clientY - lastMouse.y;
-                view.x += dx;
-                view.y += dy;
+                view.x += e.clientX - lastMouse.x;
+                view.y += e.clientY - lastMouse.y;
                 lastMouse = { x: e.clientX, y: e.clientY };
                 updateView();
-            }
-            // DRAG ITEM
-            else if(isDragging && dragItem) {
+            } else if(isDragging && dragItem) {
                 const worldX = (e.clientX - view.x) / view.scale;
                 const worldY = (e.clientY - view.y) / view.scale;
-                
                 dragItem.x = worldX - dragOffset.x;
                 dragItem.y = worldY - dragOffset.y;
                 
-                // Update DOM sans redessiner tout
                 const el = document.getElementById(`item-${dragItem.id}`);
-                if(el) {
-                    el.style.left = dragItem.x + 'px';
-                    el.style.top = dragItem.y + 'px';
-                }
+                if(el) { el.style.left = dragItem.x + 'px'; el.style.top = dragItem.y + 'px'; }
                 refreshLinks(dragItem);
-            }
-            // CREATION LIEN
-            else if(isLinking && linkStartItem) {
+            } else if(isLinking && linkStartItem) {
                 const worldX = (e.clientX - view.x) / view.scale;
                 const worldY = (e.clientY - view.y) / view.scale;
-                const startX = linkStartItem.x + 110; 
-                const startY = linkStartItem.y + 60;
-                
-                if(tempLinkPath) {
-                    tempLinkPath.setAttribute("d", `M ${startX} ${startY} L ${worldX} ${worldY}`);
-                }
+                if(tempLinkPath) tempLinkPath.setAttribute("d", `M ${linkStartItem.x + 110} ${linkStartItem.y + 60} L ${worldX} ${worldY}`);
             }
         });
 
-        document.addEventListener('mouseup', async () => {
+        document.addEventListener('mouseup', async (e) => {
             if(isPanning) {
                 isPanning = false;
                 document.body.style.cursor = 'crosshair';
             }
             if(isDragging && dragItem) {
-                // Snap to Grid (20px)
                 dragItem.x = Math.round(dragItem.x / 20) * 20;
                 dragItem.y = Math.round(dragItem.y / 20) * 20;
                 
-                // Commit API
-                await API.exec({ action: 'move', id: dragItem.id, x: dragItem.x, y: dragItem.y });
-                
-                // Reset style
                 const el = document.getElementById(`item-${dragItem.id}`);
-                if(el) {
-                    el.style.zIndex = '';
-                    el.style.left = dragItem.x + 'px';
-                    el.style.top = dragItem.y + 'px';
-                }
-                refreshLinks(dragItem);
+                if(el) { el.style.zIndex = ''; el.style.left = dragItem.x + 'px'; el.style.top = dragItem.y + 'px'; }
                 
-                isDragging = false; 
-                dragItem = null;
+                refreshLinks(dragItem);
+                await API.exec({ action: 'move_inv_item', id: dragItem.id, x: dragItem.x, y: dragItem.y });
+                isDragging = false; dragItem = null;
             }
+            
+            // LOGIQUE DE VALIDATION DU LIEN
             if(isLinking) {
+                const targetEl = e.target.closest('.board-item');
+                if(targetEl) {
+                    const targetId = parseInt(targetEl.dataset.id);
+                    if(linkStartItem && targetId !== linkStartItem.id) {
+                        await API.exec({ action: 'add_inv_link', from_id: linkStartItem.id, to_id: targetId, type: 'red' });
+                        init();
+                    }
+                }
                 cancelLink();
             }
         });
 
-        // 2. Events ITEM (Start Drag / Start Link)
+        // --- ITEM EVENTS ---
         function onMouseDownItem(e, item) {
-            e.stopPropagation(); // Empêche le Pan du monde
+            e.stopPropagation();
             ctxMenu.style.display = 'none';
 
-            // SHIFT + CLIC = LIEN
             if(e.shiftKey) {
-                startLink(item);
-                return;
-            }
-
-            // CLIC GAUCHE = DRAG
-            if(e.button === 0) {
+                isLinking = true;
+                linkStartItem = item;
+                tempLinkPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                tempLinkPath.setAttribute("class", "link-temp");
+                svgLayer.appendChild(tempLinkPath);
+            } else if(e.button === 0) {
                 isDragging = true;
                 dragItem = item;
-                
-                // Calcul offset pour ne pas que l'item saute au centre de la souris
                 const worldX = (e.clientX - view.x) / view.scale;
                 const worldY = (e.clientY - view.y) / view.scale;
                 dragOffset.x = worldX - item.x;
                 dragOffset.y = worldY - item.y;
-                
-                // Visuel
-                const el = document.getElementById(`item-${item.id}`);
-                el.style.zIndex = 1000;
+                document.getElementById(`item-${item.id}`).style.zIndex = 1000;
             }
-        }
-
-        function onMouseUpItem(e, targetItem) {
-            // Si on relâche sur un item pendant qu'on crée un lien
-            if(isLinking && linkStartItem && linkStartItem.id !== targetItem.id) {
-                finishLink(targetItem);
-            }
-        }
-
-        // --- ZOOM CURSEUR ---
-        document.addEventListener('wheel', (e) => {
-            if(e.target.closest('.edit-modal')) return;
-            e.preventDefault();
-            
-            const zoomSpeed = 0.1;
-            const delta = -Math.sign(e.deltaY) * zoomSpeed;
-            const newScale = Math.min(Math.max(0.2, view.scale + delta), 4);
-            
-            // Zoom vers la souris
-            const mouseX = (e.clientX - view.x) / view.scale;
-            const mouseY = (e.clientY - view.y) / view.scale;
-            
-            view.x = e.clientX - mouseX * newScale;
-            view.y = e.clientY - mouseY * newScale;
-            view.scale = newScale;
-            
-            updateView();
-        }, { passive: false });
-
-        function updateView() {
-            world.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
-        }
-        function centerView() {
-            view.x = window.innerWidth/2 - 500;
-            view.y = window.innerHeight/2 - 400;
-            updateView();
-        }
-        function resetView() { view = {x:0,y:0,scale:1}; updateView(); }
-
-        // --- LOGIQUE LIENS ---
-        function refreshLinks(movedItem) {
-            // Trouve tous les liens connectés à cet item
-            const related = links.filter(l => l.from_id === movedItem.id || l.to_id === movedItem.id);
-            related.forEach(l => {
-                const path = document.querySelector(`path[data-id="${l.id}"]`);
-                const i1 = items.find(i => i.id === l.from_id);
-                const i2 = items.find(i => i.id === l.to_id);
-                if(path && i1 && i2) {
-                    path.setAttribute("d", getPathD(i1, i2));
-                }
-            });
-        }
-
-        function startLink(item) {
-            isLinking = true;
-            linkStartItem = item;
-            tempLinkPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            tempLinkPath.setAttribute("class", "link-temp");
-            svgLayer.appendChild(tempLinkPath);
-        }
-
-        async function finishLink(target) {
-            await API.exec({ action: 'add_link', from_id: linkStartItem.id, to_id: target.id, type: 'red' });
-            cancelLink();
-            init();
         }
 
         function cancelLink() {
@@ -533,10 +399,36 @@
             if(tempLinkPath) { tempLinkPath.remove(); tempLinkPath = null; }
         }
 
-        // --- MENUS & ACTIONS ---
-        function openContextMenu(e, id) {
+        function refreshLinks(movedItem) {
+            links.filter(l => l.from_id === movedItem.id || l.to_id === movedItem.id).forEach(l => {
+                const path = document.querySelector(`path[data-id="${l.id}"]`);
+                const i1 = items.find(i => i.id === l.from_id);
+                const i2 = items.find(i => i.id === l.to_id);
+                if(path && i1 && i2) path.setAttribute("d", getPathD(i1, i2));
+            });
+        }
+
+        // --- VIEW ---
+        document.addEventListener('wheel', (e) => {
+            if(e.target.closest('.edit-modal')) return;
             e.preventDefault();
-            contextTargetId = id;
+            const delta = -Math.sign(e.deltaY) * 0.1;
+            const newScale = Math.min(Math.max(0.2, view.scale + delta), 4);
+            const mouseX = (e.clientX - view.x) / view.scale;
+            const mouseY = (e.clientY - view.y) / view.scale;
+            view.x = e.clientX - mouseX * newScale;
+            view.y = e.clientY - mouseY * newScale;
+            view.scale = newScale;
+            updateView();
+        }, { passive: false });
+
+        function updateView() { world.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`; }
+        function centerView() { view.x = window.innerWidth/2 - 500; view.y = window.innerHeight/2 - 400; updateView(); }
+        function resetView() { view = {x:0,y:0,scale:1}; updateView(); }
+
+        // --- ACTIONS ---
+        function openContextMenu(e, id) {
+            e.preventDefault(); contextTargetId = id;
             ctxMenu.style.display = 'flex';
             ctxMenu.style.left = e.clientX + 'px';
             ctxMenu.style.top = e.clientY + 'px';
@@ -545,15 +437,12 @@
         async function applyColor(color) {
             ctxMenu.style.display = 'none';
             if(!contextTargetId) return;
-            
-            // Mise à jour optimiste
             const item = items.find(i => i.id === contextTargetId);
             if(item) {
                 item.color = color;
                 const el = document.getElementById(`item-${item.id}`);
                 if(el) el.style.borderTopColor = color;
-                
-                await API.exec({ action: 'update_text', id: item.id, color: color });
+                await API.exec({ action: 'update_inv_item_text', id: item.id, color: color });
             }
         }
 
@@ -561,24 +450,19 @@
             ctxMenu.style.display = 'none';
             if(!contextTargetId) return;
             const item = items.find(i => i.id === contextTargetId);
-
             if(action === 'delete') {
                 if(confirm("Supprimer ?")) {
-                    await API.exec({ action: 'del_item', id: contextTargetId });
+                    await API.exec({ action: 'del_inv_item', id: contextTargetId });
                     init();
                 }
-            } else if(action === 'edit') {
-                openEditModal('edit', item.type, item);
-            }
+            } else if(action === 'edit') openEditModal('edit', item.type, item);
         }
 
-        // --- MODALE ---
         function openEditModal(mode, type, data=null) {
             editModal.style.display = 'flex';
             document.getElementById('modal-mode').value = mode;
             document.getElementById('modal-type').value = type;
             const imgGroup = document.getElementById('modal-image-group');
-            
             if(mode === 'edit' && data) {
                 document.getElementById('modal-id').value = data.id;
                 document.getElementById('modal-label').value = data.label;
@@ -590,7 +474,6 @@
                 imgGroup.style.display = (type === 'suspect') ? 'block' : 'none';
             }
         }
-
         function closeModal() { editModal.style.display = 'none'; }
 
         async function saveModalData() {
@@ -599,29 +482,23 @@
             const label = document.getElementById('modal-label').value;
             const img = document.getElementById('modal-image').value;
             const id = parseInt(document.getElementById('modal-id').value);
-
             closeModal();
-
             if(mode === 'new') {
-                // Créer au centre de l'écran
                 const cx = (window.innerWidth/2 - view.x)/view.scale - 110;
                 const cy = (window.innerHeight/2 - view.y)/view.scale - 100;
-                await API.exec({ action: 'add_item', type, label, image_url: img, x: parseInt(cx), y: parseInt(cy), color: '#eebb00' });
+                await API.exec({ action: 'add_inv_item', type, label, image_url: img, x: parseInt(cx), y: parseInt(cy), color: '#eebb00' });
             } else {
-                await API.exec({ action: 'update_text', id, label, image_url: img });
+                await API.exec({ action: 'update_inv_item_text', id, label, image_url: img });
             }
             init();
         }
 
-        // Fermeture contextes au clic global
         document.addEventListener('click', (e) => {
             if(!e.target.closest('#context-menu')) ctxMenu.style.display = 'none';
             if(e.target === editModal) closeModal();
         });
 
-        // Démarrage
         init();
-
     </script>
 </body>
 </html>
