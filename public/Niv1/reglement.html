@@ -18,300 +18,211 @@
     <link rel="stylesheet" href="/css/style-mo.css">
 
     <style>
-        /* --- OVERRIDES POUR LE PLEIN ÉCRAN (95%) --- */
+        /* Styles cosmétiques supplémentaires */
         
-        body {
-            /* S'assure que le body ne limite pas le contenu */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-        }
+        /* Personnalisation de la Scrollbar */
+        .rules-container::-webkit-scrollbar { width: 10px; }
+        .rules-container::-webkit-scrollbar-track { background: #050505; border-left: 1px solid #333; }
+        .rules-container::-webkit-scrollbar-thumb { background: var(--primary); border: 1px solid #000; }
+        .rules-container::-webkit-scrollbar-thumb:hover { background: #fff; }
 
-        .terminal-wrapper {
-            /* C'EST ICI QUE SE JOUE LA LARGEUR */
-            width: 95vw !important; /* Force 95% de la largeur viewport */
-            max-width: none !important; /* Supprime la limite de 900px */
-            height: 95vh !important; /* Force 95% de la hauteur */
-            margin: 0 auto;
-        }
-
-        .terminal {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            padding: 2rem; /* Espace interne */
-            box-sizing: border-box;
-        }
-
-        /* Conteneur principal avec Scroll */
-        .rules-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-right: 15px;
-            margin-top: 1.5rem;
-            
-            /* GRILLE LARGE : Force le contenu à s'étaler */
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* 2 colonnes égales qui prennent toute la largeur */
-            gap: 3rem; /* Espace entre les colonnes */
-            align-content: start;
-
-            /* Scrollbar stylisée */
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary) #111;
-        }
-
-        /* Sur très grands écrans (ex: 4k), on passe à 3 colonnes pour éviter les lignes trop longues */
-        @media (min-width: 2000px) {
-            .rules-container { grid-template-columns: 1fr 1fr 1fr; }
-        }
-
-        /* Sur mobile/tablette, on repasse en 1 colonne */
-        @media (max-width: 1024px) {
-            .rules-container { grid-template-columns: 1fr; }
-            .terminal-wrapper { width: 98vw !important; height: 98vh !important; }
-        }
-
-        .rules-container::-webkit-scrollbar { width: 8px; }
-        .rules-container::-webkit-scrollbar-track { background: #0a0a0a; }
-        .rules-container::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
-
-        /* --- STYLES DES ÉLÉMENTS --- */
-        
-        /* Les éléments "pleine largeur" (Avertissement) */
-        .full-width {
-            grid-column: 1 / -1; /* S'étend sur toutes les colonnes */
-        }
-
+        /* Effets de survol et design des boites */
         .category-title {
             color: var(--secondary);
-            font-family: var(--font-code);
+            font-family: 'Share Tech Mono', monospace;
             border-bottom: 2px solid var(--dim);
-            padding-bottom: 8px;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-size: 1.6rem;
             letter-spacing: 2px;
             text-transform: uppercase;
-            margin-top: 0;
-            text-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
         }
 
-        .inventory-list {
-            list-style: none;
-            padding: 0;
-        }
+        .inventory-list { list-style: none; padding: 0; }
 
         .inventory-list > <li> {
-            margin-bottom: 20px;
-            background: rgba(15, 20, 25, 0.6);
-            padding: 25px; /* Padding augmenté */
-            border: 1px solid rgba(255,255,255,0.05);
-            border-left: 4px solid var(--dim);
-            transition: all 0.2s;
+            margin-bottom: 25px;
+            background: rgba(10, 15, 20, 0.7); /* Fond plus sombre pour contraste */
+            padding: 30px; 
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 5px solid var(--dim);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            transition: transform 0.2s, border-color 0.2s;
         }
 
         .inventory-list > <li>:hover {
             border-left-color: var(--primary);
-            background: rgba(255,255,255,0.08);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            background: rgba(20, 25, 30, 0.9);
             transform: translateX(5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
         }
 
         .item-name {
             display: block;
             color: var(--primary);
             font-weight: 700;
-            font-family: var(--font-code);
+            font-family: 'JetBrains Mono', monospace;
             margin-bottom: 15px;
-            font-size: 1.2rem;
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
-            padding-bottom: 5px;
+            font-size: 1.3rem;
+            border-bottom: 1px dashed rgba(255,255,255,0.15);
+            padding-bottom: 8px;
         }
 
         .item-details {
-            list-style: none;
             padding-left: 0;
-            color: #ddd;
-            font-size: 1.1rem; /* Texte plus gros pour remplir l'espace */
-            line-height: 1.6;
+            color: #e0e0e0;
+            font-size: 1.15rem; /* Texte agrandi pour lecture facile */
+            line-height: 1.7;
+            font-family: 'Share Tech Mono', monospace;
         }
 
         .item-details li {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             position: relative;
-            padding-left: 20px;
+            padding-left: 25px;
+            list-style: none;
         }
         .item-details li::before {
             content: '>';
             position: absolute;
             left: 0;
-            color: var(--dim);
+            color: var(--secondary);
             font-weight: bold;
         }
 
-        /* Alertes */
-        .alert-box {
-            border: 1px solid var(--danger);
-            background: rgba(255, 51, 51, 0.1);
-            color: #ff5555;
-            padding: 25px;
-            margin-bottom: 20px;
-            font-family: var(--font-code);
-            font-size: 1.1rem;
-            text-align: center;
-            box-shadow: inset 0 0 30px rgba(255,0,0,0.1);
-            letter-spacing: 1px;
-        }
-        
-        .sub-list {
-            margin-left: 25px;
-            margin-top: 8px;
-            list-style: none;
-            color: #aaa;
-            font-size: 1rem;
-        }
-        .sub-list li::before { content: '-'; margin-right: 8px; color: var(--secondary); }
+        .sub-list li { font-size: 1rem; color: #aaa; margin-bottom: 5px; }
+        .sub-list li::before { content: '-'; color: var(--dim); }
 
-        /* HEADER */
-        .header-strip { 
-            margin-bottom: 0; 
-            padding-bottom: 15px; 
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            width: 100%;
+        /* Header amélioré */
+        .header-strip h1 { 
+            font-size: 4rem; 
+            margin: 0; 
+            line-height: 1; 
+            font-family: 'JetBrains Mono', monospace;
         }
-        .header-strip h1 { font-size: 3.5rem; margin: 0; line-height: 0.9; }
     </style>
 </head>
-<body>
+<body style="padding: 0; margin: 0; width: 100vw; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000;">
 
     <div class="crt-overlay"></div>
 
-    <div class="terminal-wrapper">
-        <main class="terminal">
+    <div class="terminal-wrapper" style="width: 96vw; max-width: none; height: 96vh; margin: 0; display: flex; flex-direction: column;">
+        
+        <main class="terminal" style="width: 100%; height: 100%; padding: 2rem 3rem; box-sizing: border-box; display: flex; flex-direction: column;">
             
-            <div class="header-strip">
+            <div class="header-strip" style="flex-shrink: 0; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
                 <div>
-                    <h1>RÈGLEMENT <span class="blinker">INTÉRIEUR</span></h1>
-                    <div style="color: var(--dim); font-size: 1.1rem; letter-spacing: 3px; margin-top: 5px;">DOCUMENT: <span style="color:var(--primary)">SAS-REG-001</span></div>
+                    <h1>RÈGLEMENT <span class="blinker" style="color:var(--danger)">INTÉRIEUR</span></h1>
+                    <div style="color: var(--dim); font-size: 1.2rem; letter-spacing: 4px; margin-top: 10px;">FICHIER: <span style="color:var(--secondary)">SAS-REG-001</span></div>
                 </div>
                 <div class="meta-data" style="text-align: right;">
-                    <div style="color: var(--warning); font-size: 1.3rem; font-weight: bold;">ACCRÉDITATION: NIV 1+</div>
-                    <div style="color: var(--danger); font-size: 1rem;">[LECTURE SEULE / MODE PLEIN ÉCRAN]</div>
+                    <div style="color: var(--warning); font-size: 1.5rem; font-weight: bold; text-shadow: 0 0 10px rgba(238, 187, 0, 0.3);">NIVEAU 1+</div>
+                    <div style="color: var(--danger); font-size: 1rem; margin-top: 5px;">[ MODE IMMERSIF / PLEIN ÉCRAN ]</div>
                 </div>
             </div>
 
-            <div class="rules-container">
+            <div class="rules-container" style="flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-content: start; padding-right: 15px;">
                 
-                <div class="full-width">
-                    <div class="alert-box">
-                        <strong style="font-size: 1.3rem;">// PROTOCOLE DE SÉCURITÉ ACTIVE //</strong><br><br>
-                        CE DOCUMENT EST STRICTEMENT CONFIDENTIEL.<br>
-                        TOUTE DIFFUSION À UNE ENTITÉ CIVILE OU NON-ACCRÉDITÉE EST PASSIBLE DE COUR MARTIALE.<br>
-                        RÉSERVÉ AU PERSONNEL ACTIF DU S.A.S.
+                <div style="grid-column: 1 / -1;">
+                    <div class="alert-box" style="border: 1px solid var(--danger); background: rgba(255, 51, 51, 0.1); color: #ff6666; padding: 30px; text-align: center; font-family: 'JetBrains Mono'; font-size: 1.2rem; letter-spacing: 1px;">
+                        <strong>// PROTOCOLE DE SÉCURITÉ ACTIVE //</strong><br><br>
+                        DOCUMENT CLASSÉ CONFIDENTIEL DÉFENSE.<br>
+                        TOUTE DIVULGATION ENTRAÎNERA UNE COUR MARTIALE IMMÉDIATE.
                     </div>
-                    <p style="margin: 20px 0; color: #aaa; border-left: 4px solid var(--secondary); padding-left: 20px; font-size: 1.2rem; background: rgba(0,243,255,0.05); padding: 20px;">
-                        Le manuel du règlement interne du S.A.S est remis à chaque agent dès son incorporation. Il expose les principes essentiels et obligatoires pour maintenir un fonctionnement optimal, létal et discipliné du service.
+                    <p style="margin: 30px 0; font-size: 1.3rem; color: #ccc; border-left: 4px solid var(--secondary); padding-left: 20px; font-style: italic;">
+                        "La discipline est la mère de la victoire." - Ce manuel régit votre survie et votre efficacité au sein du S.A.S.
                     </p>
                 </div>
 
                 <div>
-                    <h3 class="category-title">//: 1.00 - CADRE GÉNÉRAL</h3>
+                    <h3 class="category-title">//: 1.00 - CADRE & HIÉRARCHIE</h3>
                     <ul class="inventory-list">
                         <li>
-                            <span class="item-name">Art. 1.01 & 1.02 - Devoir et Sanctions</span>
+                            <span class="item-name">Art. 1.01 - Devoir Absolu</span>
                             <ul class="item-details">
-                                <li>Chaque agent est tenu d'exercer ses fonctions en respectant scrupuleusement les règles.</li>
-                                <li>Le respect de la hiérarchie est <strong>CAPITAL</strong>. Tout manquement sera sanctionné :
-                                    <ul class="sub-list">
-                                        <li>Mise à pied immédiate</li>
-                                        <li>Avertissement formel</li>
-                                        <li>Licenciement sans solde</li>
-                                    </ul>
-                                </li>
+                                <li>Respect scrupuleux des règles et procédures.</li>
+                                <li><strong>Hiérarchie :</strong> Les ordres du Directeur (Graves) et des Lieutenants sont absolus.</li>
+                                <li>Sanctions : Mise à pied, Avertissement, ou Licenciement immédiat.</li>
                             </ul>
                         </li>
                         <li>
-                            <span class="item-name">Art. 1.03 à 1.06 - Gestion du Personnel</span>
+                            <span class="item-name">Art. 1.05 - Gestion RH</span>
                             <ul class="item-details">
-                                <li>La direction se réserve le droit d'évaluer la compatibilité du profil à tout moment.</li>
-                                <li>Tout incident observé doit être remonté immédiatement à l'état-major.</li>
-                                <li>Les fautes graves entraînent un licenciement immédiat.</li>
-                                <li><strong style="color:var(--warning)">Période d'essai :</strong> Chaque recrue est en période d'essai permanente. Le contrat peut être rompu sans préavis.</li>
+                                <li><span style="color:var(--warning)">Période d'essai permanente :</span> Votre contrat peut être révoqué à tout instant si performance inadéquate.</li>
+                                <li>Tout incident doit être rapporté à l'État-Major.</li>
                             </ul>
                         </li>
                     </ul>
 
-                    <h3 class="category-title" style="margin-top: 40px;">//: 2.00 - CONFIDENTIALITÉ</h3>
+                    <h3 class="category-title" style="margin-top: 50px;">//: 2.00 - SECURITÉ DE L'INFORMATION</h3>
                     <ul class="inventory-list">
                         <li>
-                            <span class="item-name">Art. 2.01 à 2.03 - Secret & Corruption</span>
+                            <span class="item-name">Art. 2.00 - Zéro Fuite</span>
                             <ul class="item-details">
-                                <li>Confidentialité ABSOLUE sur les procédures, identités et techniques.</li>
-                                <li>Fuite d'info = Licenciement + Poursuites lourdes.</li>
-                                <li><strong>Corruption :</strong> TOLÉRANCE ZÉRO. Considéré comme trahison.</li>
+                                <li>Confidentialité totale requise (Identités, Techniques, Enquêtes).</li>
+                                <li><strong>Corruption :</strong> Tolérance Zéro. Considéré comme acte de trahison.</li>
+                                <li>Rapports obligatoires après chaque opération ou incident majeur.</li>
                             </ul>
                         </li>
                     </ul>
                 </div>
 
                 <div>
-                    <h3 class="category-title">//: 3.00 & 4.00 - MATÉRIEL & UNIFORME</h3>
+                    <h3 class="category-title">//: 3.00 - LOGISTIQUE</h3>
                     <ul class="inventory-list">
                         <li>
-                            <span class="item-name">Gestion Logistique</span>
+                            <span class="item-name">Matériel & Armement</span>
                             <ul class="item-details">
-                                <li>Interdiction formelle de prêter ou dérober l'équipement d'un tiers.</li>
-                                <li>L'arme de service doit être sécurisée en permanence.</li>
-                                <li>Perte de matériel = Rapport immédiat obligatoire.</li>
-                                <li><strong>Armes Lourdes :</strong> Déploiement sur ordre direct (Lead/Director) uniquement.</li>
-                                <li><strong>Uniforme :</strong> Tenue réglementaire stricte. Apparence soignée exigée. Pas d'accessoires civils visibles.</li>
+                                <li>Votre arme est votre responsabilité. Sécurisez-la.</li>
+                                <li>Interdiction de prêter ou voler l'équipement.</li>
+                                <li>Perte de matériel = Rapport immédiat.</li>
+                                <li><strong style="color:var(--danger)">Armes Lourdes :</strong> Autorisation Commandement requise.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <span class="item-name">Uniforme</span>
+                            <ul class="item-details">
+                                <li>Tenue réglementaire obligatoire en opération.</li>
+                                <li>Apparence impeccable exigée (Pas d'accessoires civils).</li>
+                                <li>Couvre-chefs : Réservés Sergent+ (sauf Casquette Tactique).</li>
                             </ul>
                         </li>
                     </ul>
 
-                    <h3 class="category-title" style="margin-top: 40px;">//: 5.00 - PROTOCOLE TERRAIN</h3>
+                    <h3 class="category-title" style="margin-top: 50px;">//: 5.00 - COMPORTEMENT</h3>
                     <ul class="inventory-list">
                         <li>
-                            <span class="item-name">Code de Conduite Opérationnel</span>
+                            <span class="item-name">Protocole Terrain</span>
                             <ul class="item-details">
-                                <li>Insubordination = Cour Martiale.</li>
-                                <li>Anonymat strict (Alias uniquement).</li>
-                                <li>Interdiction formelle de tutoyer les VIPs ou la Direction.</li>
-                                <li>Discipline radio et verbale absolue (Pas de cris, pas d'insultes).</li>
+                                <li>Insubordination = Sanction Lourde.</li>
+                                <li>Anonymat : Utilisez uniquement votre Alias.</li>
+                                <li>Interdiction formelle de tutoyer la Direction ou les VIPs.</li>
                                 <li><strong style="color:var(--danger)">USAGE DE LA FORCE :</strong>
                                     <ul class="sub-list">
-                                        <li>Proportionnée à la menace.</li>
-                                        <li>Létale UNIQUEMENT si danger de mort imminent pour soi ou VIP.</li>
+                                        <li>Proportionnée et Justifiée.</li>
+                                        <li>Létale SI et SEULEMENT SI menace de mort imminente.</li>
                                     </ul>
                                 </li>
                             </ul>
                         </li>
-                        <li style="margin-top: 20px;">
-                            <span class="item-name">Art. 8.00 - Attitude & Image</span>
+                        <li style="margin-top: 25px;">
+                            <span class="item-name">Image du Corps</span>
                             <ul class="item-details">
-                                <li>L'agent est le visage du S.A.S. Comportement exemplaire exigé 24/7.</li>
-                                <li>Plaintes incessantes ("Pleurnichage") = Sanction immédiate.</li>
-                                <li>L'uniforme représente l'Ordre. Honorez-le.</li>
+                                <li>Attitude exemplaire 24/7. Pas de plaintes futiles.</li>
+                                <li>Respect mutuel entre opérateurs.</li>
                             </ul>
                         </li>
                     </ul>
                 </div>
 
-                <div class="full-width" style="text-align: center; margin-top: 50px; border-top: 1px solid var(--dim); padding-top: 20px; color: var(--dim);">
-                    // FIN DU FICHIER // SIGNATURE NUMÉRIQUE REQUISE POUR MODIFICATION
+                <div style="grid-column: 1 / -1; text-align: center; margin-top: 40px; color: var(--dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                    // FIN DE TRANSMISSION // S.A.S MAINFRAME
                 </div>
-
             </div>
 
-            <footer class="portal-footer">
-                <a href="/index.html" class="back-link">[ < REVENIR AU DASHBOARD ]</a>
-                <span style="color: var(--dim); font-size: 0.9rem; margin-left: 20px;">SYSTEM_ID: REG_V2.5_WIDE</span>
+            <footer class="portal-footer" style="flex-shrink: 0; margin-top: 20px; padding-top: 10px; border-top: 1px solid var(--dim); display: flex; justify-content: center;">
+                <a href="/index.html" class="back-link" style="color: var(--dim); text-decoration: none; font-size: 1rem; transition: color 0.3s;">[ < REVENIR AU DASHBOARD ]</a>
             </footer>
         </main>
     </div>
