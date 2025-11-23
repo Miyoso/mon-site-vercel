@@ -23,17 +23,36 @@
             --corner-size: 15px;
         }
 
-        /* 1. SCROLLBAR TACTIQUE */
-        ::-webkit-scrollbar { width: 6px; }
+        /* 1. SCROLLBAR TACTIQUE (Maintenant sur la page entière) */
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #050505; }
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 0; }
         ::-webkit-scrollbar-thumb:hover { background: #fff; box-shadow: 0 0 10px #fff; }
 
-        /* 2. OVERRIDES LAYOUT (Force le plein écran) */
-        body { background: #020202; overflow: hidden; }
+        /* 2. OVERRIDES LAYOUT (ACTIVATION DU SCROLL) */
+        body { 
+            background: #020202; 
+            overflow-y: auto !important; /* Force le scroll vertical */
+            height: auto !important;
+            min-height: 100vh;
+        }
         
         .terminal-wrapper.mode-large {
-            max-width: 96vw !important; width: 96vw !important; height: 96vh !important;
+            max-width: 96vw !important; 
+            width: 96vw !important; 
+            height: auto !important; /* La hauteur s'adapte au contenu */
+            min-height: 96vh;
+            margin-bottom: 50px; /* Espace en bas pour scroller confortablement */
+        }
+        
+        .terminal {
+            height: auto !important; /* Permet au terminal de s'agrandir */
+        }
+        
+        /* On écrase le style grid qui bloquait le scroll interne */
+        .rules-grid-layout {
+            height: auto !important;
+            overflow: visible !important;
         }
 
         /* 3. DESIGN DES BLOCS (CARTES) */
@@ -140,22 +159,11 @@
         }
         .sub-title { font-family: 'Share Tech Mono'; color: var(--primary); letter-spacing: 4px; margin-top: 5px; }
 
-        /* Animation Scanline */
-        .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-            background: rgba(0, 255, 157, 0.3);
-            box-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
-            animation: scan 4s linear infinite; pointer-events: none; z-index: 50;
-        }
-        @keyframes scan { 0% {top:0; opacity:0;} 10% {opacity:1;} 90% {opacity:1;} 100% {top:100%; opacity:0;} }
-
     </style>
 </head>
 <body>
 
     <div class="crt-overlay"></div>
-    <div class="scan-line"></div>
-
     <div class="terminal-wrapper mode-large">
         <main class="terminal">
             
