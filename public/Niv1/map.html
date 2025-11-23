@@ -4,88 +4,232 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SAS - Carte Tactique</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
-    <link rel="stylesheet" href="/css/style.css">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    <style>
-        
-        .leaflet-container {
-            background-color: #0e3c63 !important; 
-        }
-        #map-container {
-            background-color: #0e3c63;
-        }
-   
+    
+    <link rel="stylesheet" href="/css/style-mo.css"> 
 
+    <style>
+        /* Ajustements de layout pour la carte */
+        .terminal {
+            max-width: 95vw; /* Plus large pour la carte */
+            height: 90vh;
+            padding: 1.5rem;
+        }
+
+        #map-container {
+            flex-grow: 1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            /* Filtre global sur la carte pour l'assombrir et la teinter */
+            filter: sepia(20%) hue-rotate(180deg) contrast(110%) saturate(80%); 
+        }
+
+        /* --- STYLES DES CONTRÔLES (INPUTS) --- */
         #intel-controls {
-            background: #0a0a0a;
+            background: rgba(10, 15, 20, 0.8);
+            border: 1px solid var(--dim);
             padding: 1rem;
-            margin-bottom: 1rem;
-            border: 1px solid #333;
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
             align-items: flex-end;
+            backdrop-filter: blur(5px);
         }
-        .control-group { display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
-        .control-group label { color: #00ff00; font-size: 0.9rem; }
+
+        .control-group label {
+            color: var(--secondary);
+            font-size: 0.8rem;
+            font-family: var(--font-code);
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
         .intel-input, .intel-select {
-            font-family: 'Share Tech Mono', monospace;
-            background: #111; color: #eaeaea; border: 1px solid #333; padding: 0.5rem; font-size: 1rem;
+            font-family: var(--font-ui);
+            background: rgba(0,0,0,0.5); 
+            color: #fff; 
+            border: 1px solid var(--dim); 
+            padding: 0.5rem; 
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
         }
-        .intel-input:focus, .intel-select:focus { outline: none; border-color: #00ff00; }
-        #add-mode-indicator { color: #555; font-style: italic; margin-top: 0.5rem; }
-        #add-mode-indicator.active { color: #00ff00; animation: blink 1s infinite; }
+
+        .intel-input:focus, .intel-select:focus { 
+            outline: none; 
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 157, 0.2); 
+        }
+
+        /* Indicateur de mode */
+        #add-mode-indicator { 
+            color: var(--dim); 
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            margin: 0.5rem 0;
+            border-left: 2px solid var(--dim);
+            padding-left: 10px;
+            transition: color 0.3s;
+        }
+        #add-mode-indicator.active { 
+            color: var(--primary); 
+            border-color: var(--primary);
+            text-shadow: 0 0 8px var(--primary);
+            animation: blink 1.5s infinite; 
+        }
+
+        /* --- OVERRIDE LEAFLET (Thème Dark) --- */
+        
+        /* Popups */
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: rgba(15, 20, 25, 0.95);
+            border: 1px solid var(--primary);
+            color: #eee;
+            border-radius: 0;
+            font-family: var(--font-ui);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+        }
+        .leaflet-popup-content h4 {
+            font-family: var(--font-code);
+            color: var(--secondary);
+            border-bottom-color: var(--dim) !important;
+        }
+        .leaflet-container a.leaflet-popup-close-button {
+            color: var(--danger);
+        }
+
+        /* Boutons de Zoom et Draw */
+        .leaflet-bar { border: none; box-shadow: none; }
+        .leaflet-bar a {
+            background-color: rgba(10, 15, 20, 0.9) !important;
+            border: 1px solid var(--dim) !important;
+            color: var(--primary) !important;
+            border-radius: 0 !important;
+        }
+        .leaflet-bar a:hover {
+            border-color: var(--secondary) !important;
+            color: #fff !important;
+            background-color: rgba(255,255,255,0.1) !important;
+        }
+        
+        /* Custom Markers */
         .custom-marker {
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            color: #000; font-weight: bold; font-size: 10px;
+            color: #000; font-weight: 800; font-size: 10px; border: 2px solid #000;
         }
-        .imp-1 { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
-        .imp-2 { background: #ffff00; box-shadow: 0 0 10px #ffff00; }
+        .imp-1 { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        .imp-2 { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
         .imp-3 { background: #ff9900; box-shadow: 0 0 10px #ff9900; }
-        .imp-4 { background: #ff0000; box-shadow: 0 0 15px #ff0000; animation: pulse-red 2s infinite; }
-        .current-agent-info { color: #00ff00; font-size: 0.9rem; border: 1px solid #00ff00; padding: 0.5rem; align-self: center; }
-        .leaflet-draw-toolbar a { background-color: #111 !important; border-color: #333 !important; color: #00ff00 !important; }
-        .leaflet-draw-actions { background-color: #111 !important; }
-        .leaflet-draw-actions a { background-color: #333 !important; color: #eaeaea !impmortant; }
-        .delete-btn {
-            background-color: #ff4141; color: #fff; border: none; padding: 5px 10px; 
-            cursor: pointer; font-family: 'Share Tech Mono', monospace; margin-top: 10px; width: 100%;
+        .imp-4 { background: var(--danger); box-shadow: 0 0 15px var(--danger); animation: pulse-red 2s infinite; }
+
+        @keyframes pulse-red { 0% {box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7);} 70% {box-shadow: 0 0 0 10px rgba(255, 51, 51, 0);} 100% {box-shadow: 0 0 0 0 rgba(255, 51, 51, 0);} }
+
+        /* Agent Info */
+        .current-agent-info { 
+            color: var(--secondary); 
+            font-family: var(--font-code);
+            border: 1px solid var(--secondary); 
+            padding: 0.5rem 1rem; 
+            background: rgba(0, 243, 255, 0.05);
         }
-        .delete-btn:hover { background-color: #ff0000; }
+
+        /* Boutons Actions */
+        .delete-btn {
+            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 8px;
+            margin-top: 10px;
+            width: 100%;
+            font-family: var(--font-code);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .delete-btn:hover {
+            background: var(--danger);
+            color: #000;
+            box-shadow: 0 0 10px var(--danger);
+        }
+
+        /* Toolbar Draw Icons - Inversion couleur pour matcher le thème */
+        .leaflet-draw-toolbar a {
+            filter: invert(1) hue-rotate(90deg); /* Tente de rendre les icones noires un peu vertes/cyan */
+        }
+        
+        .leaflet-draw-actions { left: 35px !important; }
+        .leaflet-draw-actions li a { 
+            background-color: var(--bg-dark) !important; 
+            color: var(--primary) !important;
+            border-left: 1px solid var(--dim) !important;
+        }
     </style>
 </head>
 <body>
-    <div class="terminal" style="max-width: 95vw;">
-        <h1 class="map-title">RENSEIGNEMENT TACTIQUE</h1>
-        <div class="status">[CRYPTAGE: <span class="secure">ACTIF</span>]</div>
-        <div id="intel-controls">
-            <div class="current-agent-info" id="current-agent-display">[IDENTIFICATION EN COURS...]</div>
-            <div class="control-group" style="flex-grow: 2;">
-                <label>DESCRIPTION (POINT OU DESSIN)</label>
-                <input type="text" id="point-desc" class="intel-input" placeholder="Entrez une description avant de dessiner ou cliquer...">
+
+    <div class="crt-overlay"></div>
+
+    <div class="terminal-wrapper">
+        <div class="terminal">
+            
+            <div class="header-strip">
+                <div>
+                    <h1>RENSEIGNEMENT <span>TACTIQUE</span></h1>
+                    <div style="color: var(--primary); font-size: 0.9rem; letter-spacing: 2px;">VUE SATELLITE - SECTEUR 04</div>
+                </div>
+                <div class="meta-data">
+                    <div id="clock">00:00:00</div>
+                    <div style="color: var(--danger)">[CRYPTAGE: ACTIF]</div>
+                </div>
             </div>
-            <div class="control-group" style="max-width: 150px;">
-                <label>NIVEAU D'ALERTE</label>
-                <select id="point-importance" class="intel-select">
-                    <option value="1" style="color:#00ff00">NIV 1 - INFO</option>
-                    <option value="2" style="color:#ffff00">NIV 2 - ATTENTION</option>
-                    <option value="3" style="color:#ff9900">NIV 3 - DANGER</option>
-                    <option value="4" style="color:#ff0000">NIV 4 - CRITIQUE</option>
-                </select>
+
+            <div id="intel-controls">
+                <div class="current-agent-info" id="current-agent-display">[IDENTIFICATION...]</div>
+                
+                <div class="control-group" style="flex-grow: 2;">
+                    <label>DONNÉES INTEL (DESCRIPTION)</label>
+                    <input type="text" id="point-desc" class="intel-input" placeholder="Entrez description pour activer les outils..." autocomplete="off">
+                </div>
+                
+                <div class="control-group" style="min-width: 150px;">
+                    <label>NIVEAU DE MENACE</label>
+                    <select id="point-importance" class="intel-select">
+                        <option value="1" style="color:var(--primary)">NIV 1 - INFO</option>
+                        <option value="2" style="color:var(--warning)">NIV 2 - ATTENTION</option>
+                        <option value="3" style="color:#ff9900">NIV 3 - DANGER</option>
+                        <option value="4" style="color:var(--danger)">NIV 4 - CRITIQUE</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div id="add-mode-indicator">EN ATTENTE... ENTREZ UNE DESCRIPTION POUR ACTIVER LES OUTILS.</div>
-        <div id="map-container"></div>
-        <div class="portal-footer">
-            <a href="/index.html" class="back-link">[ REVENIR AU DASHBOARD ]</a>
-            <span style="color: #555; font-size: 0.8rem;">SAS-INTEL-V3.6 (BLUE OCEAN FIX)</span>
+
+            <div id="add-mode-indicator">EN ATTENTE... ENTREZ UNE DESCRIPTION POUR DÉVERROUILLER L'INTERFACE DESSIN.</div>
+            
+            <div id="map-container"></div>
+            
+            <div class="portal-footer">
+                <a href="/index.html" class="back-link">[ < REVENIR AU DASHBOARD ]</a>
+                <span style="color: var(--dim); font-size: 0.8rem; margin-left: 20px;">SAS-INTEL-V3.6 (SECURE)</span>
+            </div>
         </div>
     </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+
     <script>
+        // --- PETIT SCRIPT POUR L'HORLOGE ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('fr-FR');
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- CONFIGURATION CARTE EXISTANTE ---
         const mapExtent = [0, 0, 8192, 8192];
         const mapMaxZoom = 5;
         const crs = L.CRS.Simple;
@@ -95,6 +239,8 @@
 
         const imageBounds = [[0, 0], [8192, 8192]];
 
+        // Fond de carte noir par défaut (couleur du container)
+        
         const map = L.map('map-container', {
             maxZoom: mapMaxZoom, 
             minZoom: 1, 
@@ -107,6 +253,8 @@
         });
 
         L.control.zoom({ position: 'topright' }).addTo(map);
+        
+        // Note: Assurez-vous que l'image existe. Sinon le fond sera noir tactique.
         L.imageOverlay('/assets/carte-satellite-gta-5.jpg', imageBounds).addTo(map);
         
         map.setMaxBounds([[-8000, -8000], [16000, 16000]]); 
@@ -117,11 +265,12 @@
 
         let currentAgent = null;
 
+        // Configuration des couleurs de dessin pour matcher le thème
         const drawControl = new L.Control.Draw({
             draw: {
-                polyline: { shapeOptions: { color: '#00ff00', weight: 3 } },
-                polygon: { shapeOptions: { color: '#00ff00' }, allowIntersection: false, showArea: true },
-                rectangle: { shapeOptions: { color: '#ffff00', weight: 2 } },
+                polyline: { shapeOptions: { color: '#00ff9d', weight: 3 } }, // var(--primary)
+                polygon: { shapeOptions: { color: '#00ff9d' }, allowIntersection: false, showArea: true },
+                rectangle: { shapeOptions: { color: '#eebb00', weight: 2 } }, // var(--warning)
                 circle: false, marker: false, circlemarker: false
             },
             edit: false
@@ -129,16 +278,25 @@
 
         async function init() {
             const username = localStorage.getItem('sas_user');
+            // Simulation pour le test si pas de login
+            // const username = "Ghost"; 
+            
             if (!username) { window.location.href = '/login.html'; return; }
+            
             try {
-                const response = await fetch('/api/read?resource=agents'); // <-- MODIFIÉ
+                const response = await fetch('/api/read?resource=agents'); 
                 const data = await response.json();
                 currentAgent = data.agents.find(a => a.name === username);
+                
+                const display = document.getElementById('current-agent-display');
                 if (currentAgent) {
-                    document.getElementById('current-agent-display').textContent = `[AGENT: ${currentAgent.name.toUpperCase()}]`;
+                    display.innerHTML = `[AGENT: <span style="color:#fff">${currentAgent.name.toUpperCase()}</span>]`;
+                    display.style.borderColor = 'var(--primary)';
+                    display.style.color = 'var(--primary)';
                 } else {
-                     document.getElementById('current-agent-display').textContent = `[ERREUR IDENTIFICATION]`;
-                     document.getElementById('current-agent-display').style.color = '#ff0000';
+                     display.textContent = `[ERREUR IDENTIFICATION]`;
+                     display.style.borderColor = 'var(--danger)';
+                     display.style.color = 'var(--danger)';
                 }
                 loadPoints();
                 loadDrawings();
@@ -147,7 +305,7 @@
 
         async function loadPoints() {
             try {
-                const response = await fetch('/api/read?resource=points'); // <-- MODIFIÉ
+                const response = await fetch('/api/read?resource=points');
                 const data = await response.json();
                 pointsLayer.clearLayers();
                 data.points.forEach(point => {
@@ -155,54 +313,55 @@
                     const x = point.map_x;
                     const imp = point.importance_level || 1;
                     const icon = L.divIcon({ className: `custom-marker imp-${imp}`, html: imp, iconSize: [20+(imp*2), 20+(imp*2)], iconAnchor: [10+imp, 10+imp] });
-                    L.marker([y, x], {icon: icon}).addTo(pointsLayer)
-                        .bindPopup(`
-                            <div style="min-width: 200px">
-                                <h4 style="color: #eaeaea; border-bottom: 1px solid #333; margin-bottom: 5px;">
-                                    INTEL #${point.id}
-                                </h4>
-                                <p><b>SIGNALÉ PAR:</b> <span style="color:#00ff00">${point.creator_name || 'Inconnu'}</span></p>
-                                <p><b>NIVEAU:</b> <span class="imp-${imp}" style="color:#000; padding: 2px 5px; border-radius: 3px;">${imp}</span></p>
-                                <div style="background:#111; padding: 5px; margin-top: 5px; border-left: 2px solid #00ff00; color: #ccc;">
-                                    ${point.description}
-                                </div>
-                                <div style="text-align:right; font-size:0.8em; color:#666; margin-top:5px;">
-                                    ${new Date(point.created_at).toLocaleString()}
-                                </div>
-                                <button onclick="deletePoint(${point.id})" class="delete-btn">SUPPRIMER POINT</button>
+                    
+                    // Contenu Popup Stylisé
+                    const popupContent = `
+                        <div style="min-width: 200px">
+                            <h4 style="margin: 0 0 10px 0; padding-bottom: 5px; border-bottom: 1px dashed #555;">
+                                INTEL #${point.id}
+                            </h4>
+                            <p style="margin: 5px 0; font-size: 0.85rem;"><b>SOURCE:</b> <span style="color:var(--primary)">${point.creator_name || 'Inconnu'}</span></p>
+                            <div style="background:rgba(0,0,0,0.3); padding: 8px; margin-top: 5px; border-left: 2px solid var(--primary); color: #ccc; font-size: 0.9rem;">
+                                ${point.description}
                             </div>
-                        `);
+                            <div style="text-align:right; font-size:0.7em; color:var(--dim); margin-top:5px;">
+                                ${new Date(point.created_at).toLocaleString()}
+                            </div>
+                            <button onclick="deletePoint(${point.id})" class="delete-btn">SUPPRIMER MARQUEUR</button>
+                        </div>
+                    `;
+
+                    L.marker([y, x], {icon: icon}).addTo(pointsLayer).bindPopup(popupContent);
                 });
             } catch (e) { console.error("Erreur points:", e); }
         }
 
         async function loadDrawings() {
             try {
-                const response = await fetch('/api/read?resource=drawings'); // <-- MODIFIÉ
+                const response = await fetch('/api/read?resource=drawings');
                 const data = await response.json();
                 drawnItems.clearLayers();
                 data.drawings.forEach(drawing => {
-                    let color = '#00ff00';
+                    let color = '#00ff9d'; // primary
                     const imp = drawing.importance_level || 1;
-                    if (imp === 2) color = '#ffff00';
+                    if (imp === 2) color = '#eebb00'; // warning
                     if (imp === 3) color = '#ff9900';
-                    if (imp === 4) color = '#ff0000';
+                    if (imp === 4) color = '#ff3333'; // danger
 
                     const layer = L.geoJSON(drawing.geojson, {
                         style: function (feature) { return { color: color, weight: 3 }; }
                     });
                     layer.eachLayer(function (l) {
                         l.bindPopup(`
-                            <div style="min-width: 200px; color: #eaeaea;">
-                                <h4 style="color: #eaeaea; border-bottom: 1px solid #333; margin-bottom: 5px;">
-                                    DESSIN TACTIQUE #${drawing.id}
+                            <div style="min-width: 200px;">
+                                <h4 style="margin: 0 0 10px 0; border-bottom: 1px dashed ${color};">
+                                    ZONE TACTIQUE #${drawing.id}
                                 </h4>
-                                <p><b>PAR:</b> <span style="color:#00ff00">${drawing.creator_name || 'Inconnu'}</span></p>
-                                <p><b>NIVEAU:</b> <span class="imp-${imp}" style="color:#000; padding: 2px 5px; border-radius: 3px;">${imp}</span></p>
-                                <div style="background:#111; padding: 5px; margin-top: 5px; border-left: 2px solid ${color}; color: #ccc;">
+                                <p style="font-size: 0.85rem;"><b>OPÉRATEUR:</b> <span style="color:var(--primary)">${drawing.creator_name || 'Inconnu'}</span></p>
+                                <div style="background:rgba(0,0,0,0.3); padding: 8px; margin-top: 5px; border-left: 2px solid ${color}; color: #ccc;">
                                     ${drawing.description || 'Aucune description'}
                                 </div>
-                                <button onclick="deleteDrawing(${drawing.id})" class="delete-btn">SUPPRIMER DESSIN</button>
+                                <button onclick="deleteDrawing(${drawing.id})" class="delete-btn">EFFACER ZONE</button>
                             </div>
                         `);
                         drawnItems.addLayer(l);
@@ -212,7 +371,7 @@
         }
 
         window.deletePoint = async function(id) {
-            if (!confirm("Supprimer ce point d'intel ?")) return;
+            if (!confirm("CONFIRMER SUPPRESSION DU POINT ?")) return;
             try {
                 const response = await fetch('/api/execute-action', {
                     method: 'POST',
@@ -220,12 +379,11 @@
                     body: JSON.stringify({ action: 'delete_point', point_id: id })
                 });
                 if (response.ok) loadPoints();
-                else alert("Erreur suppression point.");
             } catch (error) { console.error("Erreur delete point:", error); }
         };
 
         window.deleteDrawing = async function(id) {
-            if (!confirm("Supprimer ce dessin tactique ?")) return;
+            if (!confirm("CONFIRMER SUPPRESSION DE LA ZONE ?")) return;
             try {
                 const response = await fetch('/api/execute-action', {
                     method: 'POST',
@@ -233,13 +391,12 @@
                     body: JSON.stringify({ action: 'delete_drawing', drawing_id: id })
                 });
                 if (response.ok) loadDrawings();
-                else alert("Erreur suppression dessin.");
             } catch (error) { console.error("Erreur delete drawing:", error); }
         };
 
         map.on(L.Draw.Event.CREATED, async function (e) {
             const description = document.getElementById('point-desc').value;
-            if (!description || !currentAgent) { alert("Description requise avant de dessiner."); drawnItems.removeLayer(e.layer); return; }
+            if (!description || !currentAgent) { alert("ERREUR: Description requise."); drawnItems.removeLayer(e.layer); return; }
             
             const importance_level = document.getElementById('point-importance').value;
             const type = e.layerType;
@@ -274,14 +431,14 @@
             const indicator = document.getElementById('add-mode-indicator');
             
             if (desc && currentAgent) {
-                indicator.textContent = ">> MODE AJOUT ACTIF : CLIQUEZ OU DESSINEZ <<";
+                indicator.textContent = ">> MODE AJOUT ACTIF : CLIQUEZ OU DESSINEZ SUR LA CARTE <<";
                 indicator.classList.add('active');
                 if (!drawControlAdded) {
                     map.addControl(drawControl);
                     drawControlAdded = true;
                 }
             } else {
-                indicator.textContent = "EN ATTENTE... ENTREZ UNE DESCRIPTION POUR ACTIVER LES OUTILS.";
+                indicator.textContent = "EN ATTENTE... ENTREZ UNE DESCRIPTION POUR DÉVERROUILLER L'INTERFACE.";
                 indicator.classList.remove('active');
                 if (drawControlAdded) {
                     map.removeControl(drawControl);
