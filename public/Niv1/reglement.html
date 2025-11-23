@@ -23,16 +23,23 @@
             --corner-size: 15px;
         }
 
-        /* 1. SCROLLBAR TACTIQUE (Maintenant sur la page entière) */
+        /* 1. RESET LISTES (CORRECTION DU PROBLÈME DES POINTS) */
+        ul, li { 
+            list-style: none !important; /* Force la suppression des puces par défaut */
+            padding: 0;
+            margin: 0;
+        }
+
+        /* 2. SCROLLBAR TACTIQUE */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #050505; }
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 0; }
         ::-webkit-scrollbar-thumb:hover { background: #fff; box-shadow: 0 0 10px #fff; }
 
-        /* 2. OVERRIDES LAYOUT (ACTIVATION DU SCROLL) */
+        /* 3. OVERRIDES LAYOUT */
         body { 
             background: #020202; 
-            overflow-y: auto !important; /* Force le scroll vertical */
+            overflow-y: auto !important; 
             height: auto !important;
             min-height: 100vh;
         }
@@ -40,22 +47,15 @@
         .terminal-wrapper.mode-large {
             max-width: 96vw !important; 
             width: 96vw !important; 
-            height: auto !important; /* La hauteur s'adapte au contenu */
-            min-height: 96vh;
-            margin-bottom: 50px; /* Espace en bas pour scroller confortablement */
-        }
-        
-        .terminal {
-            height: auto !important; /* Permet au terminal de s'agrandir */
-        }
-        
-        /* On écrase le style grid qui bloquait le scroll interne */
-        .rules-grid-layout {
             height: auto !important;
-            overflow: visible !important;
+            min-height: 96vh;
+            margin-bottom: 50px;
         }
+        
+        .terminal { height: auto !important; }
+        .rules-grid-layout { height: auto !important; overflow: visible !important; }
 
-        /* 3. DESIGN DES BLOCS (CARTES) */
+        /* 4. DESIGN DES CARTES */
         .rule-card {
             background: linear-gradient(135deg, rgba(16, 20, 24, 0.9) 0%, rgba(8, 10, 12, 0.95) 100%);
             border: 1px solid var(--hud-border);
@@ -63,19 +63,10 @@
             position: relative;
             margin-bottom: 25px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            
-            /* Coins coupés façon Sci-Fi */
-            clip-path: polygon(
-                0 0, 
-                100% 0, 
-                100% calc(100% - var(--corner-size)), 
-                calc(100% - var(--corner-size)) 100%, 
-                0 100%
-            );
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--corner-size)), calc(100% - var(--corner-size)) 100%, 0 100%);
         }
 
         .rule-card::before {
-            /* Petit accent décoratif en haut à gauche */
             content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 20px;
             background: var(--dim); transition: 0.3s;
         }
@@ -87,7 +78,7 @@
         }
         .rule-card:hover::before { background: var(--primary); height: 100%; }
 
-        /* 4. TYPOGRAPHIE ET TITRES */
+        /* 5. TYPOGRAPHIE */
         .category-header {
             display: flex; align-items: center; gap: 10px;
             border-bottom: 1px solid var(--hud-border);
@@ -105,9 +96,10 @@
 
         .category-id { font-family: 'Share Tech Mono'; color: var(--dim); font-size: 0.9rem; margin-left: auto; }
 
-        /* 5. LISTES ET CONTENU */
+        /* 6. LISTES ET PUCES PERSONNALISÉES */
         .inventory-list > <li> {
-            background: transparent; border: none; padding: 0; margin-bottom: 25px;
+            /* Plus de background ni border par défaut pour éviter le bruit visuel */
+            margin-bottom: 25px;
             border-left: 2px solid rgba(255,255,255,0.05);
             padding-left: 20px;
             transition: 0.3s;
@@ -120,37 +112,33 @@
             background: rgba(0, 255, 157, 0.05); padding: 2px 8px; border-radius: 2px;
         }
 
+        /* Sous-éléments : C'est ici qu'on gère le petit carré cyan */
+        .item-details { padding-left: 5px; } /* Petit alignement */
+        
         .item-details li {
-            color: #aaa; margin-bottom: 8px; position: relative; padding-left: 15px;
+            color: #aaa; margin-bottom: 8px; position: relative; padding-left: 20px;
             font-size: 1rem; line-height: 1.5; font-family: 'Rajdhani'; font-weight: 500;
+            list-style: none !important; /* Double sécurité */
         }
+        
+        /* Le carré cyan personnalisé */
         .item-details li::before {
             content: ''; position: absolute; left: 0; top: 8px;
             width: 4px; height: 4px; background: var(--secondary);
             box-shadow: 0 0 5px var(--secondary);
         }
 
-        /* 6. ALERTE DE SECURITÉ (HAZARD STYLE) */
+        /* 7. ALERTE */
         .hazard-box {
-            background: repeating-linear-gradient(
-                45deg,
-                rgba(60, 10, 10, 0.6),
-                rgba(60, 10, 10, 0.6) 10px,
-                rgba(30, 5, 5, 0.6) 10px,
-                rgba(30, 5, 5, 0.6) 20px
-            );
+            background: repeating-linear-gradient(45deg, rgba(60, 10, 10, 0.6), rgba(60, 10, 10, 0.6) 10px, rgba(30, 5, 5, 0.6) 10px, rgba(30, 5, 5, 0.6) 20px);
             border: 1px solid var(--danger);
-            color: #ff5555;
-            padding: 30px;
-            text-align: center;
-            font-family: 'JetBrains Mono';
-            position: relative;
-            overflow: hidden;
+            color: #ff5555; padding: 30px; text-align: center;
+            font-family: 'JetBrains Mono'; position: relative; overflow: hidden;
             box-shadow: inset 0 0 50px rgba(255,0,0,0.1);
         }
         .hazard-box strong { font-size: 1.3rem; letter-spacing: 2px; text-shadow: 0 0 10px red; }
         
-        /* 7. HEADER AVANCÉ */
+        /* 8. HEADER */
         .main-title {
             font-size: 4rem; font-family: 'Rajdhani', sans-serif; font-weight: 800;
             line-height: 0.9; text-transform: uppercase;
@@ -164,6 +152,7 @@
 <body>
 
     <div class="crt-overlay"></div>
+
     <div class="terminal-wrapper mode-large">
         <main class="terminal">
             
