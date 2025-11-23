@@ -3,162 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW_NET // NETWORK_GRID</title>
+    <title>SHADOW_NET // COMMAND_HIERARCHY</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-dark: #050505;
-            --panel-bg: rgba(15, 20, 25, 0.90);
-            --primary: #00ff9d;
-            --secondary: #00f3ff;
-            --danger: #ff3333;
-            --warning: #eebb00;
-            --dim: #445566;
-            --gold: #d4af37;
-            --font-ui: 'Share Tech Mono', monospace;
-            --font-code: 'JetBrains Mono', monospace;
-            --glass: blur(10px);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; cursor: crosshair; }
-
-        body {
-            background-color: var(--bg-dark);
-            color: #eee;
-            font-family: var(--font-ui);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 1rem;
-            overflow-x: hidden;
-        }
-
-        /* FOND TACTIQUE */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 50% 50%, rgba(20, 30, 40, 1) 0%, rgba(0,0,0,1) 90%),
-                repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0, 255, 157, 0.02) 2px, transparent 3px);
-            z-index: -2;
-        }
-
-        /* CRT OVERLAY */
-        .crt-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none; z-index: 9999; opacity: 0.5; animation: flicker 0.15s infinite;
-        }
-        @keyframes flicker { 0% {opacity: 0.45;} 50% {opacity: 0.5;} 100% {opacity: 0.45;} }
-
-        /* TERMINAL CONTAINER */
-        .terminal-wrapper { width: 100%; max-width: 1000px; perspective: 1500px; animation: terminalEntry 0.5s ease-out; }
-        @keyframes terminalEntry { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-        .terminal {
-            background: var(--panel-bg);
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: var(--glass);
-            box-shadow: 0 20px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(0, 255, 157, 0.1);
-            padding: 2.5rem;
-            display: flex; flex-direction: column; gap: 2rem;
-            position: relative;
-        }
-
-        /* HEADER */
-        .header-strip {
-            display: flex; justify-content: space-between; align-items: flex-end;
-            border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px; position: relative;
-        }
-        .header-strip::after {
-            content: ''; position: absolute; bottom: -2px; left: 0; width: 100px; height: 2px;
-            background: var(--danger); animation: scanHeader 4s infinite linear;
-        }
-        @keyframes scanHeader { 0% {left:0;} 50% {left: calc(100% - 100px);} 100% {left:0;} }
-        h1 { font-family: var(--font-code); font-weight: 800; font-size: 2rem; letter-spacing: -2px; text-transform: uppercase; margin: 0; }
-        h1 span { color: var(--danger); }
-        .meta-data { font-size: 0.8rem; color: var(--dim); text-align: right; font-family: var(--font-code); }
-
-        .system-status { text-align: center; border-bottom: 1px solid var(--dim); padding-bottom: 10px; font-size: 0.9rem; color: var(--dim); letter-spacing: 2px; }
-        .secured { color: var(--primary); } .encrypted { color: var(--danger); }
-
-        /* ==================== RÉSEAU & GRILLE ==================== */
-        .network-grid {
-            display: flex; flex-direction: column; align-items: center; gap: 80px; position: relative; padding: 20px 0;
-        }
-
-        /* STYLES DES BOITES (NOEUDS) */
-        .chart-node {
-            background: rgba(10, 15, 20, 0.85);
-            border: 1px solid var(--dim);
-            padding: 15px; width: 200px; text-align: center;
-            position: relative; z-index: 5; transition: 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .chart-node:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0, 243, 255, 0.15); border-color: #fff; }
-
-        .role { font-size: 0.7rem; letter-spacing: 2px; opacity: 0.8; margin-bottom: 5px; }
-        .name { font-size: 1.2rem; font-weight: bold; color: #fff; text-transform: uppercase; margin-bottom: 10px; }
-        
-        .action-button {
-            display: block; text-decoration: none; font-size: 0.7rem; padding: 5px;
-            border: 1px solid var(--dim); color: var(--dim); transition: 0.2s;
-        }
-        .action-button:hover { background: rgba(255,255,255,0.05); color: #fff; border-color: #fff; }
-
-        /* COULEURS DE RANG */
-        .rank-gold { border-top: 3px solid var(--gold); }
-        .rank-gold .role { color: var(--gold); }
-        
-        .rank-cyan { border-top: 3px solid var(--secondary); }
-        .rank-cyan .role { color: var(--secondary); }
-        
-        .rank-green { border-left: 3px solid var(--primary); text-align: left; }
-        .rank-green .role { color: var(--primary); }
-
-        .rank-shared { 
-            border: 1px solid var(--primary); 
-            border-top: 3px solid var(--primary);
-            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
-        }
-        .rank-shared .role { color: var(--primary); }
-
-        /* LAYOUT DES RANGÉES */
-        .row-commander { display: flex; justify-content: center; }
-        .row-lieutenants { display: flex; gap: 200px; justify-content: center; }
-        .row-squads { display: flex; gap: 40px; justify-content: center; }
-
-        /* --- LASERS & LIGNES --- */
-        .connector { position: absolute; background: var(--secondary); z-index: 1; box-shadow: 0 0 8px var(--secondary); opacity: 0.8; }
-        
-        /* Structure Haut (Grave) */
-        .line-v-grave { top: 70px; left: 50%; width: 2px; height: 50px; background: var(--gold); box-shadow: 0 0 10px var(--gold); transform: translateX(-50%); }
-        .line-h-grave { top: 120px; left: 50%; width: 402px; height: 2px; background: var(--gold); transform: translateX(-50%); }
-        .drop-javier { top: 120px; left: calc(50% - 200px); width: 2px; height: 45px; background: var(--gold); }
-        .drop-jackal { top: 120px; left: calc(50% + 200px); width: 2px; height: 45px; background: var(--gold); }
-
-        /* Lasers Diagonaux */
-        .laser { height: 2px; transform-origin: 0 50%; }
-
-        /* Config Javier */
-        .laser-javier-1 { top: 100%; left: 20%; width: 70px; transform: rotate(105deg); }
-        .laser-javier-2 { top: 100%; right: 20%; width: 140px; transform: rotate(33deg); transform-origin: top right; }
-
-        /* Config Jackal */
-        .laser-jackal-1 { top: 100%; left: 20%; width: 140px; transform: rotate(147deg); }
-        .laser-jackal-2 { top: 100%; right: 20%; width: 70px; transform: rotate(75deg); transform-origin: top right; }
-
-
-        /* FOOTER */
-        .portal-footer { margin-top: 2rem; border-top: 1px solid var(--dim); padding-top: 1rem; text-align: center; }
-        .back-link { color: var(--dim); text-decoration: none; font-size: 0.8rem; transition: color 0.3s; }
-        .back-link:hover { color: var(--danger); }
-
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Libre+Barcode+128+Text&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -168,88 +17,95 @@
         <div class="terminal">
             
             <div class="header-strip">
-                <h1>SHADOW_NET // <span>NETWORK_GRID</span></h1>
-                <div class="meta-data">SERVER: ONLINE<br>SECURE_CONNECTION_ESTABLISHED</div>
+                <h1>SHADOW_NET // <span>HIERARCHY</span></h1>
+                <div class="meta-data">SERVER: ONLINE<br>NODES: COMPLETE</div>
             </div>
 
-            <div class="system-status">
-                <span class="secured">ENCRYPTION: AES-256 [ACTIVE]</span> &bull; <span class="encrypted">NODES: CROSS-LINKED</span>
-            </div>
-
-            <div class="network-grid">
+            <div class="org-chart">
                 
-                <div class="connector line-v-grave"></div>
-                <div class="connector line-h-grave"></div>
-                <div class="connector drop-javier"></div>
-                <div class="connector drop-jackal"></div>
-
-                <div class="row-commander">
-                    <div class="chart-node rank-gold">
+                <div class="director-container">
+                    <div class="chart-node lead">
                         <div class="role">COMMANDER</div>
                         <div class="name">Graves</div>
                         <a href="#" class="action-button">DOSSIER MAÎTRE</a>
                     </div>
                 </div>
 
-                <div class="row-lieutenants">
-                    <div class="chart-node rank-cyan">
-                        <div class="role">ARMOR</div>
-                        <div class="name">Javier</div>
-                        <a href="#" class="action-button">PROFIL ></a>
-                        <div class="connector laser laser-javier-1"></div>
-                        <div class="connector laser laser-javier-2"></div>
-                    </div>
-
-                    <div class="chart-node rank-cyan">
-                        <div class="role">SPEC-OPS</div>
-                        <div class="name">Jackal</div>
-                        <a href="#" class="action-button">PROFIL ></a>
-                        <div class="connector laser laser-jackal-1"></div>
-                        <div class="connector laser laser-jackal-2"></div>
-                    </div>
-                </div>
-
-                <div class="row-squads">
+                <div class="ltn-container">
                     
-                    <div class="chart-node rank-green">
-                        <div class="role">ACTIF</div>
-                        <div class="name">LoveLace</div>
-                        <a href="#" class="action-button">VOIR ></a>
+                    <div class="wing-container">
+                        <div class="chart-node subordinate">
+                            <div class="role">LIEUTENANT (ARMOR)</div>
+                            <div class="name">Javier</div>
+                            <a href="#" class="action-button">PROFIL ></a>
+                            <div class="connector-down"></div>
+                        </div>
+
+                        <div class="squad-grid">
+                            <div class="chart-node team-member status-green">
+                                <div class="role">ACTIF</div>
+                                <div class="name">LoveLace</div>
+                                <a href="#" class="action-button">VOIR ></a>
+                            </div>
+                            <div class="chart-node team-member status-green">
+                                <div class="role">ACTIF</div>
+                                <div class="name">Adam</div>
+                                <a href="#" class="action-button">VOIR ></a>
+                            </div>
+                            <div class="chart-node team-member status-green">
+                                <div class="role">ACTIF</div>
+                                <div class="name">Blitz</div>
+                                <a href="#" class="action-button">VOIR ></a>
+                            </div>
+                            <div class="chart-node team-member status-gray">
+                                <div class="role">RECO</div>
+                                <div class="name">Dust</div>
+                                <a href="#" class="action-button">VOIR ></a>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="chart-node rank-shared">
-                        <div class="role">JOINT-OPS</div> <div class="name">Recrue</div>
-                        <a href="#" class="action-button">ACCÈS RESTREINT ></a>
+                    <div class="wing-container">
+                        <div class="chart-node subordinate">
+                            <div class="role">LIEUTENANT (SPEC-OPS)</div>
+                            <div class="name">Jackal</div>
+                            <a href="#" class="action-button">PROFIL ></a>
+                            <div class="connector-down"></div>
+                        </div>
+
+                        <div class="squad-grid">
+                            <div class="chart-node team-member status-green">
+                                <div class="role">JOINT-OPS</div>
+                                <div class="name">Recrue</div>
+                                <a href="#" class="action-button">ACCÈS ></a>
+                            </div>
+                            <div class="chart-node team-member status-green">
+                                <div class="role">ACTIF</div>
+                                <div class="name">Roxanne</div>
+                                <a href="#" class="action-button">VOIR ></a>
+                            </div>
+                            <div class="chart-node team-member status-green">
+                                <div class="role">ACTIF</div>
+                                <div class="name">Blake</div>
+                                <a href="#" class="action-button">VOIR ></a>
+                            </div>
+                            <div class="chart-node team-member status-green">
+                                <div class="role">ACTIF</div>
+                                <div class="name">Lexa</div>
+                                <a href="#" class="action-button">VOIR ></a>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="chart-node rank-green">
-                        <div class="role">ACTIF</div>
-                        <div class="name">Roxanne</div>
-                        <a href="#" class="action-button">VOIR ></a>
-                    </div>
+                </div> </div>
 
-                </div>
-
-            </div>
             <div class="portal-footer">
-                <a href="#" class="back-link">< CLASSIFIED DATABASE ACCESS ONLY ></a>
+                <a href="#" class="back-link">< SYNC COMPLETE ></a>
             </div>
 
         </div>
     </div>
 
-    <div id="boot-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:10000;"></div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const boot = document.getElementById('boot-screen');
-            if(boot) {
-                setTimeout(() => {
-                    boot.style.transition = 'opacity 1s';
-                    boot.style.opacity = '0';
-                    setTimeout(() => { boot.style.display = 'none'; }, 1000);
-                }, 1000);
-            }
-        });
-    </script>
+    <div id="boot-screen" style="display:none;"></div>
 </body>
 </html>

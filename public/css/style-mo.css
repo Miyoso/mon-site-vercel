@@ -341,93 +341,99 @@ h1 span { color: var(--danger); }
     box-shadow: 0 0 10px var(--secondary);
 }
 
-/* 2. Les Lieutenants - On resserre l'écart latéral */
+/* --- MISE A JOUR CSS POUR ORGANIGRAMME COMPLET --- */
+
+/* Conteneur principal des deux branches */
 .ltn-container {
-    position: relative;
     display: flex;
     justify-content: center;
-    gap: 40px; /* BEAUCOUP plus serré (était 100px) */
-    margin-bottom: 40px; /* Réduit l'espace avec la grille du bas */
+    gap: 40px; /* Espace entre l'équipe Javier et l'équipe Jackal */
+    margin-top: 0;
+    position: relative;
 }
 
-/* 3. La barre horizontale - RECALCULÉE pour l'écart de 40px */
+/* La grande ligne horizontale du haut (connecte les lieutenants) */
 .ltn-container::before {
     content: '';
     position: absolute;
-    top: -30px; /* Doit toucher la ligne du chef */
+    top: -40px;
     left: 50%;
     transform: translateX(-50%);
-    
-    /* MATHÉMATIQUES :
-       Largeur d'une boite (220px) / 2 = 110px
-       + Ecart (gap) = 40px
-       + Largeur d'une boite (220px) / 2 = 110px
-       TOTAL = 260px.
-       On met 262px pour assurer la jonction. */
-    width: 262px; 
-    
-    height: 2px;
+    width: 50%; /* Ajustez la largeur selon vos besoins */
+    height: 1px;
     background: var(--secondary);
-    box-shadow: 0 0 8px var(--secondary);
+    box-shadow: 0 0 5px var(--secondary);
+    z-index: 0;
 }
 
-/* 4. Les petites lignes verticales sur les Lieutenants */
-.ltn-container .chart-node::before {
+/* Connecteur vertical au dessus de chaque Lieutenant */
+.wing-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    min-width: 300px; /* Largeur min pour que les squads aient de la place */
+}
+
+.wing-container::before {
     content: '';
     position: absolute;
-    top: -30px; /* Monte jusqu'à la barre horizontale */
+    top: -40px;
     left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 30px;
+    width: 1px;
+    height: 40px;
     background: var(--secondary);
-    box-shadow: 0 0 5px var(--secondary);
 }
 
-/* 5. Les tentacules du bas (Plus subtiles et verticales) */
-.branch-left, .branch-right {
+/* Style du noeud Lieutenant */
+.subordinate {
+    margin-bottom: 40px; /* Espace entre Lieutenant et ses agents */
+    z-index: 2;
+}
+
+/* Petit connecteur sous le lieutenant vers sa squad */
+.connector-down {
     position: absolute;
-    bottom: -25px; /* Moins long */
-    width: 2px;
-    height: 25px;
-    background: linear-gradient(to bottom, var(--secondary), transparent);
-    box-shadow: 0 0 5px var(--secondary);
-    opacity: 0.6;
+    bottom: -40px;
+    left: 50%;
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--secondary), var(--dim));
 }
 
-/* On les place plus au centre pour éviter l'effet "pattes d'araignée" */
-.branch-left { left: 40%; transform: skewX(10deg); }
-.branch-right { right: 40%; transform: skewX(-10deg); }
-
-
-/* 6. REMONTER LA SECTION DU BAS */
-.operators-section {
-    margin-top: 10px; /* Collé juste en dessous des tentacules */
-    padding-top: 20px;
-    border-top: 1px dashed rgba(0, 243, 255, 0.1); /* Ligne de séparation subtile */
-}
-.section-title {
-    border-left: 4px solid var(--terminal-green);
-    padding-left: 15px;
-    font-size: 1.2rem;
-    color: #fff;
-    margin-bottom: 30px;
-    letter-spacing: 1px;
-}
-
-.operators-grid {
+/* --- GRILLE DES AGENTS (SQUAD) --- */
+.squad-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: 1fr 1fr; /* 2 colonnes d'agents */
+    gap: 15px;
+    width: 100%;
+    position: relative;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Ligne subtile au dessus du groupe */
 }
 
-.team-member {
-    width: 100%;
-    border-left: 2px solid var(--terminal-dim);
-    border-top: none;
-    text-align: left;
+/* Petit trait vertical reliant la ligne du groupe aux agents */
+.squad-grid::before {
+    content: '';
+    position: absolute;
+    top: -20px; /* Remonte vers le connecteur du lieutenant */
+    left: 50%;
+    width: 1px;
+    height: 20px;
+    background: var(--dim);
 }
-.team-member .name { font-size: 1rem; }
+
+/* Style des cartes agents (plus petit pour rentrer) */
+.team-member {
+    width: 100% !important; /* Force la largeur de la colonne */
+    font-size: 0.8rem;
+    padding: 10px;
+}
+
+.team-member .name {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
 .team-member .role { font-size: 0.65rem; }
 
 .action-button {
