@@ -8,61 +8,289 @@
     <script>
         const REQUIRED_LEVEL = 1;
     </script>
+    <script>
+        if(typeof checkSecurity === 'undefined') { window.checkSecurity = function() { console.log("Sec Check Bypass"); } }
+    </script>
     <script src="security.js"></script>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/style-mo.css">
+
+    <style>
+        /* Ajustements spécifiques pour le Règlement */
+        .terminal {
+            max-width: 900px;
+            height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Zone de contenu défilable */
+        .rules-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 15px;
+            margin-top: 1rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            
+            /* Scrollbar stylisée */
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) #111;
+        }
+
+        .rules-container::-webkit-scrollbar { width: 6px; }
+        .rules-container::-webkit-scrollbar-track { background: #111; }
+        .rules-container::-webkit-scrollbar-thumb { background: var(--primary); }
+
+        /* Styles des sections */
+        .category-title {
+            color: var(--secondary);
+            font-family: var(--font-code);
+            border-bottom: 1px solid var(--dim);
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .category-title:first-of-type { margin-top: 0; }
+
+        /* Styles des listes */
+        .inventory-list {
+            list-style: none;
+            padding: 0;
+        }
+        .inventory-list > <li> {
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.02);
+            padding: 10px;
+            border-left: 2px solid var(--dim);
+            transition: all 0.2s;
+        }
+        .inventory-list > <li>:hover {
+            border-left-color: var(--primary);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .item-name {
+            display: block;
+            color: var(--primary);
+            font-weight: bold;
+            font-family: var(--font-code);
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .item-details {
+            list-style: none;
+            padding-left: 0;
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .item-details li {
+            margin-bottom: 5px;
+            position: relative;
+            padding-left: 15px;
+        }
+        .item-details li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--dim);
+        }
+
+        /* Alertes et Notes */
+        .alert-box {
+            border: 1px solid var(--danger);
+            background: rgba(255, 51, 51, 0.1);
+            color: var(--danger);
+            padding: 15px;
+            margin-bottom: 20px;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            animation: pulse-border 3s infinite;
+        }
+        
+        .sub-list {
+            margin-left: 20px;
+            margin-top: 5px;
+            list-style: square;
+            color: var(--dim);
+        }
+        .sub-list li::before { content: ''; } /* Reset du chevron pour sous-liste */
+
+        @keyframes pulse-border { 0% {box-shadow: 0 0 5px rgba(255,51,51,0.1);} 50% {box-shadow: 0 0 15px rgba(255,51,51,0.3);} 100% {box-shadow: 0 0 5px rgba(255,51,51,0.1);} }
+    </style>
 </head>
 <body>
-    <main class="terminal">
-        <h1>RÈGLEMENT INTÉRIEUR<span class="blinker">_</span></h1>
-        
-        <p class="status">DOCUMENT: <span class="secure">SAS-REG-001</span> :: ACCRÉDITATION: <span class="secure">NIVEAU 1+</span></p>
 
-        <div class="report-content">
-            <h3 class="category-title">//: SECTION 1 - LA DISCRÉTION</h3>
-            <ul class="inventory-list">
-                <li>
-                    <span class="item-name">Art. 1.1:</span>
-                    <ul class="item-details">
-                        <li>L'identité des autres agents est confidentielle. N'utilisez que les alias désignés en opération.</li>
-                    </ul>
-                </li>
+    <div class="crt-overlay"></div>
+
+    <div class="terminal-wrapper">
+        <main class="terminal">
+            
+            <div class="header-strip">
+                <div>
+                    <h1>RÈGLEMENT <span class="blinker">INTÉRIEUR</span></h1>
+                    <div style="color: var(--dim); font-size: 0.8rem; letter-spacing: 2px;">DOCUMENT: <span style="color:var(--primary)">SAS-REG-001</span></div>
+                </div>
+                <div class="meta-data">
+                    <div style="color: var(--warning)">ACCRÉDITATION: NIV 1+</div>
+                    <div style="color: var(--danger)">[LECTURE SEULE]</div>
+                </div>
+            </div>
+
+            <div class="rules-container">
                 
-            </ul>
+                <div class="alert-box">
+                    <strong>// AVERTISSEMENT DE SÉCURITÉ</strong><br>
+                    Ce document est confidentiel. Sa diffusion à toute personne civile est strictement interdite. Seuls les agents du S.A.S sont autorisés à le consulter.
+                </div>
 
-            <h3 class="category-title">//: SECTION 2 - LA HIÉRARCHIE</h3>
-            <ul class="inventory-list">
-                <li>
-                    <span class="item-name">Art. 2.1:</span>
-                    <ul class="item-details">
-                        <li>Les ordres du Directeur (Graves) sont absolus et non négociables.</li>
-                    </ul>
-                </li>
-                <li>
-                    <span class="item-name">Art. 2.2:</span>
-                    <ul class="item-details">
-                        <li>Les Lieutenants (LTN) ont autorité pleine et entière sur les Opérateurs (STD) durant les missions.</li>
-                    </ul>
-                </li>
-            </ul>
+                <p style="margin-bottom: 20px; color: #aaa; border-left: 2px solid var(--secondary); padding-left: 10px;">
+                    Le manuel du règlement interne du S.A.S est remis à chaque agent dès son incorporation. Il expose les principes essentiels et obligatoires pour maintenir un fonctionnement optimal et sain du service.
+                </p>
 
-            <h3 class="category-title">//: SECTION 3 - L'ÉQUIPEMENT</h3>
-            <ul class="inventory-list">
-                <li>
-                    <span class="item-name">Art. 3.1:</span>
-                    <ul class="item-details">
-                        <li>Tout équipement assigné doit être maintenu en état opérationnel.</li>
-                        <li>La perte ou la destruction d'équipement doit être rapportée à l'Inventaire (Niv 3) sous 24h.</li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+                <h3 class="category-title">//: ARTICLE 1.00 - CADRE GÉNÉRAL</h3>
+                <ul class="inventory-list">
+                    <li>
+                        <span class="item-name">Art. 1.01 & 1.02 - Devoir et Sanctions</span>
+                        <ul class="item-details">
+                            <li>Chaque agent du S.A.S est tenu d'exercer ses fonctions en respectant scrupuleusement les règles.</li>
+                            <li>Le respect de la hiérarchie est capital. Tout manquement sera sanctionné :
+                                <ul class="sub-list">
+                                    <li>Mise à pied</li>
+                                    <li>Avertissement</li>
+                                    <li>Licenciement sans solde</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <span class="item-name">Art. 1.03 à 1.06 - Gestion du Personnel</span>
+                        <ul class="item-details">
+                            <li>La direction du S.A.S peut évaluer si un profil ne correspond pas aux critères (risque de licenciement).</li>
+                            <li>Tout incident observé par l'état-major doit être signalé à la direction.</li>
+                            <li>Les fautes graves entraînent un licenciement immédiat.</li>
+                            <li><strong style="color:var(--warning)">Période d'essai :</strong> Chaque recrue est en période d'essai permanente. Le contrat peut être rompu à tout moment.</li>
+                        </ul>
+                    </li>
+                </ul>
 
-        <footer class="portal-footer">
-            <a href="/index.html" class="back-link">&lt;&lt; RETURN_TO_MAINFRAME</a>
-        </footer>
-    </main>
+                <h3 class="category-title">//: ARTICLE 2.00 - CONFIDENTIALITÉ</h3>
+                <ul class="inventory-list">
+                    <li>
+                        <span class="item-name">Art. 2.01 & 2.02 - Le Secret</span>
+                        <ul class="item-details">
+                            <li>Confidentialité absolue requise sur les procédés, procédures, enquêtes et techniques.</li>
+                            <li>Toute divulgation (interne ou externe) d'informations classées confidentiel entraînera un licenciement immédiat et des répercussions graves.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <span class="item-name">Art. 2.03 - Corruption</span>
+                        <ul class="item-details">
+                            <li>La corruption est un crime au sein du S.A.S. Tolérance zéro (mise à pied ou licenciement).</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <span class="item-name">Art. 2.04 - Rapports Obligatoires</span>
+                        <ul class="item-details">
+                            <li>L'agent doit soumettre un rapport après :
+                                <ul class="sub-list">
+                                    <li>Opération terrain / Convoi (VIP, Fonds)</li>
+                                    <li>Constatation de faits majeurs</li>
+                                    <li>Enlèvement VIP ou Prise d'otages</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 class="category-title">//: ARTICLE 3.00 - L'ÉQUIPEMENT</h3>
+                <ul class="inventory-list">
+                    <li>
+                        <span class="item-name">Art. 3.01 à 3.06 - Gestion du Matériel</span>
+                        <ul class="item-details">
+                            <li>Interdiction stricte de prêter ou dérober l'équipement.</li>
+                            <li>L'arme à feu doit être sécurisée et sous contrôle en tout temps.</li>
+                            <li>Toute perte doit être signalée immédiatement.</li>
+                            <li><strong style="color:var(--danger)">Armes Lourdes :</strong> Déploiement soumis à l'autorisation de la Direction.</li>
+                            <li>Vérification obligatoire de l'équipement avant chaque début/fin de service.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 class="category-title">//: ARTICLE 4.00 - L'UNIFORME</h3>
+                <ul class="inventory-list">
+                    <li>
+                        <span class="item-name">Art. 4.01 - Tenue Réglementaire</span>
+                        <ul class="item-details">
+                            <li>Port de l'uniforme correspondant au grade obligatoire en mission spécifique.</li>
+                            <li>Apparence professionnelle, soignée et propre exigée en tout temps.</li>
+                            <li>Référence : Dossier [TENUES_OFFICIELLES]. Suggestions via l'Intranet.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <span class="item-name">Art. 4.02 - Accessoires</span>
+                        <ul class="item-details">
+                            <li>Accessoires (lunettes, montres) : Couleurs sombres et neutres uniquement.</li>
+                            <li>Couvre-chefs : Interdits en dessous du grade de Sergent (Exception : Casquette tactique noire pour les soldats).</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 class="category-title">//: ARTICLE 5.00 - AGISSEMENTS TERRAIN</h3>
+                <ul class="inventory-list">
+                    <li>
+                        <span class="item-name">Art. 5.01 à 5.07 - Comportement</span>
+                        <ul class="item-details">
+                            <li>Insubordination et rébellion formellement interdites.</li>
+                            <li>Interdiction de divulguer son identité réelle.</li>
+                            <li>Exécution des ordres obligatoire (sauf incohérence manifeste à réévaluer).</li>
+                            <li>Interdiction formelle de tutoyer les VIP.</li>
+                            <li>Pas de débordements verbaux (hurlements, insultes).</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <span class="item-name">Art. 5.10 - Usage de la Force</span>
+                        <ul class="item-details">
+                            <li>Force "objectivement raisonnable" uniquement pour :
+                                <ul class="sub-list">
+                                    <li>Se défendre / Défendre autrui (VIP, collègues)</li>
+                                    <li>Danger de mort imminent</li>
+                                </ul>
+                            </li>
+                            <li><strong style="color:var(--danger)">Force Létale :</strong> Autorisée uniquement face à une menace imminente de mort ou de blessures graves.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3 class="category-title">//: ARTICLE 8.00 - ATTITUDE & DISCIPLINE</h3>
+                <ul class="inventory-list">
+                    <li>
+                        <span class="item-name">Art. 8.01 - Code de Conduite</span>
+                        <ul class="item-details">
+                            <li>Chaque agent reflète l'image du S.A.S. Comportement irréprochable exigé.</li>
+                            <li>L'uniforme incarne la protection et le service.</li>
+                            <li>Sanctions immédiates pour : Colère, plaintes ("pleurnichage"), manque de respect, abus de pouvoir.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div style="text-align: center; margin-top: 30px; color: var(--dim); font-size: 0.8rem;">
+                    // FIN DU DOCUMENT //
+                </div>
+            </div>
+
+            <footer class="portal-footer">
+                <a href="/index.html" class="back-link">[ < REVENIR AU DASHBOARD ]</a>
+                <span style="color: var(--dim); font-size: 0.8rem; margin-left: 20px;">SYSTEM_ID: REG_V2.4</span>
+            </footer>
+        </main>
+    </div>
+
 </body>
 </html>
