@@ -3,109 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHADOW_NET // COMMAND_HIERARCHY</title>
+    <title>SHADOW_NET // HIERARCHY_V3</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Libre+Barcode+128+Text&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style-mo.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --panel-bg: rgba(15, 20, 25, 0.95);
+            --primary: #00ff9d;   /* Vert Actif */
+            --secondary: #00f3ff; /* Cyan HUD */
+            --gold: #d4af37;      /* Commander */
+            --dim: #445566;       /* Gris / Reco */
+            --font-ui: 'Share Tech Mono', monospace;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #eee;
+            font-family: var(--font-ui);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            /* Fond Grille Tactique */
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0, 243, 255, 0.03) 2px, transparent 40px),
+                repeating-linear-gradient(90deg, transparent 0px, transparent 1px, rgba(0, 243, 255, 0.03) 2px, transparent 40px);
+        }
+
+        /* --- CONTAINER PRINCIPAL --- */
+        .org-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            padding-top: 20px;
+        }
+
+        /* --- STYLES DES CARTES (NODES) --- */
+        .node {
+            background: var(--panel-bg);
+            border: 1px solid var(--dim);
+            padding: 15px;
+            width: 220px;
+            text-align: center;
+            position: relative;
+            z-index: 10; /* Au dessus des lignes */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: transform 0.3s;
+        }
+        .node:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0, 243, 255, 0.1); }
+
+        .role { font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 5px; opacity: 0.9; }
+        .name { font-size: 1.3rem; font-weight: bold; color: #fff; text-transform: uppercase; font-family: var(--font-code); }
+        .btn {
+            display: block; margin-top: 10px; border: 1px solid rgba(255,255,255,0.2);
+            padding: 5px; font-size: 0.7rem; text-decoration: none; color: #888; transition: 0.3s;
+        }
+        .btn:hover { border-color: var(--secondary); color: #fff; background: rgba(0, 243, 255, 0.1); }
+
+        /* COULEURS SPECIFIQUES */
+        .rank-gold { border-top: 3px solid var(--gold); }
+        .rank-gold .role { color: var(--gold); }
+
+        .rank-cyan { border-top: 3px solid var(--secondary); }
+        .rank-cyan .role { color: var(--secondary); }
+
+        .rank-green { border: 1px solid var(--primary); color: var(--primary); }
+        .rank-green .role { color: var(--primary); }
+
+        .rank-gray { border: 1px solid var(--dim); color: var(--dim); }
+        .rank-gray .role { color: var(--dim); }
+
+        /* --- STRUCTURE HIERARCHIQUE --- */
+        
+        /* NIVEAU 1 : COMMANDER */
+        .level-1 {
+            margin-bottom: 60px;
+            position: relative;
+        }
+        /* Ligne sous Graves */
+        .level-1::after {
+            content: ''; position: absolute; bottom: -30px; left: 50%; width: 2px; height: 30px;
+            background: var(--secondary); box-shadow: 0 0 8px var(--secondary);
+        }
+        /* Barre horizontale qui split vers Javier et Jackal */
+        .split-bar-top {
+            position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%);
+            width: 540px; /* Largeur pour atteindre le milieu des deux colonnes */
+            height: 2px;
+            background: var(--secondary); box-shadow: 0 0 8px var(--secondary);
+        }
+        /* Les petites descentes vers Javier et Jackal */
+        .split-bar-top::before { /* Gauche */
+            content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 30px; background: var(--secondary);
+        }
+        .split-bar-top::after { /* Droite */
+            content: ''; position: absolute; right: 0; top: 0; width: 2px; height: 30px; background: var(--secondary);
+        }
+
+
+        /* NIVEAU 2 : LE BLOC LIEUTENANTS + SQUADS */
+        .wings-wrapper {
+            display: flex;
+            gap: 60px; /* Ecart entre le groupe Javier et le groupe Jackal */
+            align-items: flex-start;
+        }
+
+        .wing {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 480px; /* Largeur fixe pour contenir la grille */
+        }
+
+        /* Ligne sous le Lieutenant */
+        .lt-connector {
+            height: 30px; width: 2px; background: var(--secondary);
+            box-shadow: 0 0 5px var(--secondary);
+            margin-bottom: 0; /* Colle à la barre horizontale du dessous */
+        }
+
+        /* La barre horizontale sous le lieutenant qui couvre sa grille */
+        .squad-fork {
+            width: 260px; /* Connecte le milieu de la col 1 au milieu de la col 2 */
+            height: 2px; background: var(--secondary);
+            position: relative;
+            margin-bottom: 30px; /* Espace avant la grille */
+            box-shadow: 0 0 5px var(--secondary);
+        }
+        /* Les 2 descentes vers la grille */
+        .squad-fork::before { /* Gauche */
+            content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 30px; background: var(--secondary);
+        }
+        .squad-fork::after { /* Droite */
+            content: ''; position: absolute; right: 0; top: 0; width: 2px; height: 30px; background: var(--secondary);
+        }
+
+
+        /* NIVEAU 3 : GRILLES SQUADS */
+        .squad-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 Colonnes */
+            gap: 20px 40px; /* Ecart vertical 20, horizontal 40 */
+            width: 100%;
+            justify-items: center;
+        }
+
+    </style>
 </head>
 <body>
 
-    <div class="crt-overlay"></div>
+    <div class="org-container">
 
-    <div class="terminal-wrapper">
-        <div class="terminal">
-            
-            <div class="header-strip">
-                <h1>SHADOW_NET // <span>HIERARCHY</span></h1>
-                <div class="meta-data">SERVER: ONLINE<br>NODES: COMPLETE</div>
+        <div class="level-1">
+            <div class="node rank-gold">
+                <div class="role">COMMANDER</div>
+                <div class="name">Graves</div>
+                <a href="#" class="btn">DOSSIER MAÎTRE</a>
             </div>
+            <div class="split-bar-top"></div>
+        </div>
 
-            <div class="org-chart">
+        <div class="wings-wrapper">
+
+            <div class="wing">
+                <div class="node rank-cyan">
+                    <div class="role">LIEUTENANT (ARMOR)</div>
+                    <div class="name">Javier</div>
+                    <a href="#" class="btn">PROFIL ></a>
+                </div>
                 
-                <div class="director-container">
-                    <div class="chart-node lead">
-                        <div class="role">COMMANDER</div>
-                        <div class="name">Graves</div>
-                        <a href="#" class="action-button">DOSSIER MAÎTRE</a>
+                <div class="lt-connector"></div>
+                <div class="squad-fork"></div>
+
+                <div class="squad-grid">
+                    <div class="node rank-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Lovelace</div>
+                        <a href="#" class="btn">VOIR ></a>
+                    </div>
+                    <div class="node rank-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Adam</div>
+                        <a href="#" class="btn">VOIR ></a>
+                    </div>
+                    <div class="node rank-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Blitz</div>
+                        <a href="#" class="btn">VOIR ></a>
+                    </div>
+                    <div class="node rank-gray">
+                        <div class="role">RECO</div>
+                        <div class="name">Dust</div>
+                        <a href="#" class="btn">VOIR ></a>
                     </div>
                 </div>
+            </div>
+            <div class="wing">
+                <div class="node rank-cyan">
+                    <div class="role">LIEUTENANT (SPEC-OPS)</div>
+                    <div class="name">Jackal</div>
+                    <a href="#" class="btn">PROFIL ></a>
+                </div>
 
-                <div class="ltn-container">
-                    
-                    <div class="wing-container">
-                        <div class="chart-node subordinate">
-                            <div class="role">LIEUTENANT (ARMOR)</div>
-                            <div class="name">Javier</div>
-                            <a href="#" class="action-button">PROFIL ></a>
-                            <div class="connector-down"></div>
-                        </div>
+                <div class="lt-connector"></div>
+                <div class="squad-fork"></div>
 
-                        <div class="squad-grid">
-                            <div class="chart-node team-member status-green">
-                                <div class="role">ACTIF</div>
-                                <div class="name">LoveLace</div>
-                                <a href="#" class="action-button">VOIR ></a>
-                            </div>
-                            <div class="chart-node team-member status-green">
-                                <div class="role">ACTIF</div>
-                                <div class="name">Adam</div>
-                                <a href="#" class="action-button">VOIR ></a>
-                            </div>
-                            <div class="chart-node team-member status-green">
-                                <div class="role">ACTIF</div>
-                                <div class="name">Blitz</div>
-                                <a href="#" class="action-button">VOIR ></a>
-                            </div>
-                            <div class="chart-node team-member status-gray">
-                                <div class="role">RECO</div>
-                                <div class="name">Dust</div>
-                                <a href="#" class="action-button">VOIR ></a>
-                            </div>
-                        </div>
+                <div class="squad-grid">
+                    <div class="node rank-green">
+                        <div class="role">JOINT-OPS</div>
+                        <div class="name">Recrue</div>
+                        <a href="#" class="btn">ACCÈS ></a>
                     </div>
-
-                    <div class="wing-container">
-                        <div class="chart-node subordinate">
-                            <div class="role">LIEUTENANT (SPEC-OPS)</div>
-                            <div class="name">Jackal</div>
-                            <a href="#" class="action-button">PROFIL ></a>
-                            <div class="connector-down"></div>
-                        </div>
-
-                        <div class="squad-grid">
-                            <div class="chart-node team-member status-green">
-                                <div class="role">JOINT-OPS</div>
-                                <div class="name">Recrue</div>
-                                <a href="#" class="action-button">ACCÈS ></a>
-                            </div>
-                            <div class="chart-node team-member status-green">
-                                <div class="role">ACTIF</div>
-                                <div class="name">Roxanne</div>
-                                <a href="#" class="action-button">VOIR ></a>
-                            </div>
-                            <div class="chart-node team-member status-green">
-                                <div class="role">ACTIF</div>
-                                <div class="name">Blake</div>
-                                <a href="#" class="action-button">VOIR ></a>
-                            </div>
-                            <div class="chart-node team-member status-green">
-                                <div class="role">ACTIF</div>
-                                <div class="name">Lexa</div>
-                                <a href="#" class="action-button">VOIR ></a>
-                            </div>
-                        </div>
+                    <div class="node rank-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Roxanne</div>
+                        <a href="#" class="btn">VOIR ></a>
                     </div>
-
-                </div> </div>
-
-            <div class="portal-footer">
-                <a href="#" class="back-link">< SYNC COMPLETE ></a>
+                    <div class="node rank-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Blake</div>
+                        <a href="#" class="btn">VOIR ></a>
+                    </div>
+                    <div class="node rank-green">
+                        <div class="role">ACTIF</div>
+                        <div class="name">Lexa</div>
+                        <a href="#" class="btn">VOIR ></a>
+                    </div>
+                </div>
+            </div>
             </div>
 
-        </div>
     </div>
 
-    <div id="boot-screen" style="display:none;"></div>
 </body>
 </html>
