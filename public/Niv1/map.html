@@ -180,8 +180,9 @@
                     body: JSON.stringify(data)
                 });
                 if(res.ok) return await res.json();
-                throw new Error("Serveur muet");
+                throw new Error("Erreur Serveur");
             } catch (err) {
+                // Fallback local en cas d'erreur
                 if(data.action === 'add_point') {
                     data.id = Date.now();
                     localPoints.push({
@@ -379,7 +380,15 @@
         if(imp == 3) color = '#ff9900';
         if(imp == 4) color = '#ff3333';
 
-        const l = L.geoJSON(dw.geojson, { style: { color: color, weight: 2, fillOpacity: 0.2 } });
+        // --- CORRECTION CRITIQUE : PARSE JSON ---
+        let geoData = dw.geojson;
+        // Si la BDD renvoie le JSON sous forme de texte, on le convertit
+        if (typeof geoData === 'string') {
+            try { geoData = JSON.parse(geoData); } catch(e) { console.error("Erreur GeoJSON", e); return; }
+        }
+        // ----------------------------------------
+
+        const l = L.geoJSON(geoData, { style: { color: color, weight: 2, fillOpacity: 0.2 } });
         
         l.bindPopup(`
             <div style="min-width:180px">
