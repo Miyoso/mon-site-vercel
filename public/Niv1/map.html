@@ -164,20 +164,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 
 <script>
-    // Gestion de l'identité locale
     if(!localStorage.getItem('sas_user')) {
         localStorage.setItem('sas_user', 'COMMANDER');
     }
 
-    // Bases de données locales (Fallback offline)
     let localPoints = [];
     let localDrawings = [];
 
-    // Mock API pour gérer les modes Connecté/Offline
     const api = {
         async post(data) {
             try {
-                // Tentative de connexion à une API réelle (échouera en local)
                 const res = await fetch('/api/execute-action', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -186,7 +182,6 @@
                 if(res.ok) return await res.json();
                 throw new Error("Serveur muet");
             } catch (err) {
-                // Fallback : on enregistre dans la mémoire JS temporaire
                 if(data.action === 'add_point') {
                     data.id = Date.now();
                     localPoints.push({
@@ -218,7 +213,6 @@
                 if(res.ok) return await res.json();
                 throw new Error("Offline");
             } catch (e) {
-                // Fallback offline
                 if(resource === 'points') return { points: localPoints };
                 if(resource === 'drawings') return { drawings: localDrawings };
                 if(resource === 'agents') return { agents: [{id: 1, name: localStorage.getItem('sas_user')}] };
@@ -227,9 +221,8 @@
         }
     };
 
-    // --- CONFIGURATION CARTE LEAFLET ---
     const map = L.map('map-container', {
-        crs: L.CRS.Simple, // Système de coordonnées simple pour image plate
+        crs: L.CRS.Simple,
         minZoom: -1,
         maxZoom: 3,
         zoomControl: false, 
@@ -239,11 +232,10 @@
 
     L.control.zoom({ position: 'topleft' }).addTo(map);
 
-    // Dimensions de l'image (à adapter selon votre fichier carte.jpg)
     const imageHeight = 5000; 
     const imageWidth = 4000;  
     const bounds = [[0, 0], [imageHeight, imageWidth]];
-    const imagePath = '/assets/carte.jpg'; // L'image doit être dans le même dossier
+    const imagePath = '/assets/carte.jpg';
 
     L.imageOverlay(imagePath, bounds).addTo(map);
     map.fitBounds(bounds);
@@ -251,7 +243,6 @@
 
     const itemsLayer = L.featureGroup().addTo(map);
 
-    // --- OUTILS DE DESSIN ---
     const drawControl = new L.Control.Draw({
         draw: {
             polyline: { shapeOptions: { color: '#00ff9d' } },
@@ -266,8 +257,15 @@
     let drawControlAdded = false;
     const descInput = document.getElementById('point-desc');
     const indic = document.getElementById('add-mode-indicator');
+    
+    let isDrawing = false;
+    map.on('draw:drawstart', function(e) {
+        isDrawing = true;
+    });
+    map.on('draw:drawstop', function(e) {
+        isDrawing = false;
+    });
 
-    // Active les outils de dessin seulement si une description est saisie
     function updateInterface() {
         if(descInput.value.trim().length > 0) {
             indic.innerHTML = "<span style='color:var(--primary); font-weight:bold; animation: blink 1s infinite;'>[ SYSTÈMES ARMÉS ]</span><br>CLIQUEZ SUR LA CARTE.";
@@ -281,10 +279,8 @@
     }
     descInput.addEventListener('input', updateInterface);
 
-    // --- GESTION DES CLICS (Ajout de points) ---
     map.on('click', async (e) => {
-        // Si on utilise un outil de dessin (polygone etc), on ignore le clic simple
-        if(drawControl._toolbars.draw._activeMode) return;
+        if(isDrawing) return;
 
         const desc = descInput.value;
         if(!desc) { 
@@ -306,7 +302,6 @@
         loadAllData();
     });
 
-    // --- GESTION DES DESSINS (Zones) ---
     map.on(L.Draw.Event.CREATED, async (e) => {
         const desc = descInput.value;
         if(!desc) return;
@@ -324,7 +319,6 @@
         loadAllData();
     });
 
-    // Suppression globale
     window.deleteItem = async (type, id) => {
         if(!confirm("SUPPRIMER ?")) return;
         await api.post({
@@ -335,13 +329,11 @@
         loadAllData();
     };
 
-    // --- RENDU VISUEL ---
     function addMarkerToMap(pt) {
         const y = pt.map_y || pt.lat;
         const x = pt.map_x || pt.lng;
         const imp = pt.importance_level || 1;
         
-        // Icône CSS pure
         const icon = L.divIcon({ 
             className: `custom-marker imp-${imp}`, html: imp, 
             iconSize: [20+(imp*4), 20+(imp*4)], iconAnchor: [10+(imp*2), 10+(imp*2)] 
@@ -400,13 +392,10 @@
 
     initSystem();
 
-    // UI Updates
     map.on('mousemove', (e) => {
         document.getElementById('mouse-coords').innerText = `X:${Math.round(e.latlng.lng)} Y:${Math.round(e.latlng.lat)}`;
     });
     setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString(), 1000);
-    
-    // Auto refresh des données
     setInterval(loadAllData, 5000);
 
 </script>
