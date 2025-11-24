@@ -154,6 +154,36 @@ export default async function handler(request, response) {
         return response.status(200).json({ success: true });
       }
 
+      case 'add_point': {
+        const { map_x, map_y, description, importance_level, creator_name } = data;
+        await sql`
+            INSERT INTO map_points (map_x, map_y, description, importance_level, creator_name, created_at) 
+            VALUES (${map_x}, ${map_y}, ${description}, ${importance_level}, ${creator_name}, NOW())
+        `;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'add_drawing': {
+        const { type, geojson, description, importance_level, creator_name } = data;
+        await sql`
+            INSERT INTO map_drawings (type, geojson, description, importance_level, creator_name, created_at) 
+            VALUES (${type}, ${geojson}, ${description}, ${importance_level}, ${creator_name}, NOW())
+        `;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'delete_point': {
+        const { point_id } = data;
+        await sql`DELETE FROM map_points WHERE id = ${point_id}`;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'delete_drawing': {
+        const { drawing_id } = data;
+        await sql`DELETE FROM map_drawings WHERE id = ${drawing_id}`;
+        return response.status(200).json({ success: true });
+      }
+
       default:
         return response.status(400).json({ error: `Action inconnue: ${action}` });
     }
