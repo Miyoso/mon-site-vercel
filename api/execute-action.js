@@ -35,6 +35,65 @@ export default async function handler(request, response) {
 
   try {
     switch (action) {
+      // --- MAP : GESTION DES POINTS ---
+      case 'add_point': {
+        // AUTO-REPARATION : Crée la table points si elle manque
+        await sql`CREATE TABLE IF NOT EXISTS map_points (
+          id SERIAL PRIMARY KEY,
+          map_x FLOAT NOT NULL,
+          map_y FLOAT NOT NULL,
+          description TEXT,
+          importance_level INT,
+          creator_name TEXT,
+          created_at TIMESTAMP DEFAULT NOW()
+        );`;
+
+        const { map_x, map_y, description, importance_level, creator_name } = data;
+        await sql`
+            INSERT INTO map_points (map_x, map_y, description, importance_level, creator_name, created_at) 
+            VALUES (${map_x}, ${map_y}, ${description}, ${importance_level}, ${creator_name}, NOW())
+        `;
+        return response.status(200).json({ success: true });
+      }
+
+      // --- MAP : GESTION DES DESSINS ---
+      case 'add_drawing': {
+        // AUTO-REPARATION : Crée la table drawings si elle manque
+        await sql`CREATE TABLE IF NOT EXISTS map_drawings (
+          id SERIAL PRIMARY KEY,
+          type TEXT,
+          geojson JSONB,
+          description TEXT,
+          importance_level INT,
+          creator_name TEXT,
+          created_at TIMESTAMP DEFAULT NOW()
+        );`;
+
+        const { type, geojson, description, importance_level, creator_name } = data;
+        
+        // Sécurité : On force la conversion en string pour le format JSONB
+        const geojsonString = JSON.stringify(geojson);
+
+        await sql`
+            INSERT INTO map_drawings (type, geojson, description, importance_level, creator_name, created_at) 
+            VALUES (${type}, ${geojsonString}::jsonb, ${description}, ${importance_level}, ${creator_name}, NOW())
+        `;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'delete_point': {
+        const { point_id } = data;
+        await sql`DELETE FROM map_points WHERE id = ${point_id}`;
+        return response.status(200).json({ success: true });
+      }
+
+      case 'delete_drawing': {
+        const { drawing_id } = data;
+        await sql`DELETE FROM map_drawings WHERE id = ${drawing_id}`;
+        return response.status(200).json({ success: true });
+      }
+
+      // --- AUTRES ACTIONS (Chat, Tâches, etc.) ---
       case 'add_task': {
         const { title, description, assigned_to, priority, due_date, status } = data;
         await sql`
@@ -154,40 +213,11 @@ export default async function handler(request, response) {
         return response.status(200).json({ success: true });
       }
 
-      case 'add_point': {
-        const { map_x, map_y, description, importance_level, creator_name } = data;
-        await sql`
-            INSERT INTO map_points (map_x, map_y, description, importance_level, creator_name, created_at) 
-            VALUES (${map_x}, ${map_y}, ${description}, ${importance_level}, ${creator_name}, NOW())
-        `;
-        return response.status(200).json({ success: true });
-      }
-
-      case 'add_drawing': {
-        const { type, geojson, description, importance_level, creator_name } = data;
-        await sql`
-            INSERT INTO map_drawings (type, geojson, description, importance_level, creator_name, created_at) 
-            VALUES (${type}, ${geojson}, ${description}, ${importance_level}, ${creator_name}, NOW())
-        `;
-        return response.status(200).json({ success: true });
-      }
-
-      case 'delete_point': {
-        const { point_id } = data;
-        await sql`DELETE FROM map_points WHERE id = ${point_id}`;
-        return response.status(200).json({ success: true });
-      }
-
-      case 'delete_drawing': {
-        const { drawing_id } = data;
-        await sql`DELETE FROM map_drawings WHERE id = ${drawing_id}`;
-        return response.status(200).json({ success: true });
-      }
-
       default:
         return response.status(400).json({ error: `Action inconnue: ${action}` });
     }
   } catch (error) {
+    console.error("API ERROR:", error);
     return response.status(500).json({ error: error.message });
   }
 }
