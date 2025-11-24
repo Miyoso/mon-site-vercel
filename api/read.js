@@ -21,29 +21,15 @@ export default async function handler(request, response) {
         return response.status(200).json({ evidence: result.rows });
 
       case 'points':
-        result = await sql`
-          SELECT p.*, a.name as creator_name, a.level as creator_level
-          FROM intel_points p
-          LEFT JOIN agents a ON p.creator_id = a.id
-          ORDER BY p.created_at DESC;
-        `;
+        result = await sql`SELECT * FROM map_points ORDER BY created_at DESC`;
         return response.status(200).json({ points: result.rows });
 
       case 'reports':
-        result = await sql`
-          SELECT mission_code, summary, submission_date, file_url 
-          FROM reports 
-          ORDER BY submission_date DESC
-        `;
+        result = await sql`SELECT mission_code, summary, submission_date, file_url FROM reports ORDER BY submission_date DESC`;
         return response.status(200).json(result.rows);
 
       case 'drawings':
-        result = await sql`
-          SELECT d.*, a.name as creator_name 
-          FROM map_drawings d
-          LEFT JOIN agents a ON d.creator_id = a.id
-          ORDER BY d.created_at ASC;
-        `;
+        result = await sql`SELECT * FROM map_drawings ORDER BY created_at ASC`;
         return response.status(200).json({ drawings: result.rows });
 
       case 'inventory':
@@ -55,11 +41,7 @@ export default async function handler(request, response) {
         return response.status(200).json({ notes: result.rows });
 
       case 'logs':
-        result = await sql`
-            SELECT * FROM login_logs
-            ORDER BY timestamp DESC
-            LIMIT 100;
-        `;
+        result = await sql`SELECT * FROM login_logs ORDER BY timestamp DESC LIMIT 100;`;
         return response.status(200).json({ logs: result.rows });
 
       case 'finance':
@@ -85,33 +67,19 @@ export default async function handler(request, response) {
 
       case 'agent-details':
         if (!username) throw new Error('Nom d\'utilisateur requis pour les détails.');
-        const agentResult = await sql`
-            SELECT id, warning_level FROM agents WHERE name = ${username};
-        `;
+        const agentResult = await sql`SELECT id, warning_level FROM agents WHERE name = ${username};`;
         if (agentResult.rows.length === 0) throw new Error('Agent non trouvé');
         const agentId = agentResult.rows[0].id;
         const warningLevel = agentResult.rows[0].warning_level;
-        const notesResult = await sql`
-            SELECT author_name, note_text, created_at FROM agent_notes 
-            WHERE agent_id = ${agentId} AND is_warning = true 
-            ORDER BY created_at DESC;
-        `;
+        const notesResult = await sql`SELECT author_name, note_text, created_at FROM agent_notes WHERE agent_id = ${agentId} AND is_warning = true ORDER BY created_at DESC;`;
         return response.status(200).json({ warningLevel, warningNotes: notesResult.rows });
 
       case 'messages':
         const box = request.query.box || 'inbox';
         if (box === 'sent') {
-            result = await sql`
-                SELECT * FROM messages 
-                WHERE sender = ${username} 
-                ORDER BY created_at DESC
-            `;
+            result = await sql`SELECT * FROM messages WHERE sender = ${username} ORDER BY created_at DESC`;
         } else {
-            result = await sql`
-                SELECT * FROM messages 
-                WHERE recipient = ${username} 
-                ORDER BY created_at DESC
-            `;
+            result = await sql`SELECT * FROM messages WHERE recipient = ${username} ORDER BY created_at DESC`;
         }
         return response.status(200).json({ messages: result.rows });
 
