@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS :: TACTICAL MAP (IMAGE MODE)</title>
+    <title>SAS :: TACTICAL MAP (LIVE)</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script> const REQUIRED_LEVEL = 2; </script>
+    <script src="/js/security.js"></script> <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Rajdhani:wght@500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
 
     <style>
-        /* --- CONFIGURATION GLOBALE --- */
+        /* --- DESIGN SYSTEM --- */
         :root {
             --primary: #00ff9d;
             --secondary: #00f3ff;
@@ -21,12 +22,13 @@
             --warning: #eebb00;
             --dim: #445566;
             --bg: #020202;
-            --panel: rgba(10, 15, 20, 0.90);
+            --panel: rgba(10, 15, 20, 0.95);
         }
 
         body {
             background-color: var(--bg); color: #eee; margin: 0; padding: 0;
             height: 100vh; overflow: hidden; font-family: 'Share Tech Mono', monospace;
+            user-select: none;
         }
 
         .terminal-wrapper {
@@ -34,6 +36,7 @@
             background: #000;
         }
 
+        /* HEADER */
         .header-strip {
             display: flex; justify-content: space-between; align-items: flex-end;
             padding: 15px 20px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--dim);
@@ -44,36 +47,40 @@
             text-transform: uppercase; color: #fff;
         }
 
-        /* --- MODIFICATION ICI : PANNEAU À DROITE --- */
+        /* PANEL DROITE */
         #intel-controls {
             position: absolute; 
-            top: 100px; 
-            right: 20px; /* Changé de left à right */
+            top: 100px; right: 20px; /* Position droite */
             z-index: 999;
             background: var(--panel); 
             border: 1px solid var(--dim); 
             border-right: 4px solid var(--primary); /* Bordure inversée */
-            padding: 15px; display: flex; flex-direction: column; gap: 10px; width: 300px;
-            backdrop-filter: blur(5px); box-shadow: -10px 10px 30px rgba(0,0,0,0.8);
-            text-align: right; /* Texte aligné à droite pour le style */
+            padding: 20px; display: flex; flex-direction: column; gap: 15px; width: 320px;
+            backdrop-filter: blur(5px); box-shadow: -10px 10px 40px rgba(0,0,0,0.8);
+            text-align: right;
+            transition: opacity 0.3s;
+        }
+
+        .control-group label {
+            color: var(--secondary); font-family: 'Rajdhani'; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; display: block; margin-bottom: 5px;
         }
 
         .intel-input, .intel-select {
             background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--dim);
-            padding: 8px; font-family: 'Share Tech Mono'; width: 100%; box-sizing: border-box;
-            text-align: right; /* Input aligné à droite */
+            padding: 10px; font-family: 'Share Tech Mono'; width: 100%; box-sizing: border-box;
+            text-align: right; font-size: 1rem;
         }
-        .intel-input:focus { outline: none; border-color: var(--primary); }
+        .intel-input:focus, .intel-select:focus { outline: none; border-color: var(--primary); background: rgba(0, 255, 157, 0.05); }
 
         #add-mode-indicator {
-            margin-top: 10px; font-size: 0.75rem; color: #888; border-top: 1px solid #333; padding-top: 5px;
+            margin-top: 10px; font-size: 0.75rem; color: #666; border-top: 1px solid #333; padding-top: 10px;
         }
         #add-mode-indicator.active { color: var(--primary); animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
+        /* CARTE & MARKERS */
         #map-container { flex-grow: 1; width: 100%; background: #050505; z-index: 1; }
 
-        /* MARKERS */
         .custom-marker {
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
             color: #000; font-weight: 800; font-size: 10px; border: 2px solid #fff;
@@ -84,26 +91,31 @@
         .imp-4 { background: var(--danger); box-shadow: 0 0 15px var(--danger); animation: pulse 1s infinite; }
         @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(255, 50, 50, 0.7);} 100% {box-shadow: 0 0 0 10px rgba(255, 50, 50, 0);} }
 
+        /* POPUPS */
         .leaflet-popup-content-wrapper {
             background: rgba(10, 15, 20, 0.95); border: 1px solid var(--primary);
             border-radius: 0; color: #eee; font-family: 'Share Tech Mono';
         }
         .leaflet-popup-tip { background: var(--primary); }
-        .delete-btn {
-            background: transparent; border: 1px solid var(--danger); color: var(--danger);
-            padding: 2px 8px; cursor: pointer; margin-top: 5px; font-size: 0.7rem; width: 100%;
-        }
-        .delete-btn:hover { background: var(--danger); color: #fff; }
+        .leaflet-popup-content h4 { margin: 0 0 5px 0; font-family: 'Rajdhani'; border-bottom: 1px solid #333; padding-bottom: 5px; }
 
+        .delete-btn {
+            background: rgba(255, 50, 50, 0.1); border: 1px solid var(--danger); color: var(--danger);
+            padding: 5px; cursor: pointer; margin-top: 8px; font-size: 0.75rem; width: 100%; font-family: 'JetBrains Mono';
+            transition: 0.2s;
+        }
+        .delete-btn:hover { background: var(--danger); color: #000; }
+
+        /* FOOTER */
         .status-bar {
             position: absolute; bottom: 0; left: 0; width: 100%;
             background: rgba(0,0,0,0.9); padding: 5px 20px;
             display: flex; justify-content: space-between; font-size: 0.8rem; color: #666;
             z-index: 1000; pointer-events: none;
         }
-        
-        /* Déplacer le zoom à gauche pour ne pas gêner le panneau */
-        .leaflet-top.leaflet-right { display: none; } /* Cache le zoom natif */
+
+        /* HIDE ZOOM CONTROL (On le met à gauche pour pas gêner le panel) */
+        .leaflet-top.leaflet-right { display: none; }
     </style>
 </head>
 <body>
@@ -112,81 +124,96 @@
         <div class="header-strip">
             <div>
                 <h1 class="main-title">TACTICAL <span style="color: var(--danger);">MAP</span></h1>
-                <div style="color: var(--primary); font-size: 0.8rem; letter-spacing: 2px;">LOCAL IMAGE FEED // SECTOR 0</div>
+                <div style="color: var(--primary); font-size: 0.8rem; letter-spacing: 2px;">LIVE UPLINK // IMAGE MODE</div>
             </div>
             <div style="text-align: right;">
                 <div id="clock" style="font-size: 1.2rem; font-weight: bold;">00:00:00</div>
-                <div style="color: var(--warning); font-size: 0.8rem;">[ ONLINE ]</div>
+                <div id="connection-status" style="color: var(--warning); font-size: 0.8rem;">[ CONNECTING... ]</div>
             </div>
         </div>
 
         <div id="intel-controls">
-            <div style="color:var(--primary); font-weight:bold; border-bottom:1px solid #333; padding-bottom:5px;">
-                AGENT: COMMANDER
+            <div id="agent-display" style="color:var(--primary); font-weight:bold; border-bottom:1px solid #333; padding-bottom:5px;">
+                AGENT: ...
             </div>
+            
             <div class="control-group">
-                <label style="color:var(--secondary); font-size:0.8rem; font-weight:bold;">DESCRIPTION INTEL</label>
+                <label>DESCRIPTION INTEL</label>
                 <input type="text" id="point-desc" class="intel-input" placeholder="Saisir info..." autocomplete="off">
             </div>
+            
             <div class="control-group">
-                <label style="color:var(--secondary); font-size:0.8rem; font-weight:bold;">NIVEAU DE MENACE</label>
-                <select id="point-importance" class="intel-select" dir="rtl"> <option value="1" style="color:var(--primary)">NIV 1 - INFO</option>
+                <label>NIVEAU DE MENACE</label>
+                <select id="point-importance" class="intel-select" dir="rtl">
+                    <option value="1" style="color:var(--primary)">NIV 1 - INFO</option>
                     <option value="2" style="color:var(--warning)">NIV 2 - SUSPECT</option>
                     <option value="3" style="color:#ff9900">NIV 3 - DANGER</option>
                     <option value="4" style="color:var(--danger)">NIV 4 - CRITIQUE</option>
                 </select>
             </div>
+            
             <div id="add-mode-indicator">
-                <span style="color:#666">STANDBY. SAISISSEZ UNE DESCRIPTION.</span>
+                STANDBY. SAISISSEZ UNE DESCRIPTION.
             </div>
         </div>
 
         <div id="map-container"></div>
 
         <div class="status-bar">
-            <span>POS: <span id="mouse-coords">0, 0</span></span>
-            <span>SOURCE: LOCAL_FILE</span>
+            <span>COORDS: <span id="mouse-coords">0, 0</span></span>
+            <span>DATABASE: <span style="color:var(--primary)">CONNECTED</span></span>
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 
     <script>
-        // --- MOCK API (LOCAL) ---
-        const API = {
-            data: { points: [], drawings: [] },
-            savePoint(p) { p.id = Date.now(); this.data.points.push(p); return p; },
-            saveDrawing(d) { d.id = Date.now(); this.data.drawings.push(d); return d; },
-            deleteItem(type, id) {
-                if(type === 'point') this.data.points = this.data.points.filter(i => i.id !== id);
-                if(type === 'drawing') this.data.drawings = this.data.drawings.filter(i => i.id !== id);
+        // --- API & AUTHENTIFICATION ---
+        let currentAgent = null;
+        const api = {
+            async fetch(url, options = {}) {
+                try {
+                    const res = await fetch(url, options);
+                    if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+                    return await res.json();
+                } catch (err) {
+                    console.error("API Error:", err);
+                    document.getElementById('connection-status').innerText = "[ OFFLINE ]";
+                    document.getElementById('connection-status').style.color = "var(--danger)";
+                    return null;
+                }
             },
-            getData() { return this.data; }
+            async get(resource) { return this.fetch(`/api/read?resource=${resource}`); },
+            async post(data) {
+                return this.fetch('/api/execute-action', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+            }
         };
 
-        // --- CONFIGURATION CARTE ---
+        // --- MAP CONFIG (IMAGE MODE) ---
         const map = L.map('map-container', {
-            crs: L.CRS.Simple,
-            minZoom: -2,
-            maxZoom: 2,
-            zoomControl: false, // Zoom désactivé ici (on le remet à gauche)
-            attributionControl: false
+            crs: L.CRS.Simple, // Mode Coordonnées simples (X/Y)
+            minZoom: -2, maxZoom: 2,
+            zoomControl: false, attributionControl: false
         });
 
-        // Zoom à gauche pour ne pas chevaucher le panneau droit
+        // Zoom à gauche
         L.control.zoom({ position: 'topleft' }).addTo(map);
 
-        // 2000x2000 est une taille standard, ajustez si votre image est rectangulaire (ex: [0,0], [1080, 1920])
-        const bounds = [[0,0], [2000,2000]];
-        const imagePath = 'carte.jpg'; // VOTRE IMAGE ICI
-        
-        const image = L.imageOverlay(imagePath, bounds).addTo(map);
+        // CONFIG IMAGE
+        const bounds = [[0,0], [2000,2000]]; // Taille virtuelle
+        const imagePath = 'carte.jpg'; // VOTRE IMAGE
+        L.imageOverlay(imagePath, bounds).addTo(map);
         map.fitBounds(bounds);
 
+        // LAYERS
         const itemsLayer = L.featureGroup().addTo(map);
 
-        // --- DRAW CONTROLS ---
+        // --- DRAW CONFIG ---
         const drawControl = new L.Control.Draw({
             draw: {
                 polyline: { shapeOptions: { color: '#00ff9d', weight: 3 } },
@@ -196,98 +223,171 @@
                 marker: false, circlemarker: false
             },
             edit: false,
-            position: 'topleft' // Outils à gauche aussi
+            position: 'topleft' // Outils à gauche
         });
 
-        // --- LOGIQUE UI ---
-        let drawControlAdded = false;
+        // --- CORE LOGIC ---
+        
+        async function initSystem() {
+            // 1. Identification
+            const username = localStorage.getItem('sas_user');
+            if (!username) {
+                alert("ACCÈS REFUSÉ. Veuillez vous connecter.");
+                window.location.href = '/login.html'; // Redirection si non connecté
+                return;
+            }
 
-        function updateUI() {
-            const desc = document.getElementById('point-desc').value.trim();
-            const indicator = document.getElementById('add-mode-indicator');
-            
-            if(desc.length > 0) {
-                indicator.innerHTML = "<span style='color:var(--primary)'>[ SYSTÈMES ARMÉS ]</span><br>CLIQUEZ POUR AJOUTER.";
-                indicator.classList.add('active');
-                if(!drawControlAdded) { map.addControl(drawControl); drawControlAdded = true; }
+            const agentData = await api.get('agents');
+            if(agentData && agentData.agents) {
+                currentAgent = agentData.agents.find(a => a.name === username);
+            }
+
+            if(currentAgent) {
+                document.getElementById('agent-display').innerText = `AGENT: ${currentAgent.name.toUpperCase()}`;
+                document.getElementById('connection-status').innerText = "[ ONLINE ]";
+                document.getElementById('connection-status').style.color = "var(--primary)";
+                refreshMapData();
+                setInterval(refreshMapData, 5000); // Auto-refresh 5sec
             } else {
-                indicator.innerHTML = "STANDBY. SAISISSEZ UNE DESCRIPTION.";
-                indicator.classList.remove('active');
-                if(drawControlAdded) { map.removeControl(drawControl); drawControlAdded = false; }
+                alert("ERREUR PROFIL AGENT.");
             }
         }
-        document.getElementById('point-desc').addEventListener('input', updateUI);
 
-        map.on('click', function(e) {
-            if(drawControl._toolbars.draw._activeMode) return;
-            const desc = document.getElementById('point-desc').value;
-            if(!desc) { alert("Entrez une description d'abord."); return; }
+        async function refreshMapData() {
+            // POINTS
+            const ptsData = await api.get('points');
+            const dwgData = await api.get('drawings');
             
-            API.savePoint({
-                lat: e.latlng.lat,
-                lng: e.latlng.lng,
-                description: desc,
-                importance: document.getElementById('point-importance').value
-            });
-            document.getElementById('point-desc').value = '';
-            updateUI(); renderMap();
+            itemsLayer.clearLayers();
+
+            if(ptsData && ptsData.points) {
+                ptsData.points.forEach(pt => {
+                    // Note: API stocke map_x/map_y, Leaflet utilise Lat(Y)/Lng(X)
+                    const y = pt.map_y || pt.lat; // Support rétroactif
+                    const x = pt.map_x || pt.lng;
+                    const imp = pt.importance_level || 1;
+                    
+                    const icon = L.divIcon({ 
+                        className: `custom-marker imp-${imp}`, html: imp, 
+                        iconSize: [20+(imp*4), 20+(imp*4)], iconAnchor: [10+(imp*2), 10+(imp*2)] 
+                    });
+                    
+                    const m = L.marker([y, x], {icon: icon});
+                    m.bindPopup(createPopupContent("INTEL", pt.id, pt.description, pt.creator_name, imp, 'delete_point'));
+                    itemsLayer.addLayer(m);
+                });
+            }
+
+            // DRAWINGS
+            if(dwgData && dwgData.drawings) {
+                dwgData.drawings.forEach(dw => {
+                    const imp = dw.importance_level || 1;
+                    let col = '#00ff9d';
+                    if(imp == 2) col = '#eebb00';
+                    if(imp == 3) col = '#ff9900';
+                    if(imp == 4) col = '#ff3333';
+
+                    const l = L.geoJSON(dw.geojson, { style: { color: col, weight: 2, fillOpacity: 0.2 } });
+                    l.bindPopup(createPopupContent("ZONE", dw.id, dw.description, dw.creator_name, imp, 'delete_drawing'));
+                    itemsLayer.addLayer(l);
+                });
+            }
+        }
+
+        function createPopupContent(type, id, desc, author, imp, deleteAction) {
+            let color = 'var(--primary)';
+            if(imp > 2) color = 'var(--danger)';
+            return `
+                <div style="min-width:180px">
+                    <h4 style="color:${color}">${type} #${id}</h4>
+                    <div style="font-size:0.75rem; margin-bottom:5px; color:#888;">OP: ${author || 'Unknown'}</div>
+                    <p style="background:rgba(255,255,255,0.05); padding:5px; border-left:2px solid ${color}">${desc}</p>
+                    <button class="delete-btn" onclick="triggerDelete('${deleteAction}', ${id})">SUPPRIMER</button>
+                </div>
+            `;
+        }
+
+        // --- INTERACTIONS ---
+        let drawControlAdded = false;
+        const descInput = document.getElementById('point-desc');
+        const indic = document.getElementById('add-mode-indicator');
+
+        descInput.addEventListener('input', () => {
+            if(descInput.value.trim().length > 0) {
+                indic.innerHTML = "<span style='color:var(--primary)'>[ SYSTÈMES ARMÉS ]</span><br>CLIQUEZ SUR CARTE.";
+                indic.classList.add('active');
+                if(!drawControlAdded) { map.addControl(drawControl); drawControlAdded = true; }
+            } else {
+                indic.innerHTML = "STANDBY. SAISISSEZ UNE DESCRIPTION.";
+                indic.classList.remove('active');
+                if(drawControlAdded) { map.removeControl(drawControl); drawControlAdded = false; }
+            }
         });
 
-        map.on(L.Draw.Event.CREATED, function (e) {
-            const desc = document.getElementById('point-desc').value;
-            if(!desc) return;
-            API.saveDrawing({
+        // 1. CLICK CARTE (AJOUT POINT)
+        map.on('click', async (e) => {
+            if(drawControl._toolbars.draw._activeMode) return; // Si mode dessin, on ignore
+            const desc = descInput.value;
+            if(!desc) { 
+                descInput.focus();
+                descInput.style.borderColor = 'var(--danger)';
+                setTimeout(() => descInput.style.borderColor = 'var(--dim)', 500);
+                return; 
+            }
+
+            await api.post({
+                action: 'add_point',
+                creator_id: currentAgent.id,
+                map_x: e.latlng.lng, // X
+                map_y: e.latlng.lat, // Y
+                description: desc,
+                importance_level: document.getElementById('point-importance').value
+            });
+
+            descInput.value = '';
+            descInput.dispatchEvent(new Event('input')); // Update UI state
+            refreshMapData();
+        });
+
+        // 2. DESSIN CRÉÉ
+        map.on(L.Draw.Event.CREATED, async (e) => {
+            const desc = descInput.value;
+            if(!desc) return; // Should be handled by UI visibility
+
+            await api.post({
+                action: 'add_drawing',
+                drawing_creator_id: currentAgent.id,
                 type: e.layerType,
                 geojson: e.layer.toGeoJSON(),
                 description: desc,
-                importance: document.getElementById('point-importance').value
+                importance_level: document.getElementById('point-importance').value
             });
-            document.getElementById('point-desc').value = '';
-            updateUI(); renderMap();
+
+            descInput.value = '';
+            descInput.dispatchEvent(new Event('input'));
+            refreshMapData();
         });
 
-        function renderMap() {
-            itemsLayer.clearLayers();
-            const data = API.getData();
+        // 3. SUPPRESSION
+        window.triggerDelete = async (action, id) => {
+            if(!confirm("CONFIRMER SUPPRESSION ?")) return;
+            // Adaptation payload selon type
+            let payload = { action: action };
+            if(action === 'delete_point') payload.point_id = id;
+            if(action === 'delete_drawing') payload.drawing_id = id;
 
-            data.points.forEach(pt => {
-                const imp = pt.importance;
-                const icon = L.divIcon({ 
-                    className: `custom-marker imp-${imp}`, html: imp, 
-                    iconSize: [20+(imp*4), 20+(imp*4)], iconAnchor: [10+(imp*2), 10+(imp*2)] 
-                });
-                const marker = L.marker([pt.lat, pt.lng], {icon: icon});
-                marker.bindPopup(`
-                    <h4 style="margin:0; color:var(--primary)">INTEL #${pt.id}</h4>
-                    <p>${pt.description}</p>
-                    <button class="delete-btn" onclick="deleteItem('point', ${pt.id})">SUPPRIMER</button>
-                `);
-                itemsLayer.addLayer(marker);
-            });
+            await api.post(payload);
+            refreshMapData();
+        };
 
-            data.drawings.forEach(dw => {
-                let color = '#00ff9d';
-                if(dw.importance == 2) color = '#eebb00';
-                if(dw.importance == 3) color = '#ff9900';
-                if(dw.importance == 4) color = '#ff3333';
-                const layer = L.geoJSON(dw.geojson, { style: { color: color, weight: 2, fillOpacity: 0.2 } });
-                layer.bindPopup(`
-                    <h4 style="margin:0; color:${color}">ZONE #${dw.id}</h4>
-                    <p>${dw.description}</p>
-                    <button class="delete-btn" onclick="deleteItem('drawing', ${dw.id})">EFFACER</button>
-                `);
-                itemsLayer.addLayer(layer);
-            });
-        }
-
-        window.deleteItem = function(type, id) { API.deleteItem(type, id); renderMap(); }
-
-        map.on('mousemove', function(e) {
+        // --- UTILS ---
+        map.on('mousemove', (e) => {
             document.getElementById('mouse-coords').innerText = `X:${Math.round(e.latlng.lng)} Y:${Math.round(e.latlng.lat)}`;
         });
+        setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString(), 1000);
 
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-        renderMap();
+        // START
+        initSystem();
 
     </script>
 </body>
