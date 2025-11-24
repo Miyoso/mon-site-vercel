@@ -258,39 +258,8 @@
     const descInput = document.getElementById('point-desc');
     const indic = document.getElementById('add-mode-indicator');
     
-    // --- SECURITE DESSIN ---
-    let isDrawing = false;
-    
-    map.on('draw:drawstart', function(e) {
-        isDrawing = true;
-    });
-    
-    map.on('draw:drawstop', function(e) {
-        // Le délai de 100ms est crucial ici. 
-        // Il empêche le dernier clic du dessin de déclencher l'ajout d'un point.
-        setTimeout(() => {
-            isDrawing = false;
-        }, 100);
-    });
-    // ----------------------
-
-    function updateInterface() {
-        if(descInput.value.trim().length > 0) {
-            indic.innerHTML = "<span style='color:var(--primary); font-weight:bold; animation: blink 1s infinite;'>[ SYSTÈMES ARMÉS ]</span><br>CLIQUEZ SUR LA CARTE.";
-            descInput.style.borderColor = "var(--primary)";
-            if(!drawControlAdded) { map.addControl(drawControl); drawControlAdded = true; }
-        } else {
-            indic.innerHTML = "STANDBY. SAISISSEZ UNE DESCRIPTION.";
-            descInput.style.borderColor = "var(--dim)";
-            if(drawControlAdded) { map.removeControl(drawControl); drawControlAdded = false; }
-        }
-    }
-    descInput.addEventListener('input', updateInterface);
-
-    map.on('click', async (e) => {
-        // Bloque le clic si on est en train de dessiner (ou juste après)
-        if(isDrawing) return;
-
+    // --- GESTION DES CLICS SÉCURISÉE ---
+    const onMapClick = async (e) => {
         const desc = descInput.value;
         if(!desc) { 
             descInput.focus();
@@ -309,11 +278,44 @@
         descInput.value = '';
         updateInterface();
         loadAllData();
+    };
+
+    // On active le clic par défaut
+    map.on('click', onMapClick);
+
+    // Quand on commence à dessiner, ON COUPE l'écouteur de clic
+    map.on('draw:drawstart', () => {
+        map.off('click', onMapClick);
     });
+
+    // Quand on a fini de dessiner, on le remet (avec un petit délai de sécurité)
+    map.on('draw:drawstop', () => {
+        setTimeout(() => {
+            map.off('click', onMapClick); // Sécurité anti-doublon
+            map.on('click', onMapClick);
+        }, 100);
+    });
+    // -----------------------------------
+
+    function updateInterface() {
+        if(descInput.value.trim().length > 0) {
+            indic.innerHTML = "<span style='color:var(--primary); font-weight:bold; animation: blink 1s infinite;'>[ SYSTÈMES ARMÉS ]</span><br>CLIQUEZ SUR LA CARTE.";
+            descInput.style.borderColor = "var(--primary)";
+            if(!drawControlAdded) { map.addControl(drawControl); drawControlAdded = true; }
+        } else {
+            indic.innerHTML = "STANDBY. SAISISSEZ UNE DESCRIPTION.";
+            descInput.style.borderColor = "var(--dim)";
+            if(drawControlAdded) { map.removeControl(drawControl); drawControlAdded = false; }
+        }
+    }
+    descInput.addEventListener('input', updateInterface);
 
     map.on(L.Draw.Event.CREATED, async (e) => {
         const desc = descInput.value;
         if(!desc) return;
+
+        // On s'assure que le clic est coupé pendant le traitement
+        map.off('click', onMapClick);
 
         await api.post({
             action: 'add_drawing',
@@ -326,6 +328,12 @@
         descInput.value = '';
         updateInterface();
         loadAllData();
+
+        // Réactivation de sécurité
+        setTimeout(() => {
+            map.off('click', onMapClick);
+            map.on('click', onMapClick);
+        }, 200);
     });
 
     window.deleteItem = async (type, id) => {
