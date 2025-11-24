@@ -44,16 +44,24 @@
             text-transform: uppercase; color: #fff;
         }
 
+        /* --- MODIFICATION ICI : PANNEAU À DROITE --- */
         #intel-controls {
-            position: absolute; top: 80px; left: 20px; z-index: 999;
-            background: var(--panel); border: 1px solid var(--dim); border-left: 4px solid var(--primary);
+            position: absolute; 
+            top: 100px; 
+            right: 20px; /* Changé de left à right */
+            z-index: 999;
+            background: var(--panel); 
+            border: 1px solid var(--dim); 
+            border-right: 4px solid var(--primary); /* Bordure inversée */
             padding: 15px; display: flex; flex-direction: column; gap: 10px; width: 300px;
-            backdrop-filter: blur(5px); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px); box-shadow: -10px 10px 30px rgba(0,0,0,0.8);
+            text-align: right; /* Texte aligné à droite pour le style */
         }
 
         .intel-input, .intel-select {
             background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--dim);
             padding: 8px; font-family: 'Share Tech Mono'; width: 100%; box-sizing: border-box;
+            text-align: right; /* Input aligné à droite */
         }
         .intel-input:focus { outline: none; border-color: var(--primary); }
 
@@ -93,6 +101,9 @@
             display: flex; justify-content: space-between; font-size: 0.8rem; color: #666;
             z-index: 1000; pointer-events: none;
         }
+        
+        /* Déplacer le zoom à gauche pour ne pas gêner le panneau */
+        .leaflet-top.leaflet-right { display: none; } /* Cache le zoom natif */
     </style>
 </head>
 <body>
@@ -115,12 +126,11 @@
             </div>
             <div class="control-group">
                 <label style="color:var(--secondary); font-size:0.8rem; font-weight:bold;">DESCRIPTION INTEL</label>
-                <input type="text" id="point-desc" class="intel-input" placeholder="Saisir info pour débloquer..." autocomplete="off">
+                <input type="text" id="point-desc" class="intel-input" placeholder="Saisir info..." autocomplete="off">
             </div>
             <div class="control-group">
                 <label style="color:var(--secondary); font-size:0.8rem; font-weight:bold;">NIVEAU DE MENACE</label>
-                <select id="point-importance" class="intel-select">
-                    <option value="1" style="color:var(--primary)">NIV 1 - INFO</option>
+                <select id="point-importance" class="intel-select" dir="rtl"> <option value="1" style="color:var(--primary)">NIV 1 - INFO</option>
                     <option value="2" style="color:var(--warning)">NIV 2 - SUSPECT</option>
                     <option value="3" style="color:#ff9900">NIV 3 - DANGER</option>
                     <option value="4" style="color:var(--danger)">NIV 4 - CRITIQUE</option>
@@ -155,29 +165,25 @@
             getData() { return this.data; }
         };
 
-        // --- CONFIGURATION CARTE IMAGE ---
-        
-        // 1. Définir le système de coordonnées "Simple" (X/Y pixels, pas Lat/Lng)
+        // --- CONFIGURATION CARTE ---
         const map = L.map('map-container', {
             crs: L.CRS.Simple,
             minZoom: -2,
             maxZoom: 2,
-            zoomControl: false,
+            zoomControl: false, // Zoom désactivé ici (on le remet à gauche)
             attributionControl: false
         });
 
-        // 2. Définir la taille de votre image (ex: 2000x2000 pixels)
-        // C'est arbitraire, tant que c'est carré ou respecte le ratio de votre image
-        const bounds = [[0,0], [2000,2000]];
+        // Zoom à gauche pour ne pas chevaucher le panneau droit
+        L.control.zoom({ position: 'topleft' }).addTo(map);
 
-        // 3. Charger l'image locale
-        // REMPLACEZ 'carte.jpg' PAR LE NOM DE VOTRE IMAGE SI DIFFÉRENT
-        const imagePath = '/assets/carte.jpg'; 
+        // 2000x2000 est une taille standard, ajustez si votre image est rectangulaire (ex: [0,0], [1080, 1920])
+        const bounds = [[0,0], [2000,2000]];
+        const imagePath = 'carte.jpg'; // VOTRE IMAGE ICI
         
         const image = L.imageOverlay(imagePath, bounds).addTo(map);
-        map.fitBounds(bounds); // Centre la vue sur l'image
+        map.fitBounds(bounds);
 
-        L.control.zoom({ position: 'topright' }).addTo(map);
         const itemsLayer = L.featureGroup().addTo(map);
 
         // --- DRAW CONTROLS ---
@@ -189,10 +195,11 @@
                 circle: { shapeOptions: { color: '#ff3333' } },
                 marker: false, circlemarker: false
             },
-            edit: false
+            edit: false,
+            position: 'topleft' // Outils à gauche aussi
         });
 
-        // --- LOGIQUE UI & INTERACTIONS ---
+        // --- LOGIQUE UI ---
         let drawControlAdded = false;
 
         function updateUI() {
@@ -211,15 +218,14 @@
         }
         document.getElementById('point-desc').addEventListener('input', updateUI);
 
-        // CLIC CARTE (Ajout Point)
         map.on('click', function(e) {
             if(drawControl._toolbars.draw._activeMode) return;
             const desc = document.getElementById('point-desc').value;
             if(!desc) { alert("Entrez une description d'abord."); return; }
             
             API.savePoint({
-                lat: e.latlng.lat, // Ici ce sont des coordonnées Y pixel
-                lng: e.latlng.lng, // Ici ce sont des coordonnées X pixel
+                lat: e.latlng.lat,
+                lng: e.latlng.lng,
                 description: desc,
                 importance: document.getElementById('point-importance').value
             });
@@ -227,7 +233,6 @@
             updateUI(); renderMap();
         });
 
-        // DRAW CREATED
         map.on(L.Draw.Event.CREATED, function (e) {
             const desc = document.getElementById('point-desc').value;
             if(!desc) return;
@@ -241,7 +246,6 @@
             updateUI(); renderMap();
         });
 
-        // RENDER
         function renderMap() {
             itemsLayer.clearLayers();
             const data = API.getData();
@@ -279,7 +283,6 @@
         window.deleteItem = function(type, id) { API.deleteItem(type, id); renderMap(); }
 
         map.on('mousemove', function(e) {
-            // Affichage simple des pixels X / Y
             document.getElementById('mouse-coords').innerText = `X:${Math.round(e.latlng.lng)} Y:${Math.round(e.latlng.lat)}`;
         });
 
