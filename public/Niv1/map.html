@@ -258,13 +258,21 @@
     const descInput = document.getElementById('point-desc');
     const indic = document.getElementById('add-mode-indicator');
     
+    // --- SECURITE DESSIN ---
     let isDrawing = false;
+    
     map.on('draw:drawstart', function(e) {
         isDrawing = true;
     });
+    
     map.on('draw:drawstop', function(e) {
-        isDrawing = false;
+        // Le délai de 100ms est crucial ici. 
+        // Il empêche le dernier clic du dessin de déclencher l'ajout d'un point.
+        setTimeout(() => {
+            isDrawing = false;
+        }, 100);
     });
+    // ----------------------
 
     function updateInterface() {
         if(descInput.value.trim().length > 0) {
@@ -280,6 +288,7 @@
     descInput.addEventListener('input', updateInterface);
 
     map.on('click', async (e) => {
+        // Bloque le clic si on est en train de dessiner (ou juste après)
         if(isDrawing) return;
 
         const desc = descInput.value;
