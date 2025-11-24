@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAS :: TACTICAL MAP (LIVE)</title>
+    <title>SAS :: TACTICAL MAP</title>
     
     <script> const REQUIRED_LEVEL = 2; </script>
-    <script src="/js/security.js"></script> <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="/js/security.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&family=Rajdhani:wght@500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
@@ -14,7 +16,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
 
     <style>
-        /* --- DESIGN SYSTEM --- */
         :root {
             --primary: #00ff9d;
             --secondary: #00f3ff;
@@ -36,7 +37,6 @@
             background: #000;
         }
 
-        /* HEADER */
         .header-strip {
             display: flex; justify-content: space-between; align-items: flex-end;
             padding: 15px 20px; background: rgba(0,0,0,0.8); border-bottom: 1px solid var(--dim);
@@ -47,14 +47,13 @@
             text-transform: uppercase; color: #fff;
         }
 
-        /* PANEL DROITE */
         #intel-controls {
             position: absolute; 
-            top: 100px; right: 20px; /* Position droite */
+            top: 100px; right: 20px;
             z-index: 999;
             background: var(--panel); 
             border: 1px solid var(--dim); 
-            border-right: 4px solid var(--primary); /* Bordure inversée */
+            border-right: 4px solid var(--primary);
             padding: 20px; display: flex; flex-direction: column; gap: 15px; width: 320px;
             backdrop-filter: blur(5px); box-shadow: -10px 10px 40px rgba(0,0,0,0.8);
             text-align: right;
@@ -78,7 +77,6 @@
         #add-mode-indicator.active { color: var(--primary); animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
 
-        /* CARTE & MARKERS */
         #map-container { flex-grow: 1; width: 100%; background: #050505; z-index: 1; }
 
         .custom-marker {
@@ -91,7 +89,6 @@
         .imp-4 { background: var(--danger); box-shadow: 0 0 15px var(--danger); animation: pulse 1s infinite; }
         @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(255, 50, 50, 0.7);} 100% {box-shadow: 0 0 0 10px rgba(255, 50, 50, 0);} }
 
-        /* POPUPS */
         .leaflet-popup-content-wrapper {
             background: rgba(10, 15, 20, 0.95); border: 1px solid var(--primary);
             border-radius: 0; color: #eee; font-family: 'Share Tech Mono';
@@ -106,7 +103,6 @@
         }
         .delete-btn:hover { background: var(--danger); color: #000; }
 
-        /* FOOTER */
         .status-bar {
             position: absolute; bottom: 0; left: 0; width: 100%;
             background: rgba(0,0,0,0.9); padding: 5px 20px;
@@ -114,7 +110,6 @@
             z-index: 1000; pointer-events: none;
         }
 
-        /* HIDE ZOOM CONTROL (On le met à gauche pour pas gêner le panel) */
         .leaflet-top.leaflet-right { display: none; }
     </style>
 </head>
@@ -128,7 +123,7 @@
             </div>
             <div style="text-align: right;">
                 <div id="clock" style="font-size: 1.2rem; font-weight: bold;">00:00:00</div>
-                <div id="connection-status" style="color: var(--warning); font-size: 0.8rem;">[ CONNECTING... ]</div>
+                <div id="connection-status" style="color: var(--warning); font-size: 0.8rem;">[ INITIALIZING ]</div>
             </div>
         </div>
 
@@ -169,225 +164,172 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 
     <script>
-        // --- API & AUTHENTIFICATION ---
-        let currentAgent = null;
+        if(!localStorage.getItem('sas_user')) {
+            localStorage.setItem('sas_user', 'COMMANDER');
+        }
+
+        let localPoints = [];
+        let localDrawings = [];
+
         const api = {
-            async fetch(url, options = {}) {
+            async post(data) {
                 try {
-                    const res = await fetch(url, options);
-                    if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-                    return await res.json();
+                    const res = await fetch('/api/execute-action', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    if(res.ok) return await res.json();
+                    throw new Error("Serveur muet");
                 } catch (err) {
-                    console.error("API Error:", err);
-                    document.getElementById('connection-status').innerText = "[ OFFLINE ]";
-                    document.getElementById('connection-status').style.color = "var(--danger)";
-                    return null;
+                    if(data.action === 'add_point') {
+                        data.id = Date.now();
+                        localPoints.push({
+                            id: data.id, map_x: data.map_x, map_y: data.map_y, 
+                            description: data.description, importance_level: data.importance_level,
+                            creator_name: localStorage.getItem('sas_user')
+                        });
+                    }
+                    return { success: true };
                 }
             },
-            async get(resource) { return this.fetch(`/api/read?resource=${resource}`); },
-            async post(data) {
-                return this.fetch('/api/execute-action', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
+            async get(resource) {
+                try {
+                    const res = await fetch(`/api/read?resource=${resource}`);
+                    if(res.ok) return await res.json();
+                    throw new Error("Offline");
+                } catch (e) {
+                    if(resource === 'points') return { points: localPoints };
+                    if(resource === 'drawings') return { drawings: localDrawings };
+                    if(resource === 'agents') return { agents: [{id: 1, name: localStorage.getItem('sas_user')}] };
+                    return {};
+                }
             }
         };
 
-        // --- MAP CONFIG (IMAGE MODE) ---
         const map = L.map('map-container', {
-            crs: L.CRS.Simple, // Mode Coordonnées simples (X/Y)
-            minZoom: -2, maxZoom: 2,
-            zoomControl: false, attributionControl: false
+            crs: L.CRS.Simple,
+            minZoom: -1,
+            maxZoom: 3,
+            zoomControl: false, 
+            attributionControl: false,
+            maxBoundsViscosity: 1.0 
         });
 
-        // Zoom à gauche
         L.control.zoom({ position: 'topleft' }).addTo(map);
 
-        // CONFIG IMAGE
-        const bounds = [[0,0], [2000,2000]]; // Taille virtuelle
-        const imagePath = '/assets/carte.jpg'; // VOTRE IMAGE
+        const imageHeight = 5000; 
+        const imageWidth = 4000;  
+        const bounds = [[0, 0], [imageHeight, imageWidth]];
+        const imagePath = 'carte.jpg';
+
         L.imageOverlay(imagePath, bounds).addTo(map);
         map.fitBounds(bounds);
+        map.setMaxBounds(bounds);
 
-        // LAYERS
         const itemsLayer = L.featureGroup().addTo(map);
 
-        // --- DRAW CONFIG ---
         const drawControl = new L.Control.Draw({
             draw: {
-                polyline: { shapeOptions: { color: '#00ff9d', weight: 3 } },
+                polyline: { shapeOptions: { color: '#00ff9d' } },
                 polygon: { shapeOptions: { color: '#00ff9d' }, showArea: false },
                 rectangle: { shapeOptions: { color: '#eebb00' } },
                 circle: { shapeOptions: { color: '#ff3333' } },
                 marker: false, circlemarker: false
             },
-            edit: false,
-            position: 'topleft' // Outils à gauche
+            edit: false, position: 'topleft'
         });
 
-        // --- CORE LOGIC ---
-        
-        async function initSystem() {
-            // 1. Identification
-            const username = localStorage.getItem('sas_user');
-            if (!username) {
-                alert("ACCÈS REFUSÉ. Veuillez vous connecter.");
-                window.location.href = '/login.html'; // Redirection si non connecté
-                return;
-            }
-
-            const agentData = await api.get('agents');
-            if(agentData && agentData.agents) {
-                currentAgent = agentData.agents.find(a => a.name === username);
-            }
-
-            if(currentAgent) {
-                document.getElementById('agent-display').innerText = `AGENT: ${currentAgent.name.toUpperCase()}`;
-                document.getElementById('connection-status').innerText = "[ ONLINE ]";
-                document.getElementById('connection-status').style.color = "var(--primary)";
-                refreshMapData();
-                setInterval(refreshMapData, 5000); // Auto-refresh 5sec
-            } else {
-                alert("ERREUR PROFIL AGENT.");
-            }
-        }
-
-        async function refreshMapData() {
-            // POINTS
-            const ptsData = await api.get('points');
-            const dwgData = await api.get('drawings');
-            
-            itemsLayer.clearLayers();
-
-            if(ptsData && ptsData.points) {
-                ptsData.points.forEach(pt => {
-                    // Note: API stocke map_x/map_y, Leaflet utilise Lat(Y)/Lng(X)
-                    const y = pt.map_y || pt.lat; // Support rétroactif
-                    const x = pt.map_x || pt.lng;
-                    const imp = pt.importance_level || 1;
-                    
-                    const icon = L.divIcon({ 
-                        className: `custom-marker imp-${imp}`, html: imp, 
-                        iconSize: [20+(imp*4), 20+(imp*4)], iconAnchor: [10+(imp*2), 10+(imp*2)] 
-                    });
-                    
-                    const m = L.marker([y, x], {icon: icon});
-                    m.bindPopup(createPopupContent("INTEL", pt.id, pt.description, pt.creator_name, imp, 'delete_point'));
-                    itemsLayer.addLayer(m);
-                });
-            }
-
-            // DRAWINGS
-            if(dwgData && dwgData.drawings) {
-                dwgData.drawings.forEach(dw => {
-                    const imp = dw.importance_level || 1;
-                    let col = '#00ff9d';
-                    if(imp == 2) col = '#eebb00';
-                    if(imp == 3) col = '#ff9900';
-                    if(imp == 4) col = '#ff3333';
-
-                    const l = L.geoJSON(dw.geojson, { style: { color: col, weight: 2, fillOpacity: 0.2 } });
-                    l.bindPopup(createPopupContent("ZONE", dw.id, dw.description, dw.creator_name, imp, 'delete_drawing'));
-                    itemsLayer.addLayer(l);
-                });
-            }
-        }
-
-        function createPopupContent(type, id, desc, author, imp, deleteAction) {
-            let color = 'var(--primary)';
-            if(imp > 2) color = 'var(--danger)';
-            return `
-                <div style="min-width:180px">
-                    <h4 style="color:${color}">${type} #${id}</h4>
-                    <div style="font-size:0.75rem; margin-bottom:5px; color:#888;">OP: ${author || 'Unknown'}</div>
-                    <p style="background:rgba(255,255,255,0.05); padding:5px; border-left:2px solid ${color}">${desc}</p>
-                    <button class="delete-btn" onclick="triggerDelete('${deleteAction}', ${id})">SUPPRIMER</button>
-                </div>
-            `;
-        }
-
-        // --- INTERACTIONS ---
         let drawControlAdded = false;
         const descInput = document.getElementById('point-desc');
         const indic = document.getElementById('add-mode-indicator');
 
-        descInput.addEventListener('input', () => {
+        function updateInterface() {
             if(descInput.value.trim().length > 0) {
-                indic.innerHTML = "<span style='color:var(--primary)'>[ SYSTÈMES ARMÉS ]</span><br>CLIQUEZ SUR CARTE.";
-                indic.classList.add('active');
+                indic.innerHTML = "<span style='color:var(--primary); font-weight:bold; animation: blink 1s infinite;'>[ SYSTÈMES ARMÉS ]</span><br>CLIQUEZ SUR LA CARTE.";
+                descInput.style.borderColor = "var(--primary)";
                 if(!drawControlAdded) { map.addControl(drawControl); drawControlAdded = true; }
             } else {
                 indic.innerHTML = "STANDBY. SAISISSEZ UNE DESCRIPTION.";
-                indic.classList.remove('active');
+                descInput.style.borderColor = "var(--dim)";
                 if(drawControlAdded) { map.removeControl(drawControl); drawControlAdded = false; }
             }
-        });
+        }
+        descInput.addEventListener('input', updateInterface);
 
-        // 1. CLICK CARTE (AJOUT POINT)
         map.on('click', async (e) => {
-            if(drawControl._toolbars.draw._activeMode) return; // Si mode dessin, on ignore
+            if(drawControl._toolbars.draw._activeMode) return;
+
             const desc = descInput.value;
             if(!desc) { 
                 descInput.focus();
-                descInput.style.borderColor = 'var(--danger)';
-                setTimeout(() => descInput.style.borderColor = 'var(--dim)', 500);
+                descInput.style.borderColor = "var(--danger)";
                 return; 
             }
 
+            addMarkerToMap({
+                id: Date.now(),
+                map_x: e.latlng.lng,
+                map_y: e.latlng.lat,
+                description: desc,
+                importance_level: document.getElementById('point-importance').value,
+                creator_name: localStorage.getItem('sas_user')
+            });
+
             await api.post({
                 action: 'add_point',
-                creator_id: currentAgent.id,
-                map_x: e.latlng.lng, // X
-                map_y: e.latlng.lat, // Y
+                map_x: e.latlng.lng,
+                map_y: e.latlng.lat,
                 description: desc,
                 importance_level: document.getElementById('point-importance').value
             });
 
             descInput.value = '';
-            descInput.dispatchEvent(new Event('input')); // Update UI state
-            refreshMapData();
+            updateInterface();
         });
 
-        // 2. DESSIN CRÉÉ
-        map.on(L.Draw.Event.CREATED, async (e) => {
-            const desc = descInput.value;
-            if(!desc) return; // Should be handled by UI visibility
-
-            await api.post({
-                action: 'add_drawing',
-                drawing_creator_id: currentAgent.id,
-                type: e.layerType,
-                geojson: e.layer.toGeoJSON(),
-                description: desc,
-                importance_level: document.getElementById('point-importance').value
+        function addMarkerToMap(pt) {
+            const y = pt.map_y || pt.lat;
+            const x = pt.map_x || pt.lng;
+            const imp = pt.importance_level || 1;
+            
+            const icon = L.divIcon({ 
+                className: `custom-marker imp-${imp}`, html: imp, 
+                iconSize: [20+(imp*4), 20+(imp*4)], iconAnchor: [10+(imp*2), 10+(imp*2)] 
             });
+            
+            const m = L.marker([y, x], {icon: icon});
+            
+            let color = 'var(--primary)';
+            if(imp > 2) color = 'var(--danger)';
+            
+            m.bindPopup(`
+                <div style="min-width:180px">
+                    <h4 style="color:${color}; margin:0; border-bottom:1px solid #333">INTEL #${pt.id}</h4>
+                    <div style="font-size:0.75rem; color:#888;">OP: ${pt.creator_name}</div>
+                    <p style="margin:10px 0; font-size:0.9rem;">${pt.description}</p>
+                    <button class="delete-btn" onclick="this.closest('.leaflet-popup')._source.remove()">RETIRER (LOCAL)</button>
+                </div>
+            `);
+            itemsLayer.addLayer(m);
+        }
 
-            descInput.value = '';
-            descInput.dispatchEvent(new Event('input'));
-            refreshMapData();
-        });
+        async function initSystem() {
+            document.getElementById('connection-status').innerText = "[ INITIALIZED ]";
+            document.getElementById('agent-display').innerText = "AGENT: " + localStorage.getItem('sas_user');
+            
+            const data = await api.get('points');
+            if(data && data.points) {
+                data.points.forEach(p => addMarkerToMap(p));
+            }
+        }
 
-        // 3. SUPPRESSION
-        window.triggerDelete = async (action, id) => {
-            if(!confirm("CONFIRMER SUPPRESSION ?")) return;
-            // Adaptation payload selon type
-            let payload = { action: action };
-            if(action === 'delete_point') payload.point_id = id;
-            if(action === 'delete_drawing') payload.drawing_id = id;
+        initSystem();
 
-            await api.post(payload);
-            refreshMapData();
-        };
-
-        // --- UTILS ---
         map.on('mousemove', (e) => {
             document.getElementById('mouse-coords').innerText = `X:${Math.round(e.latlng.lng)} Y:${Math.round(e.latlng.lat)}`;
         });
         setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString(), 1000);
-
-        // START
-        initSystem();
 
     </script>
 </body>
